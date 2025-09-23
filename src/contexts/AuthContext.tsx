@@ -1,6 +1,7 @@
 import React, { createContext, useReducer, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { AuthState, AuthContextType, LoginRequest, User } from '../types/auth';
+import { apiService } from '../services/api';
 
 // Initial state
 const initialState: AuthState = {
@@ -112,19 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         dispatch({ type: 'LOGIN_START' });
 
         try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(credentials),
-            });
-
-            if (!response.ok) {
-                throw new Error('Login failed');
-            }
-
-            const data = await response.json();
+            const data = await apiService.login(credentials);
 
             // Store in localStorage
             localStorage.setItem('auth_token', data.access_token);
@@ -151,18 +140,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Refresh token function
     const refreshToken = async (): Promise<void> => {
         try {
-            const response = await fetch('/api/auth/refresh', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${state.token}`,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error('Token refresh failed');
-            }
-
-            const data = await response.json();
+            const data = await apiService.refreshToken();
 
             // Update stored token
             localStorage.setItem('auth_token', data.access_token);
