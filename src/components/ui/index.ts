@@ -1,6 +1,6 @@
 // Export all UI components
-export { default as Button } from './Button';
-export { default as Input } from './Input';
-export { default as Modal } from './Modal';
-export { default as Table } from './Table';
-export { default as Card } from './Card';
+export { Button } from './Button';
+export { Input } from './Input';
+export { Card, CardHeader, CardTitle, CardContent } from './Card';
+export { Badge } from './Badge';
+export { LoadingSpinner, LoadingPage } from './Loading';

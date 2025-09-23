@@ -2,7 +2,7 @@
 
 ## 📁 Project Structure
 
-```
+```text
 src/
 ├── components/           # Reusable UI components
 │   ├── ui/              # Basic UI components (Button, Input, Modal, etc.)
@@ -23,36 +23,43 @@ src/
 ## 🎯 Purpose of Each Folder
 
 ### Components
+
 - **ui/**: Basic, reusable UI components (buttons, inputs, modals)
 - **forms/**: Complex form components with validation
 - **layout/**: Layout and navigation components
 
 ### Pages
+
 - **auth/**: Authentication and user management
 - **dashboard/**: Main application dashboard
 - **persons/**: Person (client/supplier) management
 
 ### Services
+
 - API communication layer
 - External service integrations
 - Data fetching logic
 
 ### Hooks
+
 - Custom React hooks for reusable logic
 - State management hooks
 - API integration hooks
 
 ### Utils
+
 - Helper functions
 - Constants
 - Validation utilities
 
 ### Types
+
 - TypeScript interfaces and types
 - API response types
 - Component prop types
 
 ### Contexts
+
 - React contexts for global state
 - Theme management
 - Authentication state
