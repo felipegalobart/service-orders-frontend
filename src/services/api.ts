@@ -1,6 +1,6 @@
 import { API_CONFIG, buildApiUrl } from '../config/api';
 import type { LoginRequest, LoginResponse } from '../types/auth';
-import type { Person, CreatePersonRequest, UpdatePersonRequest, PersonListResponse } from '../types/person';
+import type { Person, CreatePersonRequest, UpdatePersonRequest, PersonListResponse, PaginationParams } from '../types/person';
 
 // Classe para gerenciar requisições HTTP
 class ApiService {
@@ -77,11 +77,37 @@ class ApiService {
   }
 
   // Métodos para pessoas
-  async getPersons(): Promise<Person[]> {
-    const response = await this.request<PersonListResponse>(API_CONFIG.ENDPOINTS.PERSONS.LIST, {
+  async getPersons(params?: PaginationParams): Promise<PersonListResponse> {
+    // Se há busca, usar endpoint específico de busca
+    if (params?.search && params.search.trim()) {
+      const queryParams = new URLSearchParams();
+      queryParams.append('q', params.search.trim());
+      
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+      if (params?.type && params.type !== 'all') queryParams.append('type', params.type);
+      
+      const endpoint = `${API_CONFIG.ENDPOINTS.PERSONS.LIST}/search?${queryParams.toString()}`;
+      
+      return this.request<PersonListResponse>(endpoint, {
+        method: 'GET',
+      });
+    }
+    
+    // Caso contrário, usar endpoint normal
+    const queryParams = new URLSearchParams();
+    
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.type && params.type !== 'all') queryParams.append('type', params.type);
+    
+    const endpoint = queryParams.toString() 
+      ? `${API_CONFIG.ENDPOINTS.PERSONS.LIST}?${queryParams.toString()}`
+      : API_CONFIG.ENDPOINTS.PERSONS.LIST;
+    
+    return this.request<PersonListResponse>(endpoint, {
       method: 'GET',
     });
-    return response.data || response;
   }
 
   async getPersonById(id: string): Promise<Person> {

@@ -6,6 +6,7 @@ interface InputProps {
     placeholder?: string;
     value: string;
     onChange: (value: string) => void;
+    onKeyPress?: (e: React.KeyboardEvent) => void;
     error?: string;
     disabled?: boolean;
     required?: boolean;
@@ -18,6 +19,7 @@ export const Input: React.FC<InputProps> = ({
     placeholder,
     value,
     onChange,
+    onKeyPress,
     error,
     disabled = false,
     required = false,
@@ -42,6 +44,7 @@ export const Input: React.FC<InputProps> = ({
                 placeholder={placeholder}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
+                onKeyPress={onKeyPress}
                 disabled={disabled}
                 required={required}
                 className={inputClasses}

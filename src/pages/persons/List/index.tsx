@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, Button, Badge, Input, LoadingSpinner } from '../../../components/ui';
+import { Card, CardContent, Button, Badge, Input, LoadingSpinner, Pagination } from '../../../components/ui';
 import { apiService } from '../../../services/api';
-import type { Person } from '../../../types/person';
+import type { Person, PersonListResponse, PaginationParams } from '../../../types/person';
 
 const PersonList: React.FC = () => {
     const [persons, setPersons] = useState<Person[]>([]);
@@ -11,12 +11,36 @@ const PersonList: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterType, setFilterType] = useState<'all' | 'customer' | 'supplier'>('all');
 
-    const fetchPersons = async () => {
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const [itemsPerPage] = useState(10);
+
+    const fetchPersons = useCallback(async (page: number = 1, search: string = '', type: string = 'all') => {
         try {
             setLoading(true);
             setError(null);
-            const data = await apiService.getPersons();
-            setPersons(data);
+
+            const params: PaginationParams = {
+                page,
+                limit: itemsPerPage,
+            };
+
+            if (search.trim()) {
+                params.search = search.trim();
+            }
+
+            if (type !== 'all') {
+                params.type = type as 'customer' | 'supplier';
+            }
+
+            const response: PersonListResponse = await apiService.getPersons(params);
+
+            setPersons(response.data);
+            setTotalItems(response.total);
+            setTotalPages(Math.ceil(response.total / itemsPerPage));
+            setCurrentPage(response.page);
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar pessoas';
             setError(errorMessage);
@@ -24,25 +48,46 @@ const PersonList: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [itemsPerPage]);
 
     const refetch = async () => {
-        await fetchPersons();
+        await fetchPersons(1, searchTerm, filterType);
     };
 
+    // Initial load
     useEffect(() => {
-        fetchPersons();
-    }, []);
+        fetchPersons(1, '', 'all');
+    }, [fetchPersons]);
 
-    const filteredPersons = persons.filter((person: Person) => {
-        const matchesSearch = person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (person.document && person.document.includes(searchTerm)) ||
-            (person.corporateName && person.corporateName.toLowerCase().includes(searchTerm.toLowerCase()));
+    // Handle search change (just update state, no API call)
+    const handleSearchChange = (value: string) => {
+        setSearchTerm(value);
+    };
 
-        const matchesFilter = filterType === 'all' || person.type === filterType;
+    // Handle search submit (manual search with button)
+    const handleSearchSubmit = () => {
+        setCurrentPage(1);
+        fetchPersons(1, searchTerm, filterType);
+    };
 
-        return matchesSearch && matchesFilter;
-    });
+    // Handle filter change
+    const handleFilterChange = (type: 'all' | 'customer' | 'supplier') => {
+        setFilterType(type);
+        setCurrentPage(1);
+        fetchPersons(1, searchTerm, type);
+    };
+
+    // Handle Enter key in search input
+    const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleSearchSubmit();
+        }
+    };
+
+    // Handle page change
+    const handlePageChange = (page: number) => {
+        fetchPersons(page, searchTerm, filterType);
+    };
 
     const getPersonTypeIcon = (type: 'customer' | 'supplier') => {
         if (type === 'customer') {
@@ -136,31 +181,44 @@ const PersonList: React.FC = () => {
             <Card className="mb-6">
                 <CardContent>
                     <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1">
-                            <Input
-                                placeholder="Buscar por nome, documento ou razão social..."
-                                value={searchTerm}
-                                onChange={setSearchTerm}
-                            />
+                        <div className="flex-1 flex gap-2">
+                            <div className="flex-1">
+                                <Input
+                                    placeholder="Buscar por nome, documento ou razão social..."
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                    onKeyPress={handleSearchKeyPress}
+                                />
+                            </div>
+                            <Button
+                                onClick={handleSearchSubmit}
+                                disabled={loading}
+                                className="px-6"
+                            >
+                                <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                Buscar
+                            </Button>
                         </div>
                         <div className="flex gap-2">
                             <Button
                                 variant={filterType === 'all' ? 'primary' : 'secondary'}
-                                onClick={() => setFilterType('all')}
+                                onClick={() => handleFilterChange('all')}
                                 size="sm"
                             >
                                 Todos
                             </Button>
                             <Button
                                 variant={filterType === 'customer' ? 'primary' : 'secondary'}
-                                onClick={() => setFilterType('customer')}
+                                onClick={() => handleFilterChange('customer')}
                                 size="sm"
                             >
                                 Clientes
                             </Button>
                             <Button
                                 variant={filterType === 'supplier' ? 'primary' : 'secondary'}
-                                onClick={() => setFilterType('supplier')}
+                                onClick={() => handleFilterChange('supplier')}
                                 size="sm"
                             >
                                 Fornecedores
@@ -173,13 +231,15 @@ const PersonList: React.FC = () => {
             {/* Results */}
             <div className="mb-4">
                 <p className="text-sm text-gray-600">
-                    {filteredPersons.length} {filteredPersons.length === 1 ? 'pessoa encontrada' : 'pessoas encontradas'}
+                    {totalItems} {totalItems === 1 ? 'pessoa encontrada' : 'pessoas encontradas'}
+                    {searchTerm && ` para "${searchTerm}"`}
+                    {filterType !== 'all' && ` (${filterType === 'customer' ? 'Clientes' : 'Fornecedores'})`}
                 </p>
             </div>
 
             {/* Person List */}
             <div className="space-y-4">
-                {filteredPersons.length === 0 ? (
+                {persons.length === 0 ? (
                     <Card>
                         <CardContent>
                             <div className="text-center py-12">
@@ -197,7 +257,7 @@ const PersonList: React.FC = () => {
                         </CardContent>
                     </Card>
                 ) : (
-                    filteredPersons.map((person: Person) => (
+                    persons.map((person: Person) => (
                         <Card key={person._id} className="hover:shadow-lg transition-shadow">
                             <CardContent>
                                 <div className="flex items-start justify-between">
@@ -282,6 +342,19 @@ const PersonList: React.FC = () => {
                     ))
                 )}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="mt-8">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalItems={totalItems}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={handlePageChange}
+                    />
+                </div>
+            )}
         </div>
     );
 };

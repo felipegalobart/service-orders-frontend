@@ -4,3 +4,4 @@ export { Input } from './Input';
 export { Card, CardHeader, CardTitle, CardContent } from './Card';
 export { Badge } from './Badge';
 export { LoadingSpinner, LoadingPage } from './Loading';
+export { Pagination } from './Pagination';

@@ -31,7 +31,7 @@ const Login: React.FC = () => {
         try {
             await login({ email, password });
             // Navigation will be handled by the redirect above
-        } catch (err) {
+        } catch {
             setError('Email ou senha inválidos');
         } finally {
             setIsLoading(false);
