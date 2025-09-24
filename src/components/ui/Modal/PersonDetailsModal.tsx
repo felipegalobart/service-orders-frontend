@@ -4,6 +4,7 @@ import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { PersonEditForm } from './PersonEditForm';
 import { Notification, useNotification } from '../Notification';
+import { formatPhoneNumber } from '../../../utils/formatters';
 import { apiService } from '../../../services/api';
 import type { Person, UpdatePersonRequest } from '../../../types/person';
 
@@ -234,7 +235,7 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
                                                                 Telefone
                                                             </label>
                                                             <div className="flex items-center space-x-2">
-                                                                <p className="text-sm text-gray-900">{contact.phone}</p>
+                                                                <p className="text-sm text-gray-900">{formatPhoneNumber(contact.phone)}</p>
                                                                 {contact.isWhatsApp && (
                                                                     <Badge variant="success" size="sm">
                                                                         WhatsApp

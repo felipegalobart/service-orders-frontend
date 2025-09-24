@@ -8,3 +8,6 @@ export { Pagination } from './Pagination';
 export { AdvancedFilters } from './AdvancedFilters';
 export { Modal, PersonDetailsModal, PersonEditForm } from './Modal';
 export { Notification, useNotification } from './Notification';
+export { PhoneInput } from './PhoneInput';
+export { DocumentInput } from './DocumentInput';
+export { CEPInput } from './CEPInput';

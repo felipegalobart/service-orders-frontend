@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from '../Input';
 import { Button } from '../Button';
+import { PhoneInput } from '../PhoneInput';
+import { DocumentInput } from '../DocumentInput';
+import { CEPInput } from '../CEPInput';
 import type { Person } from '../../../types/person';
 
 interface PersonEditFormProps {
@@ -159,7 +162,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                     </div>
 
                     <div>
-                        <Input
+                        <DocumentInput
                             label="Documento *"
                             value={formData.document}
                             onChange={(value) => handleInputChange('document', value)}
@@ -304,9 +307,8 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                                     onChange={(value) => updateContact(index, 'sector', value)}
                                 />
 
-                                <Input
+                                <PhoneInput
                                     label="Telefone"
-                                    type="tel"
                                     value={contact.phone}
                                     onChange={(value) => updateContact(index, 'phone', value)}
                                 />
@@ -387,7 +389,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                                     onChange={(value) => updateAddress(index, 'number', value)}
                                 />
 
-                                <Input
+                                <CEPInput
                                     label="CEP"
                                     value={address.zipCode}
                                     onChange={(value) => updateAddress(index, 'zipCode', value)}
