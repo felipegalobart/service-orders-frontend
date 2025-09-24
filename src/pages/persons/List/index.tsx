@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, Button, Badge, LoadingSpinner, Pagination, AdvancedFilters } from '../../../components/ui';
+import { Card, CardContent, Button, Badge, LoadingSpinner, Pagination, AdvancedFilters, PersonDetailsModal } from '../../../components/ui';
 import { apiService } from '../../../services/api';
 import type { Person, PersonListResponse, PaginationParams } from '../../../types/person';
 import type { FilterOptions } from '../../../components/ui/AdvancedFilters';
@@ -9,6 +9,10 @@ const PersonList: React.FC = () => {
     const [persons, setPersons] = useState<Person[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Modal state
+    const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Filtros avançados
     const [filters, setFilters] = useState<FilterOptions>({
@@ -99,6 +103,17 @@ const PersonList: React.FC = () => {
     // Handle page change
     const handlePageChange = (page: number) => {
         fetchPersons(page, filters);
+    };
+
+    // Handle modal
+    const handleViewDetails = (person: Person) => {
+        setSelectedPerson(person);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedPerson(null);
     };
 
     const getPersonTypeIcon = (type: 'customer' | 'supplier') => {
@@ -301,6 +316,17 @@ const PersonList: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="flex space-x-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleViewDetails(person)}
+                                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                        >
+                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </Button>
                                         <Button variant="ghost" size="sm">
                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -331,6 +357,13 @@ const PersonList: React.FC = () => {
                     />
                 </div>
             )}
+
+            {/* Person Details Modal */}
+            <PersonDetailsModal
+                person={selectedPerson}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+            />
         </div>
     );
 };

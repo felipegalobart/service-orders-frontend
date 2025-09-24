@@ -6,3 +6,4 @@ export { Badge } from './Badge';
 export { LoadingSpinner, LoadingPage } from './Loading';
 export { Pagination } from './Pagination';
 export { AdvancedFilters } from './AdvancedFilters';
+export { Modal, PersonDetailsModal } from './Modal';
