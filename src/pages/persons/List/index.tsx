@@ -1,15 +1,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, Button, Badge, Input, LoadingSpinner, Pagination } from '../../../components/ui';
+import { Card, CardContent, Button, Badge, LoadingSpinner, Pagination, AdvancedFilters } from '../../../components/ui';
 import { apiService } from '../../../services/api';
 import type { Person, PersonListResponse, PaginationParams } from '../../../types/person';
+import type { FilterOptions } from '../../../components/ui/AdvancedFilters';
 
 const PersonList: React.FC = () => {
     const [persons, setPersons] = useState<Person[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterType, setFilterType] = useState<'all' | 'customer' | 'supplier'>('all');
+
+    // Filtros avançados
+    const [filters, setFilters] = useState<FilterOptions>({
+        search: '',
+        type: 'all',
+        personType: 'all',
+        status: 'all',
+        blacklist: 'all',
+        dateFrom: '',
+        dateTo: ''
+    });
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -17,7 +27,7 @@ const PersonList: React.FC = () => {
     const [totalItems, setTotalItems] = useState(0);
     const [itemsPerPage] = useState(10);
 
-    const fetchPersons = useCallback(async (page: number = 1, search: string = '', type: string = 'all') => {
+    const fetchPersons = useCallback(async (page: number = 1, filterOptions: FilterOptions = filters) => {
         try {
             setLoading(true);
             setError(null);
@@ -25,15 +35,14 @@ const PersonList: React.FC = () => {
             const params: PaginationParams = {
                 page,
                 limit: itemsPerPage,
+                search: filterOptions.search,
+                type: filterOptions.type,
+                personType: filterOptions.personType,
+                status: filterOptions.status,
+                blacklist: filterOptions.blacklist,
+                dateFrom: filterOptions.dateFrom,
+                dateTo: filterOptions.dateTo
             };
-
-            if (search.trim()) {
-                params.search = search.trim();
-            }
-
-            if (type !== 'all') {
-                params.type = type as 'customer' | 'supplier';
-            }
 
             const response: PersonListResponse = await apiService.getPersons(params);
 
@@ -44,49 +53,52 @@ const PersonList: React.FC = () => {
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar pessoas';
             setError(errorMessage);
-            console.error('Erro ao carregar pessoas:', err);
+            console.error('❌ Erro ao carregar pessoas:', err);
         } finally {
             setLoading(false);
         }
-    }, [itemsPerPage]);
+    }, [itemsPerPage, filters]);
 
     const refetch = async () => {
-        await fetchPersons(1, searchTerm, filterType);
+        await fetchPersons(1, filters);
     };
 
     // Initial load
     useEffect(() => {
-        fetchPersons(1, '', 'all');
-    }, [fetchPersons]);
+        fetchPersons(1, filters);
+    }, []); // Só executa uma vez no mount
 
-    // Handle search change (just update state, no API call)
-    const handleSearchChange = (value: string) => {
-        setSearchTerm(value);
+    // Handle filters change
+    const handleFiltersChange = (newFilters: FilterOptions) => {
+        setFilters(newFilters);
     };
 
-    // Handle search submit (manual search with button)
-    const handleSearchSubmit = () => {
+    // Handle search
+    const handleSearch = (searchFilters?: FilterOptions) => {
         setCurrentPage(1);
-        fetchPersons(1, searchTerm, filterType);
+        const filtersToUse = searchFilters || filters;
+        fetchPersons(1, filtersToUse);
     };
 
-    // Handle filter change
-    const handleFilterChange = (type: 'all' | 'customer' | 'supplier') => {
-        setFilterType(type);
+    // Handle clear filters
+    const handleClearFilters = () => {
+        const clearedFilters: FilterOptions = {
+            search: '',
+            type: 'all',
+            personType: 'all',
+            status: 'all',
+            blacklist: 'all',
+            dateFrom: '',
+            dateTo: ''
+        };
+        setFilters(clearedFilters);
         setCurrentPage(1);
-        fetchPersons(1, searchTerm, type);
-    };
-
-    // Handle Enter key in search input
-    const handleSearchKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-            handleSearchSubmit();
-        }
+        fetchPersons(1, clearedFilters);
     };
 
     // Handle page change
     const handlePageChange = (page: number) => {
-        fetchPersons(page, searchTerm, filterType);
+        fetchPersons(page, filters);
     };
 
     const getPersonTypeIcon = (type: 'customer' | 'supplier') => {
@@ -177,63 +189,27 @@ const PersonList: React.FC = () => {
                 </div>
             </div>
 
+
             {/* Filters */}
-            <Card className="mb-6">
-                <CardContent>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 flex gap-2">
-                            <div className="flex-1">
-                                <Input
-                                    placeholder="Buscar por nome, documento ou razão social..."
-                                    value={searchTerm}
-                                    onChange={handleSearchChange}
-                                    onKeyPress={handleSearchKeyPress}
-                                />
-                            </div>
-                            <Button
-                                onClick={handleSearchSubmit}
-                                disabled={loading}
-                                className="px-6"
-                            >
-                                <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                                Buscar
-                            </Button>
-                        </div>
-                        <div className="flex gap-2">
-                            <Button
-                                variant={filterType === 'all' ? 'primary' : 'secondary'}
-                                onClick={() => handleFilterChange('all')}
-                                size="sm"
-                            >
-                                Todos
-                            </Button>
-                            <Button
-                                variant={filterType === 'customer' ? 'primary' : 'secondary'}
-                                onClick={() => handleFilterChange('customer')}
-                                size="sm"
-                            >
-                                Clientes
-                            </Button>
-                            <Button
-                                variant={filterType === 'supplier' ? 'primary' : 'secondary'}
-                                onClick={() => handleFilterChange('supplier')}
-                                size="sm"
-                            >
-                                Fornecedores
-                            </Button>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+            <div className="mb-6">
+                <AdvancedFilters
+                    filters={filters}
+                    onFiltersChange={handleFiltersChange}
+                    onSearch={handleSearch}
+                    onClearFilters={handleClearFilters}
+                    loading={loading}
+                />
+            </div>
 
             {/* Results */}
             <div className="mb-4">
                 <p className="text-sm text-gray-600">
                     {totalItems} {totalItems === 1 ? 'pessoa encontrada' : 'pessoas encontradas'}
-                    {searchTerm && ` para "${searchTerm}"`}
-                    {filterType !== 'all' && ` (${filterType === 'customer' ? 'Clientes' : 'Fornecedores'})`}
+                    {filters.search && ` para "${filters.search}"`}
+                    {filters.type !== 'all' && ` (${filters.type === 'customer' ? 'Clientes' : 'Fornecedores'})`}
+                    {filters.personType !== 'all' && ` - ${filters.personType === 'physical' ? 'Pessoa Física' : 'Pessoa Jurídica'}`}
+                    {filters.status !== 'all' && ` - ${filters.status === 'active' ? 'Ativos' : 'Inativos'}`}
+                    {filters.blacklist !== 'all' && ` - ${filters.blacklist === 'blocked' ? 'Bloqueados' : 'Não Bloqueados'}`}
                 </p>
             </div>
 
@@ -248,7 +224,7 @@ const PersonList: React.FC = () => {
                                 </svg>
                                 <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhuma pessoa encontrada</h3>
                                 <p className="mt-1 text-sm text-gray-500">
-                                    {searchTerm || filterType !== 'all'
+                                    {(filters.search || filters.type !== 'all' || filters.personType !== 'all' || filters.status !== 'all' || filters.blacklist !== 'all' || filters.dateFrom || filters.dateTo)
                                         ? 'Tente ajustar os filtros de busca.'
                                         : 'Comece criando uma nova pessoa.'
                                     }

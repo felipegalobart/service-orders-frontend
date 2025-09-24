@@ -78,14 +78,27 @@ class ApiService {
 
   // Métodos para pessoas
   async getPersons(params?: PaginationParams): Promise<PersonListResponse> {
-    // Se há busca, usar endpoint específico de busca
-    if (params?.search && params.search.trim()) {
+    // Se há busca, usar endpoint específico de busca (mínimo 2 caracteres)
+    if (params?.search && params.search.trim() && params.search.trim().length >= 2) {
       const queryParams = new URLSearchParams();
       queryParams.append('q', params.search.trim());
       
       if (params?.page) queryParams.append('page', params.page.toString());
       if (params?.limit) queryParams.append('limit', params.limit.toString());
       if (params?.type && params.type !== 'all') queryParams.append('type', params.type);
+      if (params?.personType && params.personType !== 'all') {
+        const personTypeValue = params.personType === 'physical' ? 'false' : 'true';
+        queryParams.append('pessoaJuridica', personTypeValue);
+      }
+      // Nota: Filtros de status e blacklist não implementados na API ainda
+      // if (params?.status && params.status !== 'all') {
+      //   queryParams.append('isActive', params.status === 'active' ? 'true' : 'false');
+      // }
+      // if (params?.blacklist && params.blacklist !== 'all') {
+      //   queryParams.append('blacklist', params.blacklist === 'blocked' ? 'true' : 'false');
+      // }
+      if (params?.dateFrom) queryParams.append('dateFrom', params.dateFrom);
+      if (params?.dateTo) queryParams.append('dateTo', params.dateTo);
       
       const endpoint = `${API_CONFIG.ENDPOINTS.PERSONS.LIST}/search?${queryParams.toString()}`;
       
@@ -100,6 +113,19 @@ class ApiService {
     if (params?.page) queryParams.append('page', params.page.toString());
     if (params?.limit) queryParams.append('limit', params.limit.toString());
     if (params?.type && params.type !== 'all') queryParams.append('type', params.type);
+    if (params?.personType && params.personType !== 'all') {
+      const personTypeValue = params.personType === 'physical' ? 'false' : 'true';
+      queryParams.append('pessoaJuridica', personTypeValue);
+    }
+    // Nota: Filtros de status e blacklist não implementados na API ainda
+    // if (params?.status && params.status !== 'all') {
+    //   queryParams.append('isActive', params.status === 'active' ? 'true' : 'false');
+    // }
+    // if (params?.blacklist && params.blacklist !== 'all') {
+    //   queryParams.append('blacklist', params.blacklist === 'blocked' ? 'true' : 'false');
+    // }
+    if (params?.dateFrom) queryParams.append('dateFrom', params.dateFrom);
+    if (params?.dateTo) queryParams.append('dateTo', params.dateTo);
     
     const endpoint = queryParams.toString() 
       ? `${API_CONFIG.ENDPOINTS.PERSONS.LIST}?${queryParams.toString()}`

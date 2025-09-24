@@ -66,4 +66,9 @@ export interface PaginationParams {
   limit?: number;
   search?: string;
   type?: 'customer' | 'supplier' | 'all';
+  personType?: 'all' | 'physical' | 'legal';
+  status?: 'all' | 'active' | 'inactive';
+  blacklist?: 'all' | 'blocked' | 'unblocked';
+  dateFrom?: string;
+  dateTo?: string;
 }
