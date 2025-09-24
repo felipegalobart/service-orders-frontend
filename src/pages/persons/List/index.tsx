@@ -111,6 +111,15 @@ const PersonList: React.FC = () => {
         setIsModalOpen(true);
     };
 
+    const handlePersonUpdate = (updatedPerson: Person) => {
+        // Atualiza a pessoa na lista local
+        setPersons(prevPersons =>
+            prevPersons.map(person =>
+                person._id === updatedPerson._id ? updatedPerson : person
+            )
+        );
+    };
+
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setSelectedPerson(null);
@@ -363,6 +372,7 @@ const PersonList: React.FC = () => {
                 person={selectedPerson}
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
+                onUpdate={handlePersonUpdate}
             />
         </div>
     );

@@ -48,10 +48,16 @@ export interface CreatePersonRequest {
 export interface UpdatePersonRequest {
   name?: string;
   corporateName?: string;
+  tradeName?: string;
   document?: string;
-  type?: 'client' | 'supplier';
+  stateRegistration?: string;
+  type?: 'customer' | 'supplier';
+  pessoaJuridica?: boolean;
+  blacklist?: boolean;
+  isActive?: boolean;
   contacts?: Contact[];
   addresses?: Address[];
+  notes?: string;
 }
 
 export interface PersonListResponse {
