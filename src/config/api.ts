@@ -4,7 +4,7 @@ export const API_CONFIG = {
   BASE_URL: '/api',
   
   // Base URL para produção (altere conforme necessário)
-  PRODUCTION_URL: 'https://sua-api.com',
+  PRODUCTION_URL: 'http://192.168.31.75:3000',
   
   // URLs específicas dos endpoints
   ENDPOINTS: {
