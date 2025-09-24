@@ -1,5 +1,5 @@
 // Export all types
 export * from './auth';
-// TODO: Add types when implemented
-// export * from './person';
+export * from './person';
+// TODO: Add more types when implemented
 // export * from './api';

@@ -1,5 +1,6 @@
 import { API_CONFIG, buildApiUrl } from '../config/api';
 import type { LoginRequest, LoginResponse } from '../types/auth';
+import type { Person, CreatePersonRequest, UpdatePersonRequest, PersonListResponse } from '../types/person';
 
 // Classe para gerenciar requisições HTTP
 class ApiService {
@@ -75,22 +76,29 @@ class ApiService {
     });
   }
 
-  // Métodos para pessoas (exemplo)
-  async getPersons(): Promise<unknown[]> {
-    return this.request<unknown[]>(API_CONFIG.ENDPOINTS.PERSONS.LIST, {
+  // Métodos para pessoas
+  async getPersons(): Promise<Person[]> {
+    const response = await this.request<PersonListResponse>(API_CONFIG.ENDPOINTS.PERSONS.LIST, {
+      method: 'GET',
+    });
+    return response.data || response;
+  }
+
+  async getPersonById(id: string): Promise<Person> {
+    return this.request<Person>(`${API_CONFIG.ENDPOINTS.PERSONS.LIST}/${id}`, {
       method: 'GET',
     });
   }
 
-  async createPerson(personData: Record<string, unknown>): Promise<unknown> {
-    return this.request<unknown>(API_CONFIG.ENDPOINTS.PERSONS.CREATE, {
+  async createPerson(personData: CreatePersonRequest): Promise<Person> {
+    return this.request<Person>(API_CONFIG.ENDPOINTS.PERSONS.CREATE, {
       method: 'POST',
       body: JSON.stringify(personData),
     });
   }
 
-  async updatePerson(id: string, personData: Record<string, unknown>): Promise<unknown> {
-    return this.request<unknown>(`${API_CONFIG.ENDPOINTS.PERSONS.UPDATE}/${id}`, {
+  async updatePerson(id: string, personData: UpdatePersonRequest): Promise<Person> {
+    return this.request<Person>(`${API_CONFIG.ENDPOINTS.PERSONS.UPDATE}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(personData),
     });

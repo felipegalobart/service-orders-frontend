@@ -1,85 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, Button, Badge, Input, LoadingSpinner } from '../../../components/ui';
-
-interface Person {
-    id: string;
-    name: string;
-    corporateName?: string;
-    document: string;
-    type: 'client' | 'supplier';
-    contacts: Array<{
-        type: 'phone' | 'email';
-        value: string;
-    }>;
-    addresses: Array<{
-        street: string;
-        city: string;
-        state: string;
-        zipCode: string;
-    }>;
-}
+import { apiService } from '../../../services/api';
+import type { Person } from '../../../types/person';
 
 const PersonList: React.FC = () => {
     const [persons, setPersons] = useState<Person[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterType, setFilterType] = useState<'all' | 'client' | 'supplier'>('all');
+    const [filterType, setFilterType] = useState<'all' | 'customer' | 'supplier'>('all');
 
-    // Mock data - em produção viria da API
-    useEffect(() => {
-        const mockPersons: Person[] = [
-            {
-                id: '1',
-                name: 'João Silva',
-                document: '123.456.789-00',
-                type: 'client',
-                contacts: [
-                    { type: 'phone', value: '(11) 99999-9999' },
-                    { type: 'email', value: 'joao@email.com' }
-                ],
-                addresses: [
-                    { street: 'Rua das Flores, 123', city: 'São Paulo', state: 'SP', zipCode: '01234-567' }
-                ]
-            },
-            {
-                id: '2',
-                name: 'Maria Santos',
-                document: '987.654.321-00',
-                type: 'client',
-                contacts: [
-                    { type: 'phone', value: '(11) 88888-8888' },
-                    { type: 'email', value: 'maria@email.com' }
-                ],
-                addresses: [
-                    { street: 'Av. Paulista, 456', city: 'São Paulo', state: 'SP', zipCode: '01310-100' }
-                ]
-            },
-            {
-                id: '3',
-                name: 'Fornecedor ABC Ltda',
-                corporateName: 'Fornecedor ABC Ltda',
-                document: '12.345.678/0001-90',
-                type: 'supplier',
-                contacts: [
-                    { type: 'phone', value: '(11) 77777-7777' },
-                    { type: 'email', value: 'contato@abc.com' }
-                ],
-                addresses: [
-                    { street: 'Rua Industrial, 789', city: 'São Paulo', state: 'SP', zipCode: '04567-890' }
-                ]
-            }
-        ];
-
-        setTimeout(() => {
-            setPersons(mockPersons);
+    const fetchPersons = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await apiService.getPersons();
+            setPersons(data);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar pessoas';
+            setError(errorMessage);
+            console.error('Erro ao carregar pessoas:', err);
+        } finally {
             setLoading(false);
-        }, 1000);
+        }
+    };
+
+    const refetch = async () => {
+        await fetchPersons();
+    };
+
+    useEffect(() => {
+        fetchPersons();
     }, []);
 
-    const filteredPersons = persons.filter(person => {
+    const filteredPersons = persons.filter((person: Person) => {
         const matchesSearch = person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            person.document.includes(searchTerm) ||
+            (person.document && person.document.includes(searchTerm)) ||
             (person.corporateName && person.corporateName.toLowerCase().includes(searchTerm.toLowerCase()));
 
         const matchesFilter = filterType === 'all' || person.type === filterType;
@@ -87,8 +44,8 @@ const PersonList: React.FC = () => {
         return matchesSearch && matchesFilter;
     });
 
-    const getPersonTypeIcon = (type: 'client' | 'supplier') => {
-        if (type === 'client') {
+    const getPersonTypeIcon = (type: 'customer' | 'supplier') => {
+        if (type === 'customer') {
             return (
                 <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -115,6 +72,30 @@ const PersonList: React.FC = () => {
         );
     }
 
+    if (error) {
+        return (
+            <div className="p-6 bg-gray-50 min-h-screen">
+                <div className="flex items-center justify-center h-64">
+                    <div className="text-center max-w-md">
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                            <svg className="h-12 w-12 text-red-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <h3 className="text-lg font-medium text-red-800 mb-2">Erro ao carregar pessoas</h3>
+                            <p className="text-red-600 mb-4">{error}</p>
+                            <Button onClick={refetch} variant="secondary" size="sm">
+                                <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Tentar novamente
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
             {/* Header */}
@@ -127,14 +108,28 @@ const PersonList: React.FC = () => {
                         Gerencie clientes e fornecedores
                     </p>
                 </div>
-                <Link to="/persons/new">
-                    <Button size="lg" className="w-full sm:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                        onClick={refetch}
+                        variant="secondary"
+                        size="lg"
+                        disabled={loading}
+                        className="w-full sm:w-auto"
+                    >
                         <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
-                        Nova Pessoa
+                        {loading ? 'Atualizando...' : 'Atualizar'}
                     </Button>
-                </Link>
+                    <Link to="/persons/new">
+                        <Button size="lg" className="w-full sm:w-auto">
+                            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Nova Pessoa
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             {/* Filters */}
@@ -157,8 +152,8 @@ const PersonList: React.FC = () => {
                                 Todos
                             </Button>
                             <Button
-                                variant={filterType === 'client' ? 'primary' : 'secondary'}
-                                onClick={() => setFilterType('client')}
+                                variant={filterType === 'customer' ? 'primary' : 'secondary'}
+                                onClick={() => setFilterType('customer')}
                                 size="sm"
                             >
                                 Clientes
@@ -202,8 +197,8 @@ const PersonList: React.FC = () => {
                         </CardContent>
                     </Card>
                 ) : (
-                    filteredPersons.map((person) => (
-                        <Card key={person.id} className="hover:shadow-lg transition-shadow">
+                    filteredPersons.map((person: Person) => (
+                        <Card key={person._id} className="hover:shadow-lg transition-shadow">
                             <CardContent>
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-start space-x-4">
@@ -215,31 +210,44 @@ const PersonList: React.FC = () => {
                                                 <h3 className="text-lg font-semibold text-gray-900">
                                                     {person.name}
                                                 </h3>
-                                                <Badge variant={person.type === 'client' ? 'info' : 'success'}>
-                                                    {person.type === 'client' ? 'Cliente' : 'Fornecedor'}
+                                                <Badge variant={person.type === 'customer' ? 'info' : 'success'}>
+                                                    {person.type === 'customer' ? 'Cliente' : 'Fornecedor'}
                                                 </Badge>
+                                                {person.blacklist && (
+                                                    <Badge variant="danger" size="sm">
+                                                        Bloqueado
+                                                    </Badge>
+                                                )}
                                             </div>
                                             {person.corporateName && (
                                                 <p className="text-sm text-gray-600 mb-1">
                                                     {person.corporateName}
                                                 </p>
                                             )}
-                                            <p className="text-sm text-gray-500 mb-2">
-                                                {person.document}
-                                            </p>
+                                            {person.document && (
+                                                <p className="text-sm text-gray-500 mb-2">
+                                                    {person.document}
+                                                </p>
+                                            )}
                                             <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                                                {person.contacts.map((contact, index) => (
+                                                {person.contacts.map((contact, index: number) => (
                                                     <div key={index} className="flex items-center space-x-1">
-                                                        {contact.type === 'phone' ? (
-                                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                                            </svg>
-                                                        ) : (
-                                                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                            </svg>
+                                                        {contact.phone && (
+                                                            <>
+                                                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                                                </svg>
+                                                                <span>{contact.phone}</span>
+                                                            </>
                                                         )}
-                                                        <span>{contact.value}</span>
+                                                        {contact.email && (
+                                                            <>
+                                                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                                </svg>
+                                                                <span>{contact.email}</span>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 ))}
                                             </div>
@@ -250,7 +258,7 @@ const PersonList: React.FC = () => {
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                         </svg>
-                                                        <span>{person.addresses[0].street}, {person.addresses[0].city} - {person.addresses[0].state}</span>
+                                                        <span>{person.addresses[0].street}{person.addresses[0].number && `, ${person.addresses[0].number}`}, {person.addresses[0].city} - {person.addresses[0].state}</span>
                                                     </div>
                                                 </div>
                                             )}

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Script para popular o banco de dados com dados aleatórios de pessoas
- * Execute: node populate-database.js
+ * Script seguro para popular o banco de dados respeitando rate limiting
+ * Execute: node populate-database-safe.js
  */
 
 const API_BASE_URL = 'http://192.168.31.75:3000';
@@ -235,9 +235,19 @@ async function fazerRequisicao(url, dados) {
     }
 }
 
+// Função para aguardar rate limiting resetar
+async function aguardarRateLimit() {
+    console.log('⏳ Aguardando 65 segundos para rate limiting resetar...');
+    for (let i = 65; i > 0; i--) {
+        process.stdout.write(`\r   ${i} segundos restantes...`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    console.log('\n✅ Rate limiting resetado! Continuando...\n');
+}
+
 // Função principal
-async function popularBanco() {
-    console.log('🚀 Iniciando população do banco de dados...\n');
+async function popularBancoSeguro() {
+    console.log('🚀 Iniciando população SEGURA do banco de dados...\n');
 
     // Fazer login primeiro
     try {
@@ -247,35 +257,57 @@ async function popularBanco() {
         return;
     }
 
-    const quantidadeRegistros = 5; // Limitado a 5 para respeitar rate limiting (10/min)
+    const quantidadeRegistros = 15; // Total de registros a criar
+    const registrosPorLote = 8; // Máximo por lote (respeitando 10 req/min)
     let sucessos = 0;
     let erros = 0;
 
     console.log(`📊 Gerando ${quantidadeRegistros} registros de pessoas...`);
-    console.log(`⏱️  Rate limiting: 10 req/min (nginx config)\n`);
+    console.log(`⏱️  Rate limiting: 10 req/min (nginx config)`);
+    console.log(`📦 Processando em lotes de ${registrosPorLote} registros\n`);
 
-    for (let i = 1; i <= quantidadeRegistros; i++) {
-        try {
-            const pessoa = criarPessoaAleatoria();
+    for (let lote = 0; lote < Math.ceil(quantidadeRegistros / registrosPorLote); lote++) {
+        const inicioLote = lote * registrosPorLote + 1;
+        const fimLote = Math.min((lote + 1) * registrosPorLote, quantidadeRegistros);
 
-            console.log(`📝 Registro ${i}/${quantidadeRegistros}:`);
-            console.log(`   Nome: ${pessoa.name}`);
-            console.log(`   Documento: ${pessoa.document}`);
-            console.log(`   Tipo: ${pessoa.type === 'client' ? 'Cliente' : 'Fornecedor'}`);
-            console.log(`   Email: ${pessoa.contacts.find(c => c.type === 'email')?.value}`);
+        console.log(`📦 Lote ${lote + 1}: Registros ${inicioLote} a ${fimLote}`);
 
-            // Fazer a requisição para a API
-            const resultado = await fazerRequisicao(`${API_BASE_URL}/persons`, pessoa);
+        for (let i = inicioLote; i <= fimLote; i++) {
+            try {
+                const pessoa = criarPessoaAleatoria();
 
-            console.log(`   ✅ Criado com sucesso! ID: ${resultado.id || 'N/A'}\n`);
-            sucessos++;
+                console.log(`📝 Registro ${i}/${quantidadeRegistros}:`);
+                console.log(`   Nome: ${pessoa.name}`);
+                console.log(`   Documento: ${pessoa.document}`);
+                console.log(`   Tipo: ${pessoa.type === 'customer' ? 'Cliente' : 'Fornecedor'}`);
+                console.log(`   Email: ${pessoa.contacts[0].email}`);
 
-            // Pausa de 7 segundos para respeitar rate limiting (10 req/min)
-            await new Promise(resolve => setTimeout(resolve, 7000));
+                // Fazer a requisição para a API
+                const resultado = await fazerRequisicao(`${API_BASE_URL}/persons`, pessoa);
 
-        } catch (error) {
-            console.log(`   ❌ Erro ao criar registro: ${error.message}\n`);
-            erros++;
+                console.log(`   ✅ Criado com sucesso! ID: ${resultado._id || 'N/A'}\n`);
+                sucessos++;
+
+                // Pausa de 7 segundos para respeitar rate limiting (10 req/min)
+                if (i < fimLote) {
+                    console.log('   ⏳ Aguardando 7 segundos...');
+                    await new Promise(resolve => setTimeout(resolve, 7000));
+                }
+
+            } catch (error) {
+                console.log(`   ❌ Erro ao criar registro: ${error.message}\n`);
+                erros++;
+
+                // Se for rate limiting, aguardar
+                if (error.message.includes('429')) {
+                    await aguardarRateLimit();
+                }
+            }
+        }
+
+        // Aguardar entre lotes se não for o último
+        if (lote < Math.ceil(quantidadeRegistros / registrosPorLote) - 1) {
+            await aguardarRateLimit();
         }
     }
 
@@ -301,7 +333,7 @@ if (typeof fetch === 'undefined') {
 }
 
 // Executar o script
-popularBanco().catch(error => {
+popularBancoSeguro().catch(error => {
     console.error('💥 Erro fatal:', error);
     process.exit(1);
 });

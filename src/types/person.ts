@@ -1,0 +1,62 @@
+export interface Contact {
+  name?: string;
+  phone?: string;
+  email?: string;
+  sector?: string;
+  isWhatsApp?: boolean;
+  isDefault?: boolean;
+}
+
+export interface Address {
+  street: string;
+  number?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country?: string;
+  isDefault?: boolean;
+}
+
+export interface Person {
+  _id: string;
+  name: string;
+  document?: string;
+  corporateName?: string;
+  tradeName?: string;
+  stateRegistration?: string;
+  type: 'customer' | 'supplier';
+  pessoaJuridica: boolean;
+  blacklist: boolean;
+  isActive: boolean;
+  contacts: Contact[];
+  addresses: Address[];
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+export interface CreatePersonRequest {
+  name: string;
+  corporateName?: string;
+  document: string;
+  type: 'client' | 'supplier';
+  contacts: Contact[];
+  addresses: Address[];
+}
+
+export interface UpdatePersonRequest {
+  name?: string;
+  corporateName?: string;
+  document?: string;
+  type?: 'client' | 'supplier';
+  contacts?: Contact[];
+  addresses?: Address[];
+}
+
+export interface PersonListResponse {
+  data: Person[];
+  total: number;
+  page: number;
+  limit: number;
+}
