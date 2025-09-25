@@ -60,13 +60,13 @@ sudo systemctl restart nginx
 
 # Obter certificado SSL
 echo -e "${YELLOW}🔐 Obtendo certificado SSL...${NC}"
-echo -e "${BLUE}📋 Certificado será emitido para: mitsuwa.com.br${NC}"
+echo -e "${BLUE}📋 Certificado será emitido para: service.mitsuwa.com.br${NC}"
 
 # Executar Certbot
-sudo certbot --nginx -d mitsuwa.com.br --non-interactive --agree-tos --email admin@mitsuwa.com.br
+sudo certbot --nginx -d service.mitsuwa.com.br --non-interactive --agree-tos --email admin@mitsuwa.com.br
 
 # Verificar se o certificado foi obtido
-if [ -f "/etc/letsencrypt/live/mitsuwa.com.br/fullchain.pem" ]; then
+if [ -f "/etc/letsencrypt/live/service.mitsuwa.com.br/fullchain.pem" ]; then
     echo -e "${GREEN}✅ Certificado SSL obtido com sucesso${NC}"
 else
     echo -e "${RED}❌ Erro ao obter certificado SSL${NC}"
@@ -98,7 +98,7 @@ fi
 
 # Testar HTTPS
 echo -e "${BLUE}🧪 Testando HTTPS...${NC}"
-if curl -f https://mitsuwa.com.br/health > /dev/null 2>&1; then
+if curl -f https://service.mitsuwa.com.br/health > /dev/null 2>&1; then
     echo -e "${GREEN}✅ HTTPS funcionando${NC}"
 else
     echo -e "${YELLOW}⚠️  HTTPS pode não estar funcionando ainda${NC}"
@@ -109,9 +109,9 @@ echo ""
 echo -e "${GREEN}🎉 SSL implementado com sucesso!${NC}"
 echo "================================================"
 echo -e "${BLUE}📊 Informações:${NC}"
-echo "  • Frontend: https://mitsuwa.com.br/"
-echo "  • API: https://mitsuwa.com.br/api/"
-echo "  • Health: https://mitsuwa.com.br/health"
+echo "  • Frontend: https://service.mitsuwa.com.br/"
+echo "  • API: https://service.mitsuwa.com.br/api/"
+echo "  • Health: https://service.mitsuwa.com.br/health"
 echo "  • SSL: Let's Encrypt (renovação automática)"
 echo ""
 echo -e "${BLUE}🔧 Comandos úteis:${NC}"
@@ -122,12 +122,12 @@ echo "  • Status SSL: sudo certbot certificates"
 echo "  • Renovar: sudo certbot renew"
 echo ""
 echo -e "${BLUE}🧪 Testes:${NC}"
-echo "  • Testar frontend: curl https://mitsuwa.com.br/"
-echo "  • Testar API: curl https://mitsuwa.com.br/api/health"
-echo "  • Testar login: curl -X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"123456\"}' https://mitsuwa.com.br/api/auth/login"
+echo "  • Testar frontend: curl https://service.mitsuwa.com.br/"
+echo "  • Testar API: curl https://service.mitsuwa.com.br/api/health"
+echo "  • Testar login: curl -X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"123456\"}' https://service.mitsuwa.com.br/api/auth/login"
 echo ""
 echo -e "${YELLOW}⚠️  Próximos passos:${NC}"
 echo -e "${YELLOW}   1. Aguarde a propagação DNS (pode levar até 24h)${NC}"
-echo -e "${YELLOW}   2. Teste o acesso via https://mitsuwa.com.br/${NC}"
+echo -e "${YELLOW}   2. Teste o acesso via https://service.mitsuwa.com.br/${NC}"
 echo -e "${YELLOW}   3. Configure o Cloudflare Tunnel se necessário${NC}"
 echo -e "${YELLOW}   4. Monitore os logs para verificar funcionamento${NC}"

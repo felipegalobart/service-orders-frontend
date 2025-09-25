@@ -4,7 +4,7 @@ export const API_CONFIG = {
   BASE_URL: '/api',
   
   // Base URL para produção (altere conforme necessário)
-  PRODUCTION_URL: 'https://mitsuwa.com.br/api',
+  PRODUCTION_URL: 'https://service.mitsuwa.com.br/api',
   
   // URLs específicas dos endpoints
   ENDPOINTS: {

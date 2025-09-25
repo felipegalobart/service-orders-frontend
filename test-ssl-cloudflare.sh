@@ -36,11 +36,11 @@ fi
 
 # Testar certificado SSL
 echo -e "${BLUE}3. Verificando certificado SSL...${NC}"
-if [ -f "/etc/letsencrypt/live/mitsuwa.com.br/fullchain.pem" ]; then
+if [ -f "/etc/letsencrypt/live/service.mitsuwa.com.br/fullchain.pem" ]; then
     echo -e "${GREEN}✅ Certificado SSL encontrado${NC}"
     
     # Verificar validade do certificado
-    CERT_EXPIRY=$(openssl x509 -in /etc/letsencrypt/live/mitsuwa.com.br/fullchain.pem -noout -dates | grep notAfter | cut -d= -f2)
+    CERT_EXPIRY=$(openssl x509 -in /etc/letsencrypt/live/service.mitsuwa.com.br/fullchain.pem -noout -dates | grep notAfter | cut -d= -f2)
     echo -e "${BLUE}   Certificado válido até: $CERT_EXPIRY${NC}"
 else
     echo -e "${RED}❌ Certificado SSL não encontrado${NC}"
@@ -49,7 +49,7 @@ fi
 
 # Testar HTTP (deve redirecionar para HTTPS)
 echo -e "${BLUE}4. Testando redirecionamento HTTP → HTTPS...${NC}"
-HTTP_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://mitsuwa.com.br/)
+HTTP_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://service.mitsuwa.com.br/)
 if [ "$HTTP_RESPONSE" = "301" ] || [ "$HTTP_RESPONSE" = "302" ]; then
     echo -e "${GREEN}✅ Redirecionamento HTTP → HTTPS funcionando${NC}"
 else
@@ -58,7 +58,7 @@ fi
 
 # Testar HTTPS
 echo -e "${BLUE}5. Testando HTTPS...${NC}"
-if curl -f https://mitsuwa.com.br/health > /dev/null 2>&1; then
+if curl -f https://service.mitsuwa.com.br/health > /dev/null 2>&1; then
     echo -e "${GREEN}✅ HTTPS funcionando${NC}"
 else
     echo -e "${YELLOW}⚠️  HTTPS pode não estar funcionando ainda${NC}"
@@ -67,7 +67,7 @@ fi
 
 # Testar endpoint de health
 echo -e "${BLUE}6. Testando health endpoint...${NC}"
-if curl -f https://mitsuwa.com.br/health > /dev/null 2>&1; then
+if curl -f https://service.mitsuwa.com.br/health > /dev/null 2>&1; then
     echo -e "${GREEN}✅ Health endpoint funcionando via HTTPS${NC}"
 else
     echo -e "${RED}❌ Health endpoint não está funcionando via HTTPS${NC}"
@@ -75,7 +75,7 @@ fi
 
 # Testar frontend
 echo -e "${BLUE}7. Testando frontend...${NC}"
-if curl -f https://mitsuwa.com.br/ > /dev/null 2>&1; then
+if curl -f https://service.mitsuwa.com.br/ > /dev/null 2>&1; then
     echo -e "${GREEN}✅ Frontend acessível via HTTPS${NC}"
 else
     echo -e "${RED}❌ Frontend não está acessível via HTTPS${NC}"
@@ -84,7 +84,7 @@ fi
 
 # Testar API
 echo -e "${BLUE}8. Testando API...${NC}"
-if curl -f https://mitsuwa.com.br/api/health > /dev/null 2>&1; then
+if curl -f https://service.mitsuwa.com.br/api/health > /dev/null 2>&1; then
     echo -e "${GREEN}✅ API acessível via HTTPS${NC}"
 else
     echo -e "${RED}❌ API não está acessível via HTTPS${NC}"
@@ -95,7 +95,7 @@ fi
 echo -e "${BLUE}9. Testando login via HTTPS...${NC}"
 LOGIN_RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
     -d '{"email":"test@test.com","password":"123456"}' \
-    https://mitsuwa.com.br/api/auth/login)
+    https://service.mitsuwa.com.br/api/auth/login)
 
 if echo "$LOGIN_RESPONSE" | grep -q "access_token"; then
     echo -e "${GREEN}✅ Login funcionando via HTTPS${NC}"
@@ -106,11 +106,11 @@ fi
 
 # Testar CORS
 echo -e "${BLUE}10. Testando CORS...${NC}"
-CORS_RESPONSE=$(curl -s -H "Origin: https://mitsuwa.com.br" \
+CORS_RESPONSE=$(curl -s -H "Origin: https://service.mitsuwa.com.br" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Content-Type" \
     -X OPTIONS \
-    https://mitsuwa.com.br/api/auth/login)
+    https://service.mitsuwa.com.br/api/auth/login)
 
 if echo "$CORS_RESPONSE" | grep -q "Access-Control-Allow-Origin"; then
     echo -e "${GREEN}✅ CORS configurado corretamente${NC}"
@@ -140,13 +140,13 @@ echo -e "${GREEN}🎉 Testes concluídos!${NC}"
 echo "================================================"
 echo -e "${BLUE}📊 Resumo:${NC}"
 echo "  • Nginx: $(sudo systemctl is-active nginx)"
-echo "  • SSL: $(if [ -f "/etc/letsencrypt/live/mitsuwa.com.br/fullchain.pem" ]; then echo "Configurado"; else echo "Não configurado"; fi)"
-echo "  • Frontend: https://mitsuwa.com.br/"
-echo "  • API: https://mitsuwa.com.br/api/"
-echo "  • Health: https://mitsuwa.com.br/health"
+echo "  • SSL: $(if [ -f "/etc/letsencrypt/live/service.mitsuwa.com.br/fullchain.pem" ]; then echo "Configurado"; else echo "Não configurado"; fi)"
+echo "  • Frontend: https://service.mitsuwa.com.br/"
+echo "  • API: https://service.mitsuwa.com.br/api/"
+echo "  • Health: https://service.mitsuwa.com.br/health"
 echo ""
 echo -e "${BLUE}🔧 Próximos passos:${NC}"
-echo "  1. Acesse https://mitsuwa.com.br/ no navegador"
+echo "  1. Acesse https://service.mitsuwa.com.br/ no navegador"
 echo "  2. Teste o login na interface"
 echo "  3. Verifique se todas as funcionalidades estão funcionando"
 echo "  4. Configure Cloudflare Tunnel se necessário"

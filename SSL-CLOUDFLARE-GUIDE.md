@@ -2,7 +2,7 @@
 
 ## 📋 **Pré-requisitos**
 
-- ✅ **Domínio**: mitsuwa.com.br configurado no Cloudflare
+- ✅ **Domínio**: service.mitsuwa.com.br configurado no Cloudflare
 - ✅ **Cloudflare Tunnel**: Configurado e rodando
 - ✅ **Nginx**: Instalado e configurado
 - ✅ **Frontend**: Rodando na porta 3001
@@ -41,12 +41,7 @@ No painel do Cloudflare, configure:
 
 ```
 Tipo: CNAME
-Nome: @
-Conteúdo: <tunnel-id>.cfargotunnel.com
-Proxy: ✅ (Laranja)
-
-Tipo: CNAME  
-Nome: www
+Nome: service
 Conteúdo: <tunnel-id>.cfargotunnel.com
 Proxy: ✅ (Laranja)
 ```
@@ -72,9 +67,7 @@ tunnel: <tunnel-id>
 credentials-file: /home/homelab/.cloudflared/<tunnel-id>.json
 
 ingress:
-  - hostname: mitsuwa.com.br
-    service: http://localhost:80
-  - hostname: www.mitsuwa.com.br
+  - hostname: service.mitsuwa.com.br
     service: http://localhost:80
   - service: http_status:404
 ```
@@ -88,7 +81,7 @@ ingress:
 sudo apt install certbot python3-certbot-nginx
 
 # Obter certificado
-sudo certbot --nginx -d mitsuwa.com.br -d www.mitsuwa.com.br
+sudo certbot --nginx -d service.mitsuwa.com.br
 
 # Configurar renovação automática
 sudo crontab -e
@@ -100,10 +93,10 @@ sudo crontab -e
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name mitsuwa.com.br www.mitsuwa.com.br;
+    server_name service.mitsuwa.com.br;
     
-    ssl_certificate /etc/letsencrypt/live/mitsuwa.com.br/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/mitsuwa.com.br/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/service.mitsuwa.com.br/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/service.mitsuwa.com.br/privkey.pem;
     
     # Configurações SSL modernas
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -124,7 +117,7 @@ server {
 # Redirect HTTP para HTTPS
 server {
     listen 80;
-    server_name mitsuwa.com.br www.mitsuwa.com.br;
+    server_name service.mitsuwa.com.br;
     return 301 https://$server_name$request_uri;
 }
 ```
@@ -135,23 +128,23 @@ server {
 
 ```bash
 # Testar HTTP (deve redirecionar)
-curl -I http://mitsuwa.com.br/
+curl -I http://service.mitsuwa.com.br/
 
 # Testar HTTPS
-curl -I https://mitsuwa.com.br/
+curl -I https://service.mitsuwa.com.br/
 
 # Testar API
-curl https://mitsuwa.com.br/api/health
+curl https://service.mitsuwa.com.br/api/health
 
 # Testar login
 curl -X POST -H "Content-Type: application/json" \
   -d '{"email":"test@test.com","password":"123456"}' \
-  https://mitsuwa.com.br/api/auth/login
+  https://service.mitsuwa.com.br/api/auth/login
 ```
 
 ### **Testes no Navegador:**
 
-1. **Acesse** https://mitsuwa.com.br/
+1. **Acesse** https://service.mitsuwa.com.br/
 2. **Verifique** o cadeado verde na barra de endereço
 3. **Teste** o login e funcionalidades
 4. **Verifique** se não há avisos de segurança
@@ -162,7 +155,7 @@ curl -X POST -H "Content-Type: application/json" \
 
 ```bash
 # Verificar se o domínio resolve
-nslookup mitsuwa.com.br
+nslookup service.mitsuwa.com.br
 
 # Verificar se o Cloudflare Tunnel está rodando
 cloudflared tunnel list
@@ -250,8 +243,8 @@ add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
 Após a implementação:
 
-- ✅ **Frontend**: https://mitsuwa.com.br/
-- ✅ **API**: https://mitsuwa.com.br/api/
+- ✅ **Frontend**: https://service.mitsuwa.com.br/
+- ✅ **API**: https://service.mitsuwa.com.br/api/
 - ✅ **SSL**: Let's Encrypt (renovação automática)
 - ✅ **Cloudflare**: Tunnel + CDN + DDoS Protection
 - ✅ **Segurança**: Headers + HTTPS obrigatório
