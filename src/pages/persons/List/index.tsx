@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, Button, Badge, LoadingSpinner, Pagination, AdvancedFilters, PersonDetailsModal } from '../../../components/ui';
+import { Card, CardContent, Button, Badge, LoadingSpinner, Pagination, AdvancedFilters, PersonDetailsModal, CreatePersonModal } from '../../../components/ui';
 import { apiService } from '../../../services/api';
 import { formatPhoneNumber } from '../../../utils/formatters';
 import type { Person, PersonListResponse, PaginationParams } from '../../../types/person';
@@ -14,6 +13,9 @@ const PersonList: React.FC = () => {
     // Modal state
     const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Modal de criação
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // Filtros avançados
     const [filters, setFilters] = useState<FilterOptions>({
@@ -126,6 +128,21 @@ const PersonList: React.FC = () => {
         setSelectedPerson(null);
     };
 
+    // Funções do modal de criação
+    const handleOpenCreateModal = () => {
+        setIsCreateModalOpen(true);
+    };
+
+    const handleCloseCreateModal = () => {
+        setIsCreateModalOpen(false);
+    };
+
+    const handlePersonCreated = (newPerson: Person) => {
+        // Adicionar o novo cadastro à lista
+        setPersons(prevPersons => [newPerson, ...prevPersons]);
+        setTotalItems(prev => prev + 1);
+    };
+
     const getPersonTypeIcon = (type: 'customer' | 'supplier') => {
         if (type === 'customer') {
             return (
@@ -203,14 +220,17 @@ const PersonList: React.FC = () => {
                         </svg>
                         {loading ? 'Atualizando...' : 'Atualizar'}
                     </Button>
-                    <Link to="/persons/new">
-                        <Button variant="mitsuwa" size="lg" className="w-full sm:w-auto">
-                            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
-                            Novo Cadastro
-                        </Button>
-                    </Link>
+                    <Button
+                        onClick={handleOpenCreateModal}
+                        variant="mitsuwa"
+                        size="lg"
+                        className="w-full sm:w-auto"
+                    >
+                        <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Novo Cadastro
+                    </Button>
                 </div>
             </div>
 
@@ -379,6 +399,13 @@ const PersonList: React.FC = () => {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onUpdate={handlePersonUpdate}
+            />
+
+            {/* Create Person Modal */}
+            <CreatePersonModal
+                isOpen={isCreateModalOpen}
+                onClose={handleCloseCreateModal}
+                onPersonCreated={handlePersonCreated}
             />
         </div>
     );
