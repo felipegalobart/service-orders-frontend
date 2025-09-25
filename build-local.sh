@@ -82,10 +82,10 @@ fi
 
 echo -e "${GREEN}✅ Build completed successfully${NC}"
 
-# Install serve globally if not already installed
+# Install serve locally if not already installed
 if ! command -v serve &> /dev/null; then
-    echo -e "${BLUE}📦 Installing serve globally...${NC}"
-    npm install -g serve
+    echo -e "${BLUE}📦 Installing serve locally...${NC}"
+    npm install serve
 fi
 
 # Start the application
@@ -93,5 +93,5 @@ echo -e "${BLUE}🚀 Starting the application...${NC}"
 echo -e "${GREEN}✅ Frontend is now running at http://localhost:3000${NC}"
 echo -e "${YELLOW}⚠️  Press Ctrl+C to stop the server${NC}"
 
-# Start serve
-serve -s dist -l 3000
+# Start serve using npx (no global install needed)
+npx serve -s dist -l 3000
