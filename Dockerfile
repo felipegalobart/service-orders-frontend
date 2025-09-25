@@ -1,29 +1,32 @@
-# Dockerfile simples para Frontend React
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copiar package.json e instalar dependências
+# Copy package files
 COPY package*.json ./
-RUN npm ci --only=production
 
-# Copiar código e fazer build
+# Install dependencies
+RUN npm ci
+
+# Copy source code
 COPY . .
+
+# Build the application
 RUN npm run build
 
-# Estágio de produção - servidor simples
-FROM node:18-alpine
-
-# Instalar serve para servir arquivos estáticos
-RUN npm install -g serve
+# Production stage
+FROM node:22-alpine
 
 WORKDIR /app
 
-# Copiar arquivos buildados
+# Install serve globally
+RUN npm install -g serve
+
+# Copy built application
 COPY --from=builder /app/dist ./dist
 
-# Expor porta 3000
+# Expose port
 EXPOSE 3000
 
-# Servir arquivos estáticos
+# Start the application
 CMD ["serve", "-s", "dist", "-l", "3000"]
