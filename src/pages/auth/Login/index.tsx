@@ -73,6 +73,7 @@ const Login: React.FC = () => {
                                 onChange={setEmail}
                                 required
                                 disabled={isLoading}
+                                className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-gray-500 focus:ring-gray-500"
                             />
 
                             <Input
@@ -83,6 +84,7 @@ const Login: React.FC = () => {
                                 onChange={setPassword}
                                 required
                                 disabled={isLoading}
+                                className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-gray-500 focus:ring-gray-500"
                             />
 
                             {error && (
