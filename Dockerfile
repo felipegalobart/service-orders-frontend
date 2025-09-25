@@ -1,4 +1,7 @@
-FROM node:18 AS builder
+FROM alpine:latest AS builder
+
+# Install Node.js and npm
+RUN apk add --no-cache nodejs npm
 
 WORKDIR /app
 
@@ -15,7 +18,10 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:18
+FROM alpine:latest
+
+# Install Node.js and npm
+RUN apk add --no-cache nodejs npm
 
 WORKDIR /app
 
