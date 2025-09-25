@@ -143,11 +143,11 @@ const PersonList: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="p-6 bg-gray-50 min-h-screen">
+            <div className="space-y-6">
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
                         <LoadingSpinner size="lg" className="mx-auto mb-4" />
-                        <p className="text-gray-600">Carregando pessoas...</p>
+                        <p className="text-gray-300">Carregando pessoas...</p>
                     </div>
                 </div>
             </div>
@@ -156,15 +156,15 @@ const PersonList: React.FC = () => {
 
     if (error) {
         return (
-            <div className="p-6 bg-gray-50 min-h-screen">
+            <div className="space-y-6">
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center max-w-md">
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                        <div className="bg-red-900/30 border border-red-700/50 rounded-lg p-6">
                             <svg className="h-12 w-12 text-red-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                             </svg>
-                            <h3 className="text-lg font-medium text-red-800 mb-2">Erro ao carregar pessoas</h3>
-                            <p className="text-red-600 mb-4">{error}</p>
+                            <h3 className="text-lg font-medium text-red-300 mb-2">Erro ao carregar pessoas</h3>
+                            <p className="text-red-200 mb-4">{error}</p>
                             <Button onClick={refetch} variant="secondary" size="sm">
                                 <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -179,14 +179,14 @@ const PersonList: React.FC = () => {
     }
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="space-y-6">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 space-y-4 sm:space-y-0">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">
+                    <h1 className="text-3xl font-bold text-white">
                         Pessoas
                     </h1>
-                    <p className="text-gray-600 mt-1">
+                    <p className="text-gray-300 mt-1">
                         Gerencie clientes e fornecedores
                     </p>
                 </div>
@@ -204,7 +204,7 @@ const PersonList: React.FC = () => {
                         {loading ? 'Atualizando...' : 'Atualizar'}
                     </Button>
                     <Link to="/persons/new">
-                        <Button size="lg" className="w-full sm:w-auto">
+                        <Button variant="mitsuwa" size="lg" className="w-full sm:w-auto">
                             <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
@@ -241,14 +241,14 @@ const PersonList: React.FC = () => {
             {/* Person List */}
             <div className="space-y-4">
                 {persons.length === 0 ? (
-                    <Card>
+                    <Card className="bg-gray-800 border-gray-700">
                         <CardContent>
                             <div className="text-center py-12">
                                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
-                                <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhuma pessoa encontrada</h3>
-                                <p className="mt-1 text-sm text-gray-500">
+                                <h3 className="mt-2 text-sm font-medium text-white">Nenhuma pessoa encontrada</h3>
+                                <p className="mt-1 text-sm text-gray-400">
                                     {(filters.search || filters.type !== 'all' || filters.personType !== 'all' || filters.status !== 'all' || filters.blacklist !== 'all' || filters.dateFrom || filters.dateTo)
                                         ? 'Tente ajustar os filtros de busca.'
                                         : 'Comece criando uma nova pessoa.'
@@ -259,16 +259,16 @@ const PersonList: React.FC = () => {
                     </Card>
                 ) : (
                     persons.map((person: Person) => (
-                        <Card key={person._id} className="hover:shadow-lg transition-shadow">
+                        <Card key={person._id} className="bg-gray-800 border-gray-700 hover:shadow-lg hover:shadow-gray-500/25 transition-shadow">
                             <CardContent>
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-start space-x-4">
-                                        <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                        <div className="h-12 w-12 bg-gray-700 rounded-lg flex items-center justify-center">
                                             {getPersonTypeIcon(person.type)}
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex items-center space-x-2 mb-1">
-                                                <h3 className="text-lg font-semibold text-gray-900">
+                                                <h3 className="text-lg font-semibold text-white">
                                                     {person.name}
                                                 </h3>
                                                 <Badge variant={person.type === 'customer' ? 'info' : 'success'}>
@@ -281,16 +281,16 @@ const PersonList: React.FC = () => {
                                                 )}
                                             </div>
                                             {person.corporateName && (
-                                                <p className="text-sm text-gray-600 mb-1">
+                                                <p className="text-sm text-gray-300 mb-1">
                                                     {person.corporateName}
                                                 </p>
                                             )}
                                             {person.document && (
-                                                <p className="text-sm text-gray-500 mb-2">
+                                                <p className="text-sm text-gray-400 mb-2">
                                                     {person.document}
                                                 </p>
                                             )}
-                                            <div className="space-y-2 text-sm text-gray-600">
+                                            <div className="space-y-2 text-sm text-gray-300">
                                                 {person.contacts.map((contact, index: number) => (
                                                     <div key={index} className="flex items-center space-x-4">
                                                         {contact.phone && (
@@ -318,7 +318,7 @@ const PersonList: React.FC = () => {
                                                 ))}
                                             </div>
                                             {person.addresses.length > 0 && (
-                                                <div className="mt-2 text-sm text-gray-600">
+                                                <div className="mt-2 text-sm text-gray-300">
                                                     <div className="flex items-start space-x-1">
                                                         <svg className="h-4 w-4 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -335,19 +335,19 @@ const PersonList: React.FC = () => {
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => handleViewDetails(person)}
-                                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                            className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
                                         >
                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </Button>
-                                        <Button variant="ghost" size="sm">
+                                        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-gray-700">
                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </Button>
-                                        <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                                        <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300 hover:bg-red-900/20">
                                             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>

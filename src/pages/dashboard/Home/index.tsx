@@ -66,13 +66,13 @@ const Home: React.FC = () => {
     ];
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="space-y-8">
             {/* Welcome Section */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <div className="text-center">
+                <h1 className="text-3xl font-bold text-white mb-2">
                     Bem-vindo, {user?.name}!
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-gray-300">
                     Aqui está um resumo do seu sistema de Service Orders.
                 </p>
             </div>
@@ -80,20 +80,20 @@ const Home: React.FC = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {stats.map((stat, index) => (
-                    <Card key={index}>
+                    <Card key={index} className="bg-gray-800 border-gray-700">
                         <CardContent>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                                    <p className={`text-sm ${stat.changeType === 'positive' ? 'text-green-600' :
-                                        stat.changeType === 'negative' ? 'text-red-600' :
-                                            'text-gray-500'
+                                    <p className="text-sm font-medium text-gray-300">{stat.title}</p>
+                                    <p className="text-2xl font-bold text-white">{stat.value}</p>
+                                    <p className={`text-sm ${stat.changeType === 'positive' ? 'text-green-400' :
+                                        stat.changeType === 'negative' ? 'text-red-400' :
+                                            'text-gray-400'
                                         }`}>
                                         {stat.change}
                                     </p>
                                 </div>
-                                <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                                <div className="h-12 w-12 bg-gray-700 rounded-lg flex items-center justify-center text-gray-300">
                                     {stat.icon}
                                 </div>
                             </div>
@@ -104,9 +104,9 @@ const Home: React.FC = () => {
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
+                <Card className="bg-gray-800 border-gray-700">
                     <CardHeader>
-                        <CardTitle>Ações Rápidas</CardTitle>
+                        <CardTitle className="text-white">Ações Rápidas</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
@@ -114,14 +114,16 @@ const Home: React.FC = () => {
                                 <Link
                                     key={index}
                                     to={action.href}
-                                    className="flex items-center p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                                    className="flex items-center p-4 rounded-lg border border-gray-600 hover:border-red-500 hover:bg-gray-700 transition-colors group"
                                 >
-                                    <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-200 transition-colors">
+                                    <div className="h-10 w-10 bg-gray-700 rounded-lg flex items-center justify-center text-gray-300 group-hover:bg-red-600 group-hover:text-white transition-colors">
                                         {action.icon}
                                     </div>
                                     <div className="ml-4">
-                                        <h3 className="font-medium text-gray-900">{action.title}</h3>
-                                        <p className="text-sm text-gray-600">{action.description}</p>
+                                        <h3 className="font-medium text-white group-hover:text-red-400 transition-colors">
+                                            {action.title}
+                                        </h3>
+                                        <p className="text-sm text-gray-400">{action.description}</p>
                                     </div>
                                 </Link>
                             ))}
@@ -129,24 +131,24 @@ const Home: React.FC = () => {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gray-800 border-gray-700">
                     <CardHeader>
-                        <CardTitle>Informações do Sistema</CardTitle>
+                        <CardTitle className="text-white">Informações do Sistema</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-600">Versão do Sistema</span>
+                                <span className="text-sm text-gray-300">Versão do Sistema</span>
                                 <Badge variant="info">v1.0.0</Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-600">Seu Perfil</span>
+                                <span className="text-sm text-gray-300">Seu Perfil</span>
                                 <Badge variant={user?.role === 'admin' ? 'danger' : 'info'}>
                                     {user?.role}
                                 </Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-600">Status</span>
+                                <span className="text-sm text-gray-300">Status</span>
                                 <Badge variant="success">Ativo</Badge>
                             </div>
                         </div>

@@ -176,8 +176,8 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Dados Básicos */}
-            <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Dados Básicos</h3>
+            <div className="bg-gray-700 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-white mb-4">Dados Básicos</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -235,13 +235,13 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                             Tipo
                         </label>
                         <select
                             value={formData.type}
                             onChange={(e) => handleInputChange('type', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                         >
                             <option value="customer">Cliente</option>
                             <option value="supplier">Fornecedor</option>
@@ -249,13 +249,13 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
                             Tipo de Pessoa
                         </label>
                         <select
                             value={formData.pessoaJuridica ? 'true' : 'false'}
                             onChange={(e) => handleInputChange('pessoaJuridica', e.target.value === 'true')}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                         >
                             <option value="false">Pessoa Física</option>
                             <option value="true">Pessoa Jurídica</option>
@@ -263,36 +263,36 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                     </div>
 
                     <div className="flex items-center space-x-4">
-                        <label className="flex items-center">
+                        <label className="flex items-center text-gray-300">
                             <input
                                 type="checkbox"
                                 checked={formData.isActive}
                                 onChange={(e) => handleInputChange('isActive', e.target.checked)}
-                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                className="rounded border-gray-600 text-gray-400 focus:ring-gray-500 bg-gray-800"
                             />
-                            <span className="ml-2 text-sm text-gray-700">Ativo</span>
+                            <span className="ml-2 text-sm">Ativo</span>
                         </label>
 
-                        <label className="flex items-center">
+                        <label className="flex items-center text-gray-300">
                             <input
                                 type="checkbox"
                                 checked={formData.blacklist}
                                 onChange={(e) => handleInputChange('blacklist', e.target.checked)}
-                                className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                                className="rounded border-gray-600 text-red-400 focus:ring-red-500 bg-gray-800"
                             />
-                            <span className="ml-2 text-sm text-gray-700">Bloqueado</span>
+                            <span className="ml-2 text-sm">Bloqueado</span>
                         </label>
                     </div>
                 </div>
             </div>
 
             {/* Contatos */}
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-700 rounded-lg p-4">
                 <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Contatos</h3>
+                    <h3 className="text-lg font-semibold text-white">Contatos</h3>
                     <Button
                         type="button"
-                        variant="secondary"
+                        variant="mitsuwa"
                         size="sm"
                         onClick={addContact}
                     >
@@ -305,16 +305,16 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
 
                 <div className="space-y-4">
                     {formData.contacts.map((contact, index) => (
-                        <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
+                        <div key={index} className="bg-gray-800 rounded-lg p-4 border border-gray-600">
                             <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-sm font-medium text-gray-700">Contato {index + 1}</h4>
+                                <h4 className="text-sm font-medium text-white">Contato {index + 1}</h4>
                                 {formData.contacts.length > 1 && (
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => removeContact(index)}
-                                        className="text-red-600 hover:text-red-700"
+                                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
                                     >
                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -375,12 +375,12 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
             </div>
 
             {/* Endereços */}
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-700 rounded-lg p-4">
                 <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Endereços</h3>
+                    <h3 className="text-lg font-semibold text-white">Endereços</h3>
                     <Button
                         type="button"
-                        variant="secondary"
+                        variant="mitsuwa"
                         size="sm"
                         onClick={addAddress}
                     >
@@ -393,16 +393,16 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
 
                 <div className="space-y-4">
                     {formData.addresses.map((address, index) => (
-                        <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
+                        <div key={index} className="bg-gray-800 rounded-lg p-4 border border-gray-600">
                             <div className="flex justify-between items-center mb-3">
-                                <h4 className="text-sm font-medium text-gray-700">Endereço {index + 1}</h4>
+                                <h4 className="text-sm font-medium text-white">Endereço {index + 1}</h4>
                                 {formData.addresses.length > 1 && (
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => removeAddress(index)}
-                                        className="text-red-600 hover:text-red-700"
+                                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
                                     >
                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -467,6 +467,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                 </Button>
                 <Button
                     type="submit"
+                    variant="mitsuwa"
                     disabled={loading}
                 >
                     {loading ? 'Salvando...' : 'Salvar Alterações'}

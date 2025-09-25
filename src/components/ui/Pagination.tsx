@@ -54,7 +54,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     if (totalPages <= 1) {
         return (
             <div className={`flex items-center justify-between ${className}`}>
-                <div className="text-sm text-gray-700">
+                <div className="text-sm text-gray-300">
                     Mostrando {totalItems} {totalItems === 1 ? 'item' : 'itens'}
                 </div>
             </div>
@@ -63,7 +63,7 @@ export const Pagination: React.FC<PaginationProps> = ({
 
     return (
         <div className={`flex items-center justify-between ${className}`}>
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-gray-300">
                 Mostrando {startItem} a {endItem} de {totalItems} {totalItems === 1 ? 'item' : 'itens'}
             </div>
 
@@ -86,7 +86,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     {getVisiblePages().map((page, index) => {
                         if (page === '...') {
                             return (
-                                <span key={index} className="px-3 py-2 text-sm text-gray-500">
+                                <span key={index} className="px-3 py-2 text-sm text-gray-400">
                                     ...
                                 </span>
                             );
@@ -98,7 +98,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                         return (
                             <Button
                                 key={pageNumber}
-                                variant={isCurrentPage ? 'primary' : 'ghost'}
+                                variant={isCurrentPage ? 'mitsuwa' : 'ghost'}
                                 size="sm"
                                 onClick={() => onPageChange(pageNumber)}
                                 className="px-3 py-2 min-w-[40px]"

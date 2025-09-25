@@ -56,7 +56,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
         filters.dateTo !== '';
 
     return (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-4">
             {/* Basic Search */}
             <div className="flex flex-col sm:flex-row gap-4 mb-4">
                 <div className="flex-1 flex gap-2">
@@ -66,11 +66,13 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                             value={filters.search}
                             onChange={handleSearchInputChange}
                             onKeyPress={handleSearchKeyPress}
+                            className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-gray-500 focus:ring-gray-500"
                         />
                     </div>
                     <Button
                         onClick={() => onSearch(filters)}
                         disabled={loading}
+                        variant="mitsuwa"
                         className="px-6"
                     >
                         <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,21 +84,21 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
 
                 <div className="flex gap-2">
                     <Button
-                        variant={filters.type === 'all' ? 'primary' : 'secondary'}
+                        variant={filters.type === 'all' ? 'mitsuwa' : 'secondary'}
                         onClick={() => handleFilterChange('type', 'all')}
                         size="sm"
                     >
                         Todos
                     </Button>
                     <Button
-                        variant={filters.type === 'customer' ? 'primary' : 'secondary'}
+                        variant={filters.type === 'customer' ? 'mitsuwa' : 'secondary'}
                         onClick={() => handleFilterChange('type', 'customer')}
                         size="sm"
                     >
                         Clientes
                     </Button>
                     <Button
-                        variant={filters.type === 'supplier' ? 'primary' : 'secondary'}
+                        variant={filters.type === 'supplier' ? 'mitsuwa' : 'secondary'}
                         onClick={() => handleFilterChange('type', 'supplier')}
                         size="sm"
                     >
@@ -110,7 +112,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                 <Button
                     variant="ghost"
                     onClick={() => setShowAdvanced(!showAdvanced)}
-                    className="text-sm text-gray-600 hover:text-gray-800"
+                    className="text-sm text-gray-300 hover:text-white"
                 >
                     <svg
                         className={`h-4 w-4 mr-2 transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
@@ -127,7 +129,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                     <Button
                         variant="ghost"
                         onClick={onClearFilters}
-                        className="text-sm text-red-600 hover:text-red-800"
+                        className="text-sm text-red-400 hover:text-red-300"
                     >
                         <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -139,17 +141,17 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
 
             {/* Advanced Filters */}
             {showAdvanced && (
-                <div className="border-t border-gray-200 pt-4">
+                <div className="border-t border-gray-600 pt-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         {/* Tipo de Pessoa */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Tipo de Pessoa
                             </label>
                             <select
                                 value={filters.personType}
                                 onChange={(e) => handleFilterChange('personType', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                             >
                                 <option value="all">Todos</option>
                                 <option value="physical">Pessoa Física</option>
@@ -159,14 +161,14 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
 
                         {/* Status */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-2">
+                            <label className="block text-sm font-medium text-gray-400 mb-2">
                                 Status (Em breve)
                             </label>
                             <select
                                 value={filters.status}
                                 onChange={(e) => handleFilterChange('status', e.target.value)}
                                 disabled
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-gray-400 cursor-not-allowed"
                             >
                                 <option value="all">Todos</option>
                                 <option value="active">Ativo</option>
@@ -176,14 +178,14 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
 
                         {/* Blacklist */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-500 mb-2">
+                            <label className="block text-sm font-medium text-gray-400 mb-2">
                                 Blacklist (Em breve)
                             </label>
                             <select
                                 value={filters.blacklist}
                                 onChange={(e) => handleFilterChange('blacklist', e.target.value)}
                                 disabled
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-gray-400 cursor-not-allowed"
                             >
                                 <option value="all">Todos</option>
                                 <option value="blocked">Bloqueados</option>
@@ -193,7 +195,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
 
                         {/* Data de Criação */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Data de Criação
                             </label>
                             <div className="space-y-2">
@@ -202,14 +204,14 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                                     placeholder="Data inicial"
                                     value={filters.dateFrom}
                                     onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                                 />
                                 <input
                                     type="date"
                                     placeholder="Data final"
                                     value={filters.dateTo}
                                     onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                                 />
                             </div>
                         </div>
@@ -220,6 +222,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                         <Button
                             onClick={() => onSearch(filters)}
                             disabled={loading}
+                            variant="mitsuwa"
                             className="px-6"
                         >
                             <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

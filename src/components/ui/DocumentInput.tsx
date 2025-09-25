@@ -63,7 +63,7 @@ export const DocumentInput: React.FC<DocumentInputProps> = ({
     return (
         <div className={`space-y-1 ${className}`}>
             {label && (
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-300">
                     {label}
                     {required && <span className="text-red-500 ml-1">*</span>}
                 </label>
@@ -78,12 +78,12 @@ export const DocumentInput: React.FC<DocumentInputProps> = ({
                     placeholder={placeholder}
                     disabled={disabled}
                     className={`
-            w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+            w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent
             ${error
-                            ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500'
-                            : 'border-gray-300 text-gray-900 placeholder-gray-400'
+                            ? 'border-red-500 text-red-200 placeholder-red-400 focus:ring-red-500 bg-gray-800'
+                            : 'border-gray-600 text-white placeholder-gray-400 bg-gray-700'
                         }
-            ${disabled ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : 'bg-white'}
+            ${disabled ? 'bg-gray-800 text-gray-400 cursor-not-allowed' : ''}
           `}
                 />
 
@@ -91,7 +91,7 @@ export const DocumentInput: React.FC<DocumentInputProps> = ({
                 {displayValue && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                         {documentType === 'cpf' && (
-                            <span className="text-xs text-blue-600 font-medium">CPF</span>
+                            <span className="text-xs text-blue-400 font-medium">CPF</span>
                         )}
                         {documentType === 'cnpj' && (
                             <span className="text-xs text-green-600 font-medium">CNPJ</span>
@@ -101,12 +101,12 @@ export const DocumentInput: React.FC<DocumentInputProps> = ({
             </div>
 
             {error && (
-                <p className="text-sm text-red-600">{error}</p>
+                <p className="text-sm text-red-400">{error}</p>
             )}
 
             {/* Dica de formato */}
             {!error && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                     Digite apenas números. CPF: 11 dígitos | CNPJ: 14 dígitos
                 </p>
             )}
