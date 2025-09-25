@@ -142,6 +142,13 @@ class ApiService {
     });
   }
 
+  async createPerson(personData: Partial<Person>): Promise<Person> {
+    return this.request<Person>(API_CONFIG.ENDPOINTS.PERSONS.CREATE, {
+      method: 'POST',
+      body: JSON.stringify(personData),
+    });
+  }
+
   async updatePerson(id: string, personData: UpdatePersonRequest): Promise<Person> {
     return this.request<Person>(`${API_CONFIG.ENDPOINTS.PERSONS.UPDATE}/${id}`, {
       method: 'PUT',
