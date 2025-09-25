@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Input } from '../Input';
 import { Button } from '../Button';
 import { PhoneInput } from '../PhoneInput';
@@ -52,16 +52,16 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
 
         // Validar contatos - todos os campos são obrigatórios (API exige)
         formData.contacts.forEach((contact, index) => {
-            if (!contact.name.trim()) {
+            if (!contact.name?.trim()) {
                 newErrors[`contact_${index}_name`] = 'Nome do contato é obrigatório';
             }
-            if (!contact.phone.trim()) {
+            if (!contact.phone?.trim()) {
                 newErrors[`contact_${index}_phone`] = 'Telefone é obrigatório';
             }
-            if (!contact.email.trim()) {
+            if (!contact.email?.trim()) {
                 newErrors[`contact_${index}_email`] = 'Email é obrigatório';
             }
-            if (!contact.sector.trim()) {
+            if (!contact.sector?.trim()) {
                 newErrors[`contact_${index}_sector`] = 'Setor é obrigatório';
             }
         });
@@ -326,7 +326,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <Input
                                     label="Nome do Contato *"
-                                    value={contact.name}
+                                    value={contact.name || ''}
                                     onChange={(value) => updateContact(index, 'name', value)}
                                     error={errors[`contact_${index}_name`]}
                                     required
@@ -334,7 +334,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
 
                                 <Input
                                     label="Setor *"
-                                    value={contact.sector}
+                                    value={contact.sector || ''}
                                     onChange={(value) => updateContact(index, 'sector', value)}
                                     error={errors[`contact_${index}_sector`]}
                                     required
@@ -342,7 +342,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
 
                                 <PhoneInput
                                     label="Telefone *"
-                                    value={contact.phone}
+                                    value={contact.phone || ''}
                                     onChange={(value) => updateContact(index, 'phone', value)}
                                     error={errors[`contact_${index}_phone`]}
                                     required
@@ -351,7 +351,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                                 <Input
                                     label="E-mail *"
                                     type="email"
-                                    value={contact.email}
+                                    value={contact.email || ''}
                                     onChange={(value) => updateContact(index, 'email', value)}
                                     error={errors[`contact_${index}_email`]}
                                     required
@@ -422,7 +422,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
 
                                 <Input
                                     label="Número"
-                                    value={address.number}
+                                    value={address.number || ''}
                                     onChange={(value) => updateAddress(index, 'number', value)}
                                 />
 
@@ -446,7 +446,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
 
                                 <Input
                                     label="País"
-                                    value={address.country}
+                                    value={address.country || ''}
                                     onChange={(value) => updateAddress(index, 'country', value)}
                                 />
                             </div>
