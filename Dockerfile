@@ -1,7 +1,9 @@
-FROM alpine:latest AS builder
+FROM debian:bullseye-slim AS builder
 
 # Install Node.js and npm
-RUN apk add --no-cache nodejs npm
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
 
 WORKDIR /app
 
@@ -18,10 +20,12 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM alpine:latest
+FROM debian:bullseye-slim
 
 # Install Node.js and npm
-RUN apk add --no-cache nodejs npm
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
 
 WORKDIR /app
 
