@@ -32,6 +32,19 @@ echo -e "${GREEN}✅ Node.js and npm are installed${NC}"
 echo -e "${BLUE}📊 Node.js version: $(node --version)${NC}"
 echo -e "${BLUE}📊 npm version: $(npm --version)${NC}"
 
+# Check if Node.js version is compatible
+NODE_VERSION=$(node --version | cut -d'v' -f2 | cut -d'.' -f1)
+if [ "$NODE_VERSION" -lt 22 ]; then
+    echo -e "${YELLOW}⚠️  Node.js version $NODE_VERSION detected. Recommended: Node.js 22 LTS${NC}"
+    echo -e "${YELLOW}   The project is optimized for Node.js 22 LTS${NC}"
+    read -p "Continue anyway? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo -e "${RED}❌ Build cancelled${NC}"
+        exit 1
+    fi
+fi
+
 # Check if we're in a git repository
 if [ ! -d ".git" ]; then
     echo -e "${YELLOW}📥 This doesn't appear to be a git repository${NC}"

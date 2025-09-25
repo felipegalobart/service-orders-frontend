@@ -1,4 +1,65 @@
-# React + TypeScript + Vite
+# Service Orders Frontend
+
+A React + TypeScript + Vite frontend application for managing service orders.
+
+## Requirements
+
+- **Node.js**: 22 LTS (recommended)
+- **npm**: 10.0.0 or higher
+
+## Quick Start
+
+### Using Docker (Recommended)
+
+```bash
+# Clone the repository
+git clone https://github.com/felipegalobart/service-orders-frontend.git
+cd service-orders-frontend
+
+# Deploy with Docker
+./deploy-frontend.sh
+```
+
+### Using Local Build
+
+```bash
+# Clone the repository
+git clone https://github.com/felipegalobart/service-orders-frontend.git
+cd service-orders-frontend
+
+# Build and run locally
+./build-local.sh
+```
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## Node.js Version
+
+This project is optimized for **Node.js 22 LTS**. If you're using a different version, you can:
+
+1. **Use nvm** (recommended):
+   ```bash
+   nvm use  # Uses version from .nvmrc
+   ```
+
+2. **Install Node.js 22 LTS** directly from [nodejs.org](https://nodejs.org/)
+
+## Docker
+
+The project includes Docker configuration optimized for Node.js 22 Alpine images for better performance and security.
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
