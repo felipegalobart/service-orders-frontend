@@ -11,9 +11,21 @@ export default defineConfig(({ mode }) => {
       port: 3001,
       proxy: {
         '/api': {
-          target: env.VITE_API_URL || 'http://localhost:3000',
+          target: env.VITE_API_URL || 'http://192.168.31.75:3000',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
+        }
+      }
+    },
+    build: {
+      // Configurações para produção
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom'],
+            router: ['react-router-dom'],
+            query: ['@tanstack/react-query']
+          }
         }
       }
     }
