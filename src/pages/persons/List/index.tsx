@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, Button, Badge, LoadingSpinner, Pagination, AdvancedFilters, PersonDetailsModal, CreatePersonModal } from '../../../components/ui';
 import { apiService } from '../../../services/api';
 import { formatPhoneNumber } from '../../../utils/formatters';
@@ -6,6 +7,8 @@ import type { Person, PersonListResponse, PaginationParams } from '../../../type
 import type { FilterOptions } from '../../../components/ui/AdvancedFilters';
 
 const PersonList: React.FC = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const [persons, setPersons] = useState<Person[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -70,10 +73,20 @@ const PersonList: React.FC = () => {
         await fetchPersons(1, filters);
     };
 
+    // Detectar parâmetro de ação da URL
+    useEffect(() => {
+        const action = searchParams.get('action');
+        if (action === 'create') {
+            setIsCreateModalOpen(true);
+            // Limpar o parâmetro da URL
+            setSearchParams({});
+        }
+    }, [searchParams, setSearchParams]);
+
     // Initial load
     useEffect(() => {
         fetchPersons(1, filters);
-    }, []); // Só executa uma vez no mount
+    }, [fetchPersons, filters]); // Incluir dependências
 
     // Handle filters change
     const handleFiltersChange = (newFilters: FilterOptions) => {
@@ -285,8 +298,8 @@ const PersonList: React.FC = () => {
                     </Card>
                 ) : (
                     persons.map((person: Person) => (
-                        <Card 
-                            key={person._id} 
+                        <Card
+                            key={person._id}
                             className="bg-gray-800 border-gray-700 hover:shadow-lg hover:shadow-gray-500/25 transition-shadow cursor-pointer"
                             onClick={() => handleViewDetails(person)}
                         >
