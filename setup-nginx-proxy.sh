@@ -20,6 +20,9 @@ if ! command -v nginx &> /dev/null; then
     echo -e "${RED}❌ Nginx não está instalado. Instalando...${NC}"
     sudo apt update
     sudo apt install -y nginx
+    echo -e "${GREEN}✅ Nginx instalado com sucesso${NC}"
+else
+    echo -e "${GREEN}✅ Nginx já está instalado${NC}"
 fi
 
 # Verificar se o arquivo de configuração existe
@@ -58,19 +61,46 @@ else
     exit 1
 fi
 
+# Verificar se os serviços estão rodando
+echo -e "${BLUE}🔍 Verificando serviços...${NC}"
+
+# Verificar se o frontend está rodando na porta 3001
+if curl -f http://localhost:3001 > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ Frontend está rodando na porta 3001${NC}"
+else
+    echo -e "${YELLOW}⚠️  Frontend não está rodando na porta 3001${NC}"
+    echo -e "${YELLOW}   Execute: ./deploy-frontend.sh${NC}"
+fi
+
+# Verificar se a API está rodando na porta 3000
+if curl -f http://localhost:3000/health > /dev/null 2>&1; then
+    echo -e "${GREEN}✅ API está rodando na porta 3000${NC}"
+else
+    echo -e "${YELLOW}⚠️  API não está rodando na porta 3000${NC}"
+    echo -e "${YELLOW}   Verifique se a API está rodando${NC}"
+fi
+
 echo ""
 echo -e "${GREEN}🎉 Configuração concluída com sucesso!${NC}"
 echo "================================================"
 echo -e "${BLUE}📊 Informações:${NC}"
 echo "  • Frontend: http://192.168.31.75/"
 echo "  • API: http://192.168.31.75/api/"
+echo "  • Health: http://192.168.31.75/health"
 echo "  • Nginx: Proxy reverso configurado"
 echo ""
 echo -e "${BLUE}🔧 Comandos úteis:${NC}"
-echo "  • Ver logs: sudo tail -f /var/log/nginx/error.log"
+echo "  • Ver logs: sudo tail -f /var/log/nginx/frontend_error.log"
 echo "  • Testar config: sudo nginx -t"
 echo "  • Reiniciar: sudo systemctl restart nginx"
 echo "  • Status: sudo systemctl status nginx"
 echo ""
-echo -e "${YELLOW}⚠️  Nota: Certifique-se de que o frontend está rodando na porta 3001${NC}"
-echo -e "${YELLOW}   e a API na porta 3000${NC}"
+echo -e "${BLUE}🧪 Testes:${NC}"
+echo "  • Testar frontend: curl http://192.168.31.75/"
+echo "  • Testar API: curl http://192.168.31.75/api/health"
+echo "  • Testar login: curl -X POST -H 'Content-Type: application/json' -d '{\"email\":\"test@test.com\",\"password\":\"123456\"}' http://192.168.31.75/api/auth/login"
+echo ""
+echo -e "${YELLOW}⚠️  Próximos passos:${NC}"
+echo -e "${YELLOW}   1. Certifique-se de que o frontend está rodando na porta 3001${NC}"
+echo -e "${YELLOW}   2. Certifique-se de que a API está rodando na porta 3000${NC}"
+echo -e "${YELLOW}   3. Acesse http://192.168.31.75/ para testar${NC}"
