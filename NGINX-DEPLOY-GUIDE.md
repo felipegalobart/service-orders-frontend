@@ -73,7 +73,7 @@ curl -X POST -H "Content-Type: application/json" \
 1. **Acesse** http://192.168.31.75/
 2. **Teste o login** com credenciais válidas
 3. **Verifique** se todas as funcionalidades estão funcionando
-4. **Teste** a listagem de pessoas, busca, filtros, etc.
+4. **Teste** a listagem de cadastros, busca, filtros, etc.
 
 ## 🔧 **Comandos de Manutenção**
 

@@ -47,7 +47,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
         }
 
         if (formData.pessoaJuridica && !formData.corporateName.trim()) {
-            newErrors.corporateName = 'Razão social é obrigatória para pessoa jurídica';
+            newErrors.corporateName = 'Razão social é obrigatória para cadastro jurídico';
         }
 
         // Validar contatos - todos os campos são obrigatórios (API exige)
@@ -93,7 +93,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
         try {
             await onSave(formData);
         } catch (error) {
-            console.error('Erro ao salvar pessoa:', error);
+            console.error('Erro ao salvar cadastro:', error);
         }
     };
 
@@ -250,7 +250,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
 
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Tipo de Pessoa
+                            Tipo de Cadastro
                         </label>
                         <select
                             value={formData.pessoaJuridica ? 'true' : 'false'}

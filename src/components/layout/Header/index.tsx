@@ -51,7 +51,7 @@ const Header: React.FC = () => {
                                 : 'text-gray-300 hover:text-white hover:bg-gray-800'
                                 }`}
                         >
-                            Pessoas
+                            Cadastros
                         </Link>
 
                         {/* User info and logout */}

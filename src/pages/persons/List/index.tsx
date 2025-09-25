@@ -56,9 +56,9 @@ const PersonList: React.FC = () => {
             setTotalPages(Math.ceil(response.total / itemsPerPage));
             setCurrentPage(response.page);
         } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar pessoas';
+            const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar cadastros';
             setError(errorMessage);
-            console.error('❌ Erro ao carregar pessoas:', err);
+            console.error('❌ Erro ao carregar cadastros:', err);
         } finally {
             setLoading(false);
         }
@@ -113,7 +113,7 @@ const PersonList: React.FC = () => {
     };
 
     const handlePersonUpdate = (updatedPerson: Person) => {
-        // Atualiza a pessoa na lista local
+        // Atualiza o cadastro na lista local
         setPersons(prevPersons =>
             prevPersons.map(person =>
                 person._id === updatedPerson._id ? updatedPerson : person
@@ -147,7 +147,7 @@ const PersonList: React.FC = () => {
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
                         <LoadingSpinner size="lg" className="mx-auto mb-4" />
-                        <p className="text-gray-300">Carregando pessoas...</p>
+                        <p className="text-gray-300">Carregando cadastros...</p>
                     </div>
                 </div>
             </div>
@@ -163,7 +163,7 @@ const PersonList: React.FC = () => {
                             <svg className="h-12 w-12 text-red-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                             </svg>
-                            <h3 className="text-lg font-medium text-red-300 mb-2">Erro ao carregar pessoas</h3>
+                            <h3 className="text-lg font-medium text-red-300 mb-2">Erro ao carregar cadastros</h3>
                             <p className="text-red-200 mb-4">{error}</p>
                             <Button onClick={refetch} variant="secondary" size="sm">
                                 <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -184,7 +184,7 @@ const PersonList: React.FC = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
                 <div>
                     <h1 className="text-3xl font-bold text-white">
-                        Pessoas
+                        Cadastros
                     </h1>
                     <p className="text-gray-300 mt-1">
                         Gerencie clientes e fornecedores
@@ -208,7 +208,7 @@ const PersonList: React.FC = () => {
                             <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
-                            Nova Pessoa
+                            Novo Cadastro
                         </Button>
                     </Link>
                 </div>
@@ -229,7 +229,7 @@ const PersonList: React.FC = () => {
             {/* Results */}
             <div className="mb-4">
                 <p className="text-sm text-gray-600">
-                    {totalItems} {totalItems === 1 ? 'pessoa encontrada' : 'pessoas encontradas'}
+                    {totalItems} {totalItems === 1 ? 'cadastro encontrado' : 'cadastros encontrados'}
                     {filters.search && ` para "${filters.search}"`}
                     {filters.type !== 'all' && ` (${filters.type === 'customer' ? 'Clientes' : 'Fornecedores'})`}
                     {filters.personType !== 'all' && ` - ${filters.personType === 'physical' ? 'Pessoa Física' : 'Pessoa Jurídica'}`}
@@ -247,11 +247,11 @@ const PersonList: React.FC = () => {
                                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
-                                <h3 className="mt-2 text-sm font-medium text-white">Nenhuma pessoa encontrada</h3>
+                                <h3 className="mt-2 text-sm font-medium text-white">Nenhum cadastro encontrado</h3>
                                 <p className="mt-1 text-sm text-gray-400">
                                     {(filters.search || filters.type !== 'all' || filters.personType !== 'all' || filters.status !== 'all' || filters.blacklist !== 'all' || filters.dateFrom || filters.dateTo)
                                         ? 'Tente ajustar os filtros de busca.'
-                                        : 'Comece criando uma nova pessoa.'
+                                        : 'Comece criando um novo cadastro.'
                                     }
                                 </p>
                             </div>

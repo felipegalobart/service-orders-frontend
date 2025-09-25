@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Script para popular o banco de dados com dados aleatórios de pessoas
+ * Script para popular o banco de dados com dados aleatórios de cadastros
  * Execute: node populate-database.js
  */
 
@@ -122,9 +122,9 @@ function gerarEndereco() {
     };
 }
 
-// Função para criar uma pessoa aleatória
-function criarPessoaAleatoria() {
-    const isPessoaFisica = Math.random() > 0.4; // 60% pessoa física, 40% jurídica
+// Função para criar um cadastro aleatório
+function criarCadastroAleatorio() {
+    const isPessoaFisica = Math.random() > 0.4; // 60% cadastro físico, 40% jurídico
 
     if (isPessoaFisica) {
         const nome = nomes[Math.floor(Math.random() * nomes.length)];
@@ -251,21 +251,21 @@ async function popularBanco() {
     let sucessos = 0;
     let erros = 0;
 
-    console.log(`📊 Gerando ${quantidadeRegistros} registros de pessoas...`);
+    console.log(`📊 Gerando ${quantidadeRegistros} registros de cadastros...`);
     console.log(`⏱️  Rate limiting: 10 req/min (nginx config)\n`);
 
     for (let i = 1; i <= quantidadeRegistros; i++) {
         try {
-            const pessoa = criarPessoaAleatoria();
+            const cadastro = criarCadastroAleatorio();
 
             console.log(`📝 Registro ${i}/${quantidadeRegistros}:`);
-            console.log(`   Nome: ${pessoa.name}`);
-            console.log(`   Documento: ${pessoa.document}`);
-            console.log(`   Tipo: ${pessoa.type === 'client' ? 'Cliente' : 'Fornecedor'}`);
-            console.log(`   Email: ${pessoa.contacts.find(c => c.type === 'email')?.value}`);
+            console.log(`   Nome: ${cadastro.name}`);
+            console.log(`   Documento: ${cadastro.document}`);
+            console.log(`   Tipo: ${cadastro.type === 'client' ? 'Cliente' : 'Fornecedor'}`);
+            console.log(`   Email: ${cadastro.contacts.find(c => c.type === 'email')?.value}`);
 
             // Fazer a requisição para a API
-            const resultado = await fazerRequisicao(`${API_BASE_URL}/persons`, pessoa);
+            const resultado = await fazerRequisicao(`${API_BASE_URL}/persons`, cadastro);
 
             console.log(`   ✅ Criado com sucesso! ID: ${resultado.id || 'N/A'}\n`);
             sucessos++;

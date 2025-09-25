@@ -143,10 +143,10 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             {showAdvanced && (
                 <div className="border-t border-gray-600 pt-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {/* Tipo de Pessoa */}
+                        {/* Tipo de Cadastro */}
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                                Tipo de Pessoa
+                                Tipo de Cadastro
                             </label>
                             <select
                                 value={filters.personType}

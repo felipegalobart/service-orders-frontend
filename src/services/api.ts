@@ -76,7 +76,7 @@ class ApiService {
     });
   }
 
-  // Métodos para pessoas
+  // Métodos para cadastros
   async getPersons(params?: PaginationParams): Promise<PersonListResponse> {
     // Se há busca, usar endpoint específico de busca (mínimo 2 caracteres)
     if (params?.search && params.search.trim() && params.search.trim().length >= 2) {

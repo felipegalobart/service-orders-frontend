@@ -2,7 +2,7 @@
 
 ## 📋 Descrição
 
-Estes scripts foram criados para popular o banco de dados com dados aleatórios de pessoas (clientes e fornecedores) para facilitar os testes do sistema.
+Estes scripts foram criados para popular o banco de dados com dados aleatórios de cadastros (clientes e fornecedores) para facilitar os testes do sistema.
 
 ## 🚀 Como Usar
 
@@ -36,19 +36,19 @@ chmod +x populate-database.sh
 
 ### **Quantidade:**
 - **25 registros** por execução
-- **60% pessoas físicas** (clientes)
-- **40% pessoas jurídicas** (clientes/fornecedores)
+- **60% cadastros físicos** (clientes)
+- **40% cadastros jurídicos** (clientes/fornecedores)
 
 ### **Tipos de Dados:**
 
-#### **Pessoas Físicas:**
+#### **Cadastros Físicos:**
 - ✅ Nome completo
 - ✅ CPF válido (com dígitos verificadores)
 - ✅ Telefone formatado
 - ✅ Email realista
 - ✅ Endereço completo
 
-#### **Pessoas Jurídicas:**
+#### **Cadastros Jurídicos:**
 - ✅ Razão social
 - ✅ Nome fantasia
 - ✅ CNPJ válido (com dígitos verificadores)
@@ -69,7 +69,7 @@ chmod +x populate-database.sh
 ```
 🚀 Iniciando população do banco de dados...
 
-📊 Gerando 25 registros de pessoas...
+📊 Gerando 25 registros de cadastros...
 
 📝 Registro 1/25:
    Nome: João Silva
@@ -168,7 +168,7 @@ npm install node-fetch
 ## 🎉 Resultado
 
 Após executar o script, você terá:
-- 📊 **25 pessoas** no banco de dados
+- 📊 **25 cadastros** no banco de dados
 - 🔍 **Dados para testar** filtros e buscas
 - 📱 **Interface populada** para demonstrações
 - 🧪 **Dados realistas** para desenvolvimento

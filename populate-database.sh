@@ -64,21 +64,21 @@ sucessos=0
 erros=0
 total=25
 
-echo "📊 Gerando $total registros de pessoas..."
+echo "📊 Gerando $total registros de cadastros..."
 echo ""
 
 for i in $(seq 1 $total); do
     echo "📝 Registro $i/$total:"
     
-    # Decidir se é pessoa física ou jurídica (60% física, 40% jurídica)
+    # Decidir se é cadastro físico ou jurídico (60% físico, 40% jurídico)
     if [ $((RANDOM % 10)) -lt 6 ]; then
-        # Pessoa física
+        # Cadastro físico
         nome=${nomes[$RANDOM % ${#nomes[@]}]}
         documento=$(gerar_cpf)
         tipo="client"
         corporate_name=""
     else
-        # Pessoa jurídica
+        # Cadastro jurídico
         nome=${empresas[$RANDOM % ${#empresas[@]}]}
         documento=$(gerar_cnpj)
         tipo=$([ $((RANDOM % 2)) -eq 0 ] && echo "supplier" || echo "client")
@@ -98,7 +98,7 @@ for i in $(seq 1 $total); do
     echo "   Tipo: $([ "$tipo" = "client" ] && echo "Cliente" || echo "Fornecedor")"
     echo "   Email: $email"
     
-    # Criar JSON da pessoa
+    # Criar JSON do cadastro
     if [ -n "$corporate_name" ]; then
         json_data=$(cat <<EOF
 {

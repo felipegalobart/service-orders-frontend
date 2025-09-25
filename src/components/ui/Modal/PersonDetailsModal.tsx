@@ -65,14 +65,14 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
             }
 
             // Mostrar notificação de sucesso
-            showNotification('Pessoa atualizada com sucesso!', 'success');
+            showNotification('Cadastro atualizado com sucesso!', 'success');
         } catch (error) {
-            console.error('Erro ao atualizar pessoa:', error);
+            console.error('Erro ao atualizar cadastro:', error);
 
             // Mostrar notificação de erro
             const errorMessage = error instanceof Error
-                ? `Erro ao atualizar pessoa: ${error.message}`
-                : 'Erro ao atualizar pessoa. Tente novamente.';
+                ? `Erro ao atualizar cadastro: ${error.message}`
+                : 'Erro ao atualizar cadastro. Tente novamente.';
             showNotification(errorMessage, 'error');
         } finally {
             setLoading(false);
@@ -120,7 +120,7 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
             <Modal
                 isOpen={isOpen}
                 onClose={onClose}
-                title={isEditing ? "Editar Pessoa" : "Detalhes da Pessoa"}
+                title={isEditing ? "Editar Cadastro" : "Detalhes do Cadastro"}
                 size="lg"
             >
                 <div className="p-6">
@@ -197,7 +197,7 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
                                         )}
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">
-                                                Tipo de Pessoa
+                                                Tipo de Cadastro
                                             </label>
                                             <p className="text-sm text-white">
                                                 {currentPerson.pessoaJuridica ? 'Pessoa Jurídica' : 'Pessoa Física'}

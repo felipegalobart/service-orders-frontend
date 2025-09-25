@@ -8,7 +8,7 @@ const Home: React.FC = () => {
 
     const stats = [
         {
-            title: 'Total de Pessoas',
+            title: 'Total de Cadastros',
             value: '3',
             change: '+2 este mês',
             changeType: 'positive' as const,
@@ -44,7 +44,7 @@ const Home: React.FC = () => {
 
     const quickActions = [
         {
-            title: 'Nova Pessoa',
+            title: 'Novo Cadastro',
             description: 'Cadastrar cliente ou fornecedor',
             href: '/persons/new',
             icon: (
@@ -54,8 +54,8 @@ const Home: React.FC = () => {
             ),
         },
         {
-            title: 'Listar Pessoas',
-            description: 'Ver todas as pessoas cadastradas',
+            title: 'Listar Cadastros',
+            description: 'Ver todos os cadastros registrados',
             href: '/persons',
             icon: (
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

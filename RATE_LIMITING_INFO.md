@@ -118,7 +118,7 @@ curl -s -o /dev/null -w "%{http_code}" http://192.168.31.75:3000/persons
 
 ### **Contar Registros:**
 ```bash
-# Contar pessoas no banco
+# Contar cadastros no banco
 curl -s -H "Authorization: Bearer TOKEN" "http://192.168.31.75:3000/persons" | jq '.data | length'
 ```
 
