@@ -1,6 +1,6 @@
 import { API_CONFIG, buildApiUrl } from '../config/api';
 import type { LoginRequest, LoginResponse } from '../types/auth';
-import type { Person, CreatePersonRequest, UpdatePersonRequest, PersonListResponse, PaginationParams } from '../types/person';
+import type { Person, UpdatePersonRequest, PersonListResponse, PaginationParams } from '../types/person';
 
 // Classe para gerenciar requisições HTTP
 class ApiService {
@@ -141,14 +141,6 @@ class ApiService {
       method: 'GET',
     });
   }
-
-  async createPerson(personData: CreatePersonRequest): Promise<Person> {
-    return this.request<Person>(API_CONFIG.ENDPOINTS.PERSONS.CREATE, {
-      method: 'POST',
-      body: JSON.stringify(personData),
-    });
-  }
-
 
   async updatePerson(id: string, personData: UpdatePersonRequest): Promise<Person> {
     return this.request<Person>(`${API_CONFIG.ENDPOINTS.PERSONS.UPDATE}/${id}`, {

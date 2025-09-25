@@ -13,13 +13,15 @@ interface PersonDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
     onUpdate?: (updatedPerson: Person) => void;
+    onDelete?: (deletedPersonId: string) => void;
 }
 
 export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
     person,
     isOpen,
     onClose,
-    onUpdate
+    onUpdate,
+    onDelete,
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -82,6 +84,40 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
     const handleCancelEdit = () => {
         setIsEditing(false);
         setCurrentPerson(person); // Restaura os dados originais
+    };
+
+    const handleDelete = async () => {
+        if (!currentPerson || !onDelete) return;
+
+        const confirmed = window.confirm(
+            `Tem certeza que deseja excluir o cadastro "${currentPerson.name}"?\n\nEsta ação não pode ser desfeita.`
+        );
+
+        if (!confirmed) return;
+
+        setLoading(true);
+        try {
+            await apiService.deletePerson(currentPerson._id);
+            
+            // Chamar callback para remover da lista
+            onDelete(currentPerson._id);
+            
+            // Mostrar notificação de sucesso
+            showNotification('Cadastro excluído com sucesso!', 'success');
+            
+            // Fechar modal
+            onClose();
+        } catch (error) {
+            console.error('Erro ao excluir cadastro:', error);
+            
+            // Mostrar notificação de erro
+            const errorMessage = error instanceof Error
+                ? `Erro ao excluir cadastro: ${error.message}`
+                : 'Erro ao excluir cadastro. Tente novamente.';
+            showNotification(errorMessage, 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleEdit = () => {
@@ -324,22 +360,39 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
                             </div>
 
                             {/* Actions */}
-                            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-600">
-                                <Button
-                                    variant="secondary"
-                                    onClick={onClose}
-                                >
-                                    Fechar
-                                </Button>
-                                <Button
-                                    variant="mitsuwa"
-                                    onClick={handleEdit}
-                                >
-                                    <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Editar
-                                </Button>
+                            <div className="flex justify-between pt-4 border-t border-gray-600">
+                                <div>
+                                    {onDelete && (
+                                        <Button
+                                            variant="ghost"
+                                            onClick={handleDelete}
+                                            disabled={loading}
+                                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                        >
+                                            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            {loading ? 'Excluindo...' : 'Excluir'}
+                                        </Button>
+                                    )}
+                                </div>
+                                <div className="flex space-x-3">
+                                    <Button
+                                        variant="secondary"
+                                        onClick={onClose}
+                                    >
+                                        Fechar
+                                    </Button>
+                                    <Button
+                                        variant="mitsuwa"
+                                        onClick={handleEdit}
+                                    >
+                                        <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Editar
+                                    </Button>
+                                </div>
                             </div>
                         </>
                     )}
