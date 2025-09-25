@@ -1,9 +1,4 @@
-FROM debian:bullseye-slim AS builder
-
-# Install Node.js and npm
-RUN apt-get update && apt-get install -y curl && \
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
@@ -20,12 +15,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM debian:bullseye-slim
-
-# Install Node.js and npm
-RUN apt-get update && apt-get install -y curl && \
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs
+FROM node:18-alpine
 
 WORKDIR /app
 
