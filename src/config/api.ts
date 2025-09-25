@@ -33,9 +33,7 @@ export const API_CONFIG = {
 
 // Função para obter a URL base baseada no ambiente
 export const getBaseURL = (): string => {
-  if (import.meta.env.PROD) {
-    return API_CONFIG.PRODUCTION_URL;
-  }
+  // Em produção, usar proxy para evitar problemas de CORS
   return API_CONFIG.BASE_URL;
 };
 
