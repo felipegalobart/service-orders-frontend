@@ -39,7 +39,7 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
                 {/* Header */}
                 <div className="text-center">
@@ -59,8 +59,8 @@ const Login: React.FC = () => {
                 </div>
 
                 {/* Login Form */}
-                <Card className="bg-gray-800 border-gray-700">
-                    <CardHeader className="border-b border-gray-700">
+                <Card className="bg-gray-800 border-gray-600 shadow-2xl">
+                    <CardHeader className="border-b border-gray-600">
                         <CardTitle className="text-white">Entrar</CardTitle>
                     </CardHeader>
                     <CardContent className="bg-gray-800">
@@ -86,7 +86,7 @@ const Login: React.FC = () => {
                             />
 
                             {error && (
-                                <div className="rounded-md bg-red-900/20 p-4 border border-red-800/50">
+                                <div className="rounded-md bg-red-900/30 p-4 border border-red-700/50">
                                     <div className="flex">
                                         <div className="flex-shrink-0">
                                             <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -109,7 +109,8 @@ const Login: React.FC = () => {
                                 type="submit"
                                 disabled={isLoading}
                                 loading={isLoading}
-                                className="w-full bg-gray-700 hover:bg-gray-600 text-white border-gray-600 hover:border-gray-500"
+                                variant="mitsuwa"
+                                className="w-full"
                                 size="lg"
                             >
                                 {isLoading ? 'Entrando...' : 'Entrar'}
@@ -121,7 +122,7 @@ const Login: React.FC = () => {
                                 Não tem uma conta?{' '}
                                 <Link
                                     to="/register"
-                                    className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
+                                    className="font-medium text-red-400 hover:text-red-300 transition-colors"
                                 >
                                     Criar conta
                                 </Link>

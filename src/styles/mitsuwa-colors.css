@@ -1,0 +1,304 @@
+/* 🎨 Mitsuwa Design System - CSS Variables */
+
+:root {
+  /* 🎯 Cores Primárias */
+  --mitsuwa-red: #DC2626;
+  --mitsuwa-red-hover: #B91C1C;
+  --mitsuwa-red-light: #F87171;
+  --mitsuwa-red-light-hover: #FCA5A5;
+  
+  /* 🎯 Cores Neutras */
+  --mitsuwa-black: #000000;
+  --mitsuwa-gray-900: #111827;
+  --mitsuwa-gray-800: #1F2937;
+  --mitsuwa-gray-700: #374151;
+  --mitsuwa-gray-600: #4B5563;
+  --mitsuwa-gray-500: #6B7280;
+  --mitsuwa-gray-400: #9CA3AF;
+  --mitsuwa-gray-300: #D1D5DB;
+  --mitsuwa-gray-200: #E5E7EB;
+  --mitsuwa-gray-100: #F3F4F6;
+  --mitsuwa-white: #FFFFFF;
+  
+  /* 🎯 Cores de Estado */
+  --mitsuwa-success: #059669;
+  --mitsuwa-warning: #D97706;
+  --mitsuwa-error: #DC2626;
+  --mitsuwa-info: #2563EB;
+  
+  /* 🎯 Sombras */
+  --mitsuwa-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --mitsuwa-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --mitsuwa-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --mitsuwa-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --mitsuwa-shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  
+  /* 🎯 Sombras Coloridas */
+  --mitsuwa-shadow-red: 0 10px 15px -3px rgb(220 38 38 / 0.25);
+  --mitsuwa-shadow-gray: 0 10px 15px -3px rgb(75 85 99 / 0.25);
+  
+  /* 🎯 Bordas */
+  --mitsuwa-border-radius: 0.5rem;
+  --mitsuwa-border-width: 1px;
+  
+  /* 🎯 Transições */
+  --mitsuwa-transition-fast: 150ms ease-in-out;
+  --mitsuwa-transition-normal: 300ms ease-in-out;
+  --mitsuwa-transition-slow: 500ms ease-in-out;
+  
+  /* 🎯 Espaçamentos */
+  --mitsuwa-spacing-xs: 0.25rem;   /* 4px */
+  --mitsuwa-spacing-sm: 0.5rem;    /* 8px */
+  --mitsuwa-spacing-md: 1rem;      /* 16px */
+  --mitsuwa-spacing-lg: 1.5rem;     /* 24px */
+  --mitsuwa-spacing-xl: 2rem;       /* 32px */
+  --mitsuwa-spacing-2xl: 3rem;      /* 48px */
+  
+  /* 🎯 Tipografia */
+  --mitsuwa-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --mitsuwa-font-size-xs: 0.75rem;   /* 12px */
+  --mitsuwa-font-size-sm: 0.875rem;  /* 14px */
+  --mitsuwa-font-size-base: 1rem;    /* 16px */
+  --mitsuwa-font-size-lg: 1.125rem;  /* 18px */
+  --mitsuwa-font-size-xl: 1.25rem;   /* 20px */
+  --mitsuwa-font-size-2xl: 1.5rem;   /* 24px */
+  --mitsuwa-font-size-3xl: 1.875rem; /* 30px */
+  
+  /* 🎯 Z-Index */
+  --mitsuwa-z-dropdown: 1000;
+  --mitsuwa-z-sticky: 1020;
+  --mitsuwa-z-fixed: 1030;
+  --mitsuwa-z-modal-backdrop: 1040;
+  --mitsuwa-z-modal: 1050;
+  --mitsuwa-z-popover: 1060;
+  --mitsuwa-z-tooltip: 1070;
+}
+
+/* 🎨 Classes Utilitárias Mitsuwa */
+
+/* Backgrounds */
+.bg-mitsuwa-primary {
+  background-color: var(--mitsuwa-red);
+}
+
+.bg-mitsuwa-secondary {
+  background-color: var(--mitsuwa-gray-800);
+}
+
+.bg-mitsuwa-dark {
+  background-color: var(--mitsuwa-black);
+}
+
+/* Text Colors */
+.text-mitsuwa-primary {
+  color: var(--mitsuwa-red);
+}
+
+.text-mitsuwa-secondary {
+  color: var(--mitsuwa-gray-300);
+}
+
+.text-mitsuwa-light {
+  color: var(--mitsuwa-white);
+}
+
+/* Borders */
+.border-mitsuwa-primary {
+  border-color: var(--mitsuwa-red);
+}
+
+.border-mitsuwa-secondary {
+  border-color: var(--mitsuwa-gray-600);
+}
+
+/* Shadows */
+.shadow-mitsuwa {
+  box-shadow: var(--mitsuwa-shadow-lg);
+}
+
+.shadow-mitsuwa-red {
+  box-shadow: var(--mitsuwa-shadow-red);
+}
+
+.shadow-mitsuwa-gray {
+  box-shadow: var(--mitsuwa-shadow-gray);
+}
+
+/* Transitions */
+.transition-mitsuwa {
+  transition: all var(--mitsuwa-transition-normal);
+}
+
+.transition-mitsuwa-fast {
+  transition: all var(--mitsuwa-transition-fast);
+}
+
+.transition-mitsuwa-slow {
+  transition: all var(--mitsuwa-transition-slow);
+}
+
+/* Gradients */
+.gradient-mitsuwa-primary {
+  background: linear-gradient(135deg, var(--mitsuwa-black) 0%, var(--mitsuwa-gray-900) 50%, var(--mitsuwa-black) 100%);
+}
+
+.gradient-mitsuwa-secondary {
+  background: linear-gradient(90deg, var(--mitsuwa-gray-800) 0%, var(--mitsuwa-gray-700) 100%);
+}
+
+/* Button Variants */
+.btn-mitsuwa {
+  background-color: var(--mitsuwa-gray-700);
+  color: var(--mitsuwa-white);
+  border: var(--mitsuwa-border-width) solid var(--mitsuwa-gray-600);
+  border-radius: var(--mitsuwa-border-radius);
+  padding: var(--mitsuwa-spacing-md) var(--mitsuwa-spacing-lg);
+  font-family: var(--mitsuwa-font-family);
+  font-size: var(--mitsuwa-font-size-base);
+  font-weight: 500;
+  transition: all var(--mitsuwa-transition-normal);
+  box-shadow: var(--mitsuwa-shadow-lg);
+}
+
+.btn-mitsuwa:hover {
+  background-color: var(--mitsuwa-gray-600);
+  border-color: var(--mitsuwa-gray-500);
+  box-shadow: var(--mitsuwa-shadow-gray);
+}
+
+.btn-mitsuwa:active {
+  background-color: var(--mitsuwa-gray-800);
+  border-color: var(--mitsuwa-gray-700);
+  transform: scale(0.95);
+}
+
+.btn-mitsuwa:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--mitsuwa-gray-500);
+}
+
+.btn-mitsuwa:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Card Variants */
+.card-mitsuwa {
+  background-color: var(--mitsuwa-gray-800);
+  border: var(--mitsuwa-border-width) solid var(--mitsuwa-gray-600);
+  border-radius: var(--mitsuwa-border-radius);
+  box-shadow: var(--mitsuwa-shadow-2xl);
+}
+
+.card-mitsuwa-header {
+  border-bottom: var(--mitsuwa-border-width) solid var(--mitsuwa-gray-600);
+  padding: var(--mitsuwa-spacing-lg);
+}
+
+.card-mitsuwa-content {
+  padding: var(--mitsuwa-spacing-lg);
+}
+
+/* Input Variants */
+.input-mitsuwa {
+  background-color: var(--mitsuwa-gray-700);
+  border: var(--mitsuwa-border-width) solid var(--mitsuwa-gray-600);
+  border-radius: var(--mitsuwa-border-radius);
+  color: var(--mitsuwa-white);
+  padding: var(--mitsuwa-spacing-sm) var(--mitsuwa-spacing-md);
+  font-family: var(--mitsuwa-font-family);
+  font-size: var(--mitsuwa-font-size-base);
+  transition: all var(--mitsuwa-transition-normal);
+}
+
+.input-mitsuwa:focus {
+  outline: none;
+  border-color: var(--mitsuwa-gray-500);
+  box-shadow: 0 0 0 2px var(--mitsuwa-gray-500);
+}
+
+.input-mitsuwa:hover {
+  border-color: var(--mitsuwa-gray-500);
+}
+
+.input-mitsuwa::placeholder {
+  color: var(--mitsuwa-gray-400);
+}
+
+/* Link Variants */
+.link-mitsuwa {
+  color: var(--mitsuwa-red-light);
+  text-decoration: none;
+  transition: color var(--mitsuwa-transition-normal);
+}
+
+.link-mitsuwa:hover {
+  color: var(--mitsuwa-red-light-hover);
+}
+
+/* Alert Variants */
+.alert-mitsuwa-success {
+  background-color: rgba(5, 150, 105, 0.1);
+  border: var(--mitsuwa-border-width) solid rgba(5, 150, 105, 0.3);
+  color: #10B981;
+}
+
+.alert-mitsuwa-warning {
+  background-color: rgba(217, 119, 6, 0.1);
+  border: var(--mitsuwa-border-width) solid rgba(217, 119, 6, 0.3);
+  color: #F59E0B;
+}
+
+.alert-mitsuwa-error {
+  background-color: rgba(220, 38, 38, 0.1);
+  border: var(--mitsuwa-border-width) solid rgba(220, 38, 38, 0.3);
+  color: #EF4444;
+}
+
+.alert-mitsuwa-info {
+  background-color: rgba(37, 99, 235, 0.1);
+  border: var(--mitsuwa-border-width) solid rgba(37, 99, 235, 0.3);
+  color: #3B82F6;
+}
+
+/* Responsive Utilities */
+@media (max-width: 640px) {
+  .btn-mitsuwa {
+    padding: var(--mitsuwa-spacing-sm) var(--mitsuwa-spacing-md);
+    font-size: var(--mitsuwa-font-size-sm);
+  }
+  
+  .card-mitsuwa-header,
+  .card-mitsuwa-content {
+    padding: var(--mitsuwa-spacing-md);
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mitsuwa-gray-100: #1F2937;
+    --mitsuwa-gray-200: #374151;
+    --mitsuwa-gray-300: #4B5563;
+    --mitsuwa-gray-400: #6B7280;
+    --mitsuwa-gray-500: #9CA3AF;
+    --mitsuwa-gray-600: #D1D5DB;
+    --mitsuwa-gray-700: #E5E7EB;
+    --mitsuwa-gray-800: #F3F4F6;
+    --mitsuwa-gray-900: #FFFFFF;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .btn-mitsuwa,
+  .card-mitsuwa {
+    box-shadow: none;
+    border: var(--mitsuwa-border-width) solid var(--mitsuwa-gray-600);
+  }
+  
+  .gradient-mitsuwa-primary,
+  .gradient-mitsuwa-secondary {
+    background: var(--mitsuwa-gray-800) !important;
+  }
+}
