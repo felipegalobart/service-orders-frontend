@@ -255,7 +255,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                                 onChange={(e) => handleInputChange('blacklist', e.target.checked)}
                                 className="rounded border-gray-600 text-red-400 focus:ring-red-500 bg-gray-800"
                             />
-                            <span className="ml-2 text-sm">Bloqueado</span>
+                            <span className="ml-2 text-sm">⚠️</span>
                         </label>
                     </div>
                 </div>

@@ -318,8 +318,8 @@ const PersonList: React.FC = () => {
                                                     {person.type === 'customer' ? 'Cliente' : 'Fornecedor'}
                                                 </Badge>
                                                 {person.blacklist && (
-                                                    <Badge variant="danger" size="sm">
-                                                        Bloqueado
+                                                    <Badge variant="default" size="md">
+                                                        ⚠️
                                                     </Badge>
                                                 )}
                                             </div>
