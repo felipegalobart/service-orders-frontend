@@ -167,11 +167,14 @@ const Home: React.FC = () => {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 animate-fade-in">
                 {stats.map((stat, index) => (
                     <Card
                         key={index}
-                        className="bg-gray-800 border-gray-700"
+                        className={`group bg-gray-800 border-gray-700 hover:border-red-500/50 transition-all duration-500 ease-out hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 cursor-pointer animate-fade-in-up ${index === 0 ? 'animate-stagger-1' :
+                                index === 1 ? 'animate-stagger-2' :
+                                    'animate-stagger-3'
+                            }`}
                     >
                         <CardContent>
                             <div className="flex items-center justify-between">
@@ -194,7 +197,7 @@ const Home: React.FC = () => {
                                         {stat.change}
                                     </p>
                                 </div>
-                                <div className="h-12 w-12 bg-gray-700 rounded-lg flex items-center justify-center text-gray-300">
+                                <div className="h-12 w-12 bg-gray-700 rounded-lg flex items-center justify-center text-gray-300 group-hover:bg-red-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-out">
                                     {stat.icon}
                                 </div>
                             </div>
@@ -226,8 +229,8 @@ const Home: React.FC = () => {
             )}
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="bg-gray-800 border-gray-700">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up animate-stagger-4">
+                <Card className="bg-gray-800 border-gray-700 hover:border-red-500/30 transition-all duration-500 ease-out hover:shadow-xl hover:shadow-red-500/5">
                     <CardHeader>
                         <CardTitle className="text-white">Ações Rápidas</CardTitle>
                     </CardHeader>
@@ -237,16 +240,16 @@ const Home: React.FC = () => {
                                 <Link
                                     key={index}
                                     to={action.href}
-                                    className="flex items-center p-4 rounded-lg border border-gray-600 hover:border-red-500 hover:bg-gray-700 transition-colors group"
+                                    className="flex items-center p-4 rounded-lg border border-gray-600 hover:border-red-500 hover:bg-gray-700 transition-all duration-300 ease-out group hover:shadow-lg hover:shadow-red-500/10 hover:-translate-y-1"
                                 >
-                                    <div className="h-10 w-10 bg-gray-700 rounded-lg flex items-center justify-center text-gray-300 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                    <div className="h-10 w-10 bg-gray-700 rounded-lg flex items-center justify-center text-gray-300 group-hover:bg-red-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-out">
                                         {action.icon}
                                     </div>
                                     <div className="ml-4">
-                                        <h3 className="font-medium text-white group-hover:text-red-400 transition-colors">
+                                        <h3 className="font-medium text-white group-hover:text-red-400 transition-colors duration-300">
                                             {action.title}
                                         </h3>
-                                        <p className="text-sm text-gray-400">{action.description}</p>
+                                        <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">{action.description}</p>
                                     </div>
                                 </Link>
                             ))}
@@ -254,25 +257,25 @@ const Home: React.FC = () => {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-gray-800 border-gray-700">
+                <Card className="bg-gray-800 border-gray-700 hover:border-red-500/30 transition-all duration-500 ease-out hover:shadow-xl hover:shadow-red-500/5 animate-fade-in-up animate-stagger-5">
                     <CardHeader>
                         <CardTitle className="text-white">Informações do Sistema</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-300">Versão do Sistema</span>
-                                <Badge variant="info">v1.0.0</Badge>
+                            <div className="flex items-center justify-between group">
+                                <span className="text-sm text-gray-300 group-hover:text-white transition-colors duration-300">Versão do Sistema</span>
+                                <Badge variant="info" className="group-hover:scale-105 transition-transform duration-300">v1.0.0</Badge>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-300">Seu Perfil</span>
-                                <Badge variant={user?.role === 'admin' ? 'danger' : 'info'}>
+                            <div className="flex items-center justify-between group">
+                                <span className="text-sm text-gray-300 group-hover:text-white transition-colors duration-300">Seu Perfil</span>
+                                <Badge variant={user?.role === 'admin' ? 'danger' : 'info'} className="group-hover:scale-105 transition-transform duration-300">
                                     {user?.role}
                                 </Badge>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-300">Status</span>
-                                <Badge variant="success">Ativo</Badge>
+                            <div className="flex items-center justify-between group">
+                                <span className="text-sm text-gray-300 group-hover:text-white transition-colors duration-300">Status</span>
+                                <Badge variant="success" className="group-hover:scale-105 transition-transform duration-300 animate-pulse-glow">Ativo</Badge>
                             </div>
                         </div>
                     </CardContent>
