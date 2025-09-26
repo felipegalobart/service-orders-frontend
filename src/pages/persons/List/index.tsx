@@ -67,7 +67,7 @@ const PersonList: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [itemsPerPage, filters]);
+    }, [itemsPerPage]);
 
     const refetch = async () => {
         await fetchPersons(1, filters);
