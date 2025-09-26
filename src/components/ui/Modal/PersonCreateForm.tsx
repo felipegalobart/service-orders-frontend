@@ -76,7 +76,7 @@ export const PersonCreateForm: React.FC<PersonCreateFormProps> = ({
                 newErrors[`contact_${index}_email`] = 'E-mail é obrigatório';
             }
             if (!contact.sector?.trim()) {
-                newErrors[`contact_${index}_sector`] = 'Setor é obrigatório';
+                newErrors[`contact_${index}_sector`] = 'Setor/Parentesco é obrigatório';
             }
         });
 
@@ -349,7 +349,7 @@ export const PersonCreateForm: React.FC<PersonCreateFormProps> = ({
 
                                 <div>
                                     <Input
-                                        label="Setor *"
+                                        label="Setor/Parentesco *"
                                         value={contact.sector || ''}
                                         onChange={(value) => updateContact(index, 'sector', value)}
                                         error={errors[`contact_${index}_sector`]}

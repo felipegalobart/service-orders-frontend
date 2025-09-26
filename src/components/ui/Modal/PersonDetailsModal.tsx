@@ -260,7 +260,7 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
                                                     {contact.sector && (
                                                         <div>
                                                             <label className="block text-sm font-medium text-gray-300 mb-1">
-                                                                Setor
+                                                                Setor/Parentesco
                                                             </label>
                                                             <p className="text-sm text-white">{contact.sector}</p>
                                                         </div>

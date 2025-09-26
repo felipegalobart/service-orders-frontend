@@ -62,7 +62,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                 newErrors[`contact_${index}_email`] = 'Email é obrigatório';
             }
             if (!contact.sector?.trim()) {
-                newErrors[`contact_${index}_sector`] = 'Setor é obrigatório';
+                newErrors[`contact_${index}_sector`] = 'Setor/Parentesco é obrigatório';
             }
         });
 
@@ -333,7 +333,7 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
                                 />
 
                                 <Input
-                                    label="Setor *"
+                                    label="Setor/Parentesco *"
                                     value={contact.sector || ''}
                                     onChange={(value) => updateContact(index, 'sector', value)}
                                     error={errors[`contact_${index}_sector`]}
