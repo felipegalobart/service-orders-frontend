@@ -1,5 +1,5 @@
 import { API_CONFIG, buildApiUrl } from '../config/api';
-import type { LoginRequest, LoginResponse } from '../types/auth';
+import type { LoginRequest, LoginResponse, CreateUserRequest, UpdateUserRequest, User } from '../types/auth';
 import type { Person, UpdatePersonRequest, PersonListResponse, PaginationParams } from '../types/person';
 
 // Classe para gerenciar requisições HTTP
@@ -39,10 +39,21 @@ class ApiService {
       
       if (!response.ok) {
         // Se for erro 401, limpar token e redirecionar para login
-        if (response.status === 401) {
+        // EXCETO para o endpoint de registro, que pode retornar 401 para email duplicado
+        if (response.status === 401 && !endpoint.includes('/auth/register')) {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('auth_user');
           window.location.href = '/login';
+        }
+        
+        // Para o endpoint de registro, tentar extrair a mensagem de erro da resposta
+        if (response.status === 401 && endpoint.includes('/auth/register')) {
+          try {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Email já cadastrado');
+          } catch {
+            throw new Error('Email já cadastrado');
+          }
         }
         
         throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
@@ -158,6 +169,40 @@ class ApiService {
 
   async deletePerson(id: string): Promise<void> {
     return this.request<void>(`${API_CONFIG.ENDPOINTS.PERSONS.DELETE}/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Métodos para usuários
+  async getUsers(): Promise<User[]> {
+    return this.request<User[]>(API_CONFIG.ENDPOINTS.USERS.LIST, {
+      method: 'GET',
+    });
+  }
+
+  async getUserById(id: string): Promise<User> {
+    return this.request<User>(`${API_CONFIG.ENDPOINTS.USERS.LIST}/${id}`, {
+      method: 'GET',
+    });
+  }
+
+  async createUser(userData: CreateUserRequest): Promise<User> {
+    // Usar endpoint de registro para criar usuários (requer autenticação)
+    return this.request<User>(API_CONFIG.ENDPOINTS.AUTH.REGISTER, {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  }
+
+  async updateUser(id: string, userData: UpdateUserRequest): Promise<User> {
+    return this.request<User>(`${API_CONFIG.ENDPOINTS.USERS.UPDATE}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    return this.request<void>(`${API_CONFIG.ENDPOINTS.USERS.DELETE}/${id}`, {
       method: 'DELETE',
     });
   }

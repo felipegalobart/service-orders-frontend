@@ -19,6 +19,12 @@ export const API_CONFIG = {
       CREATE: '/persons',
       UPDATE: '/persons',
       DELETE: '/persons',
+    },
+    USERS: {
+      LIST: '/users',
+      CREATE: '/users',
+      UPDATE: '/users',
+      DELETE: '/users',
     }
   },
   

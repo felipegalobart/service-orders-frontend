@@ -31,3 +31,26 @@ export interface AuthContextType extends AuthState {
   refreshToken: () => Promise<void>;
 }
 
+// Tipos para gerenciamento de usuários
+export interface CreateUserRequest {
+  name: string;
+  email: string;
+  password: string;
+  role: 'admin' | 'user';
+}
+
+export interface UpdateUserRequest {
+  name?: string;
+  email?: string;
+  password?: string;
+  role?: 'admin' | 'user';
+  isActive?: boolean;
+}
+
+export interface UserListResponse {
+  data: User[];
+  total: number;
+  page: number;
+  limit: number;
+}
+

@@ -3,3 +3,7 @@ export { PersonDetailsModal } from './PersonDetailsModal';
 export { PersonEditForm } from './PersonEditForm';
 export { CreatePersonModal } from './CreatePersonModal';
 export { PersonCreateForm } from './PersonCreateForm';
+export { UserModal } from './UserModal';
+export { UserList } from './UserList';
+export { UserForm } from './UserForm';
+export { UserItem } from './UserItem';
