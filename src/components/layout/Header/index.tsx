@@ -29,7 +29,7 @@ const Header: React.FC = () => {
                             />
                         </div>
                         <h1 className="text-xl font-bold text-white">
-                            Service Orders
+                            Mitsuwa Manager
                         </h1>
                     </div>
 

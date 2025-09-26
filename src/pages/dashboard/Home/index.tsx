@@ -162,7 +162,7 @@ const Home: React.FC = () => {
                     Bem-vindo, {user.name}!
                 </h1>
                 <p className="text-gray-300">
-                    Aqui está um resumo do seu sistema de Service Orders.
+                    Aqui está um resumo do seu sistema Mitsuwa Manager.
                 </p>
             </div>
 

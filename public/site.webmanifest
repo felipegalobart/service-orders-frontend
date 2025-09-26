@@ -1,7 +1,7 @@
 {
-  "name": "Service Orders - Mitsuwa",
-  "short_name": "Service Orders",
-  "description": "Sistema de gestão de ordens de serviço da Mitsuwa",
+  "name": "Mitsuwa Manager",
+  "short_name": "Mitsuwa Manager",
+  "description": "Sistema de gestão de cadastros e relacionamentos da Mitsuwa",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

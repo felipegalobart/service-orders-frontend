@@ -1,6 +1,6 @@
-# Service Orders Frontend
+# Mitsuwa Manager
 
-A React + TypeScript + Vite frontend application for managing service orders.
+A React + TypeScript + Vite frontend application for managing customer and supplier relationships.
 
 ## Requirements
 
