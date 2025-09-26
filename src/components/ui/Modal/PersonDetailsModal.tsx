@@ -98,18 +98,18 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
         setLoading(true);
         try {
             await apiService.deletePerson(currentPerson._id);
-            
+
             // Chamar callback para remover da lista
             onDelete(currentPerson._id);
-            
+
             // Mostrar notificação de sucesso
             showNotification('Cadastro excluído com sucesso!', 'success');
-            
+
             // Fechar modal
             onClose();
         } catch (error) {
             console.error('Erro ao excluir cadastro:', error);
-            
+
             // Mostrar notificação de erro
             const errorMessage = error instanceof Error
                 ? `Erro ao excluir cadastro: ${error.message}`
