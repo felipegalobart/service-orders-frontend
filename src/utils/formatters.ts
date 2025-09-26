@@ -136,3 +136,28 @@ export const formatDocument = (value: string): string => {
       return value;
   }
 };
+
+/**
+ * Formata texto com primeira letra de cada palavra em maiúscula
+ * Exceções: email, estado (sempre maiúsculo)
+ */
+export const formatTitleCase = (value: string, fieldName?: string): string => {
+  if (!value) return value;
+  
+  // Estado sempre em maiúsculo
+  if (fieldName === 'state') {
+    return value.toUpperCase();
+  }
+  
+  // Email não deve ser formatado
+  if (fieldName === 'email') {
+    return value.toLowerCase();
+  }
+  
+  // Outros campos: primeira letra de cada palavra em maiúscula
+  return value
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};

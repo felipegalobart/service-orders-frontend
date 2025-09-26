@@ -4,6 +4,7 @@ import { Button } from '../Button';
 import { PhoneInput } from '../PhoneInput';
 import { DocumentInput } from '../DocumentInput';
 import { CEPInput } from '../CEPInput';
+import { formatTitleCase } from '../../../utils/formatters';
 import type { Person } from '../../../types/person';
 
 interface PersonCreateFormProps {
@@ -88,9 +89,12 @@ export const PersonCreateForm: React.FC<PersonCreateFormProps> = ({
     };
 
     const handleInputChange = (field: string, value: string | boolean) => {
+        // Aplicar formatação para campos de texto
+        const formattedValue = typeof value === 'string' ? formatTitleCase(value, field) : value;
+
         setFormData(prev => ({
             ...prev,
-            [field]: value
+            [field]: formattedValue
         }));
     };
 
@@ -118,10 +122,13 @@ export const PersonCreateForm: React.FC<PersonCreateFormProps> = ({
     };
 
     const updateContact = (index: number, field: string, value: string | boolean) => {
+        // Aplicar formatação para campos de texto
+        const formattedValue = typeof value === 'string' ? formatTitleCase(value, field) : value;
+
         setFormData(prev => ({
             ...prev,
             contacts: prev.contacts?.map((contact, i) =>
-                i === index ? { ...contact, [field]: value } : contact
+                i === index ? { ...contact, [field]: formattedValue } : contact
             ) || []
         }));
     };
@@ -153,10 +160,13 @@ export const PersonCreateForm: React.FC<PersonCreateFormProps> = ({
     };
 
     const updateAddress = (index: number, field: string, value: string) => {
+        // Aplicar formatação para campos de texto
+        const formattedValue = formatTitleCase(value, field);
+
         setFormData(prev => ({
             ...prev,
             addresses: prev.addresses?.map((address, i) =>
-                i === index ? { ...address, [field]: value } : address
+                i === index ? { ...address, [field]: formattedValue } : address
             ) || []
         }));
     };

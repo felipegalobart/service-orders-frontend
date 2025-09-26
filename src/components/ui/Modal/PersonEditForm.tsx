@@ -4,6 +4,7 @@ import { Button } from '../Button';
 import { PhoneInput } from '../PhoneInput';
 import { DocumentInput } from '../DocumentInput';
 import { CEPInput } from '../CEPInput';
+import { formatTitleCase } from '../../../utils/formatters';
 import type { Person } from '../../../types/person';
 
 interface PersonEditFormProps {
@@ -74,9 +75,12 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
     };
 
     const handleInputChange = (field: string, value: string | boolean) => {
+        // Aplicar formatação para campos de texto
+        const formattedValue = typeof value === 'string' ? formatTitleCase(value, field) : value;
+
         setFormData(prev => ({
             ...prev,
-            [field]: value
+            [field]: formattedValue
         }));
 
         // Limpa erro do campo quando usuário começa a digitar
@@ -103,10 +107,13 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
     };
 
     const updateContact = (index: number, field: string, value: string | boolean) => {
+        // Aplicar formatação para campos de texto
+        const formattedValue = typeof value === 'string' ? formatTitleCase(value, field) : value;
+
         setFormData(prev => ({
             ...prev,
             contacts: prev.contacts.map((contact, i) =>
-                i === index ? { ...contact, [field]: value } : contact
+                i === index ? { ...contact, [field]: formattedValue } : contact
             )
         }));
     };
@@ -134,10 +141,13 @@ export const PersonEditForm: React.FC<PersonEditFormProps> = ({
     };
 
     const updateAddress = (index: number, field: string, value: string) => {
+        // Aplicar formatação para campos de texto
+        const formattedValue = formatTitleCase(value, field);
+
         setFormData(prev => ({
             ...prev,
             addresses: prev.addresses.map((address, i) =>
-                i === index ? { ...address, [field]: value } : address
+                i === index ? { ...address, [field]: formattedValue } : address
             )
         }));
     };
