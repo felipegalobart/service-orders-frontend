@@ -86,7 +86,7 @@ const PersonList: React.FC = () => {
     // Initial load
     useEffect(() => {
         fetchPersons(1, filters);
-    }, [fetchPersons, filters]); // Incluir dependências
+    }, []); // Apenas no mount inicial
 
     // Handle filters change
     const handleFiltersChange = (newFilters: FilterOptions) => {

@@ -1,17 +1,94 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
-import { Card, CardHeader, CardTitle, CardContent, Badge } from '../../../components/ui';
+import { Card, CardHeader, CardTitle, CardContent, Badge, LoadingSpinner } from '../../../components/ui';
+import { apiService } from '../../../services/api';
+import type { Person } from '../../../types/person';
 
 const Home: React.FC = () => {
     const { user } = useAuth();
 
+    // Estados para dados reais
+    const [statsData, setStatsData] = useState({
+        total: 0,
+        customers: 0,
+        suppliers: 0,
+        thisMonth: 0,
+        loading: true,
+        error: null as string | null
+    });
+
+    // Função para carregar dados reais
+    const loadStatsData = async () => {
+        try {
+            setStatsData(prev => ({ ...prev, loading: true, error: null }));
+
+            // Buscar todos os cadastros com paginação
+            let allPersons: Person[] = [];
+            let page = 1;
+            let hasMore = true;
+
+            while (hasMore) {
+                const response = await apiService.getPersons({
+                    page,
+                    limit: 50 // Usar limite menor e mais seguro
+                });
+
+                allPersons = [...allPersons, ...response.data];
+
+                // Verificar se há mais páginas
+                hasMore = response.data.length === 50 && page < Math.ceil(response.total / 50);
+                page++;
+
+                // Limite de segurança para evitar loop infinito
+                if (page > 20) break;
+            }
+
+            // Calcular estatísticas
+            const total = allPersons.length;
+            const customers = allPersons.filter(p => p.type === 'customer').length;
+            const suppliers = allPersons.filter(p => p.type === 'supplier').length;
+
+            // Calcular cadastros deste mês
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            const thisMonth = allPersons.filter(p => {
+                const createdDate = new Date(p.createdAt);
+                return createdDate.getMonth() === currentMonth && createdDate.getFullYear() === currentYear;
+            }).length;
+
+            setStatsData({
+                total,
+                customers,
+                suppliers,
+                thisMonth,
+                loading: false,
+                error: null
+            });
+        } catch (error) {
+            console.error('Erro ao carregar estatísticas:', error);
+            setStatsData(prev => ({
+                ...prev,
+                loading: false,
+                error: 'Erro ao carregar dados'
+            }));
+        }
+    };
+
+    // Carregar dados ao montar o componente
+    useEffect(() => {
+        // Só carregar dados se o usuário estiver autenticado
+        if (user) {
+            loadStatsData();
+        }
+    }, [user]);
+
     const stats = [
         {
             title: 'Total de Cadastros',
-            value: '3',
-            change: '+2 este mês',
-            changeType: 'positive' as const,
+            value: statsData.loading ? '...' : statsData.total.toString(),
+            change: statsData.loading ? 'Carregando...' : `+${statsData.thisMonth} este mês`,
+            changeType: statsData.thisMonth > 0 ? 'positive' as const : 'neutral' as const,
             icon: (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -20,8 +97,8 @@ const Home: React.FC = () => {
         },
         {
             title: 'Clientes Ativos',
-            value: '2',
-            change: '+1 este mês',
+            value: statsData.loading ? '...' : statsData.customers.toString(),
+            change: statsData.loading ? 'Carregando...' : `${statsData.customers} cadastrados`,
             changeType: 'positive' as const,
             icon: (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -31,8 +108,8 @@ const Home: React.FC = () => {
         },
         {
             title: 'Fornecedores',
-            value: '1',
-            change: 'Sem alteração',
+            value: statsData.loading ? '...' : statsData.suppliers.toString(),
+            change: statsData.loading ? 'Carregando...' : `${statsData.suppliers} cadastrados`,
             changeType: 'neutral' as 'positive' | 'negative' | 'neutral',
             icon: (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,12 +142,24 @@ const Home: React.FC = () => {
         },
     ];
 
+    // Se não há usuário autenticado, mostrar loading
+    if (!user) {
+        return (
+            <div className="space-y-8">
+                <div className="text-center">
+                    <LoadingSpinner size="lg" />
+                    <p className="text-gray-300 mt-4">Carregando dashboard...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-8">
             {/* Welcome Section */}
             <div className="text-center">
                 <h1 className="text-3xl font-bold text-white mb-2">
-                    Bem-vindo, {user?.name}!
+                    Bem-vindo, {user.name}!
                 </h1>
                 <p className="text-gray-300">
                     Aqui está um resumo do seu sistema de Service Orders.
@@ -80,13 +169,25 @@ const Home: React.FC = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {stats.map((stat, index) => (
-                    <Card key={index} className="bg-gray-800 border-gray-700">
+                    <Card
+                        key={index}
+                        className="bg-gray-800 border-gray-700"
+                    >
                         <CardContent>
                             <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-gray-300">{stat.title}</p>
-                                    <p className="text-2xl font-bold text-white">{stat.value}</p>
-                                    <p className={`text-sm ${stat.changeType === 'positive' ? 'text-green-400' :
+                                <div className="flex-1">
+                                    <p className="text-sm font-medium text-gray-300 mb-1">{stat.title}</p>
+                                    <div className="flex items-center gap-2">
+                                        {statsData.loading ? (
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-6 w-8 bg-gray-600 rounded animate-pulse"></div>
+                                                <LoadingSpinner size="sm" />
+                                            </div>
+                                        ) : (
+                                            <p className="text-2xl font-bold text-white">{stat.value}</p>
+                                        )}
+                                    </div>
+                                    <p className={`text-sm mt-1 ${stat.changeType === 'positive' ? 'text-green-400' :
                                         stat.changeType === 'negative' ? 'text-red-400' :
                                             'text-gray-400'
                                         }`}>
@@ -101,6 +202,28 @@ const Home: React.FC = () => {
                     </Card>
                 ))}
             </div>
+
+            {/* Error State */}
+            {statsData.error && (
+                <div className="mb-8">
+                    <Card className="bg-red-900/20 border-red-500/50">
+                        <CardContent>
+                            <div className="flex items-center gap-3 text-red-400">
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>{statsData.error}</span>
+                                <button
+                                    onClick={loadStatsData}
+                                    className="ml-auto text-sm underline hover:no-underline"
+                                >
+                                    Tentar novamente
+                                </button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            )}
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
