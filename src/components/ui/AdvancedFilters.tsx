@@ -35,6 +35,16 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
         });
     };
 
+    const handleTypeFilterChange = (value: 'all' | 'customer' | 'supplier') => {
+        const newFilters = {
+            ...filters,
+            type: value
+        };
+        onFiltersChange(newFilters);
+        // Aplicar filtro automaticamente
+        onSearch(newFilters);
+    };
+
     const handleSearchInputChange = (value: string) => {
         // Só atualiza o estado local, não dispara busca automática
         handleFilterChange('search', value);
@@ -85,21 +95,21 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                 <div className="flex gap-2">
                     <Button
                         variant={filters.type === 'all' ? 'mitsuwa' : 'secondary'}
-                        onClick={() => handleFilterChange('type', 'all')}
+                        onClick={() => handleTypeFilterChange('all')}
                         size="sm"
                     >
                         Todos
                     </Button>
                     <Button
                         variant={filters.type === 'customer' ? 'mitsuwa' : 'secondary'}
-                        onClick={() => handleFilterChange('type', 'customer')}
+                        onClick={() => handleTypeFilterChange('customer')}
                         size="sm"
                     >
                         Clientes
                     </Button>
                     <Button
                         variant={filters.type === 'supplier' ? 'mitsuwa' : 'secondary'}
-                        onClick={() => handleFilterChange('type', 'supplier')}
+                        onClick={() => handleTypeFilterChange('supplier')}
                         size="sm"
                     >
                         Fornecedores
