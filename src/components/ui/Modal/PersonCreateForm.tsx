@@ -56,42 +56,18 @@ export const PersonCreateForm: React.FC<PersonCreateFormProps> = ({
             newErrors.name = 'Nome é obrigatório';
         }
 
-        if (!formData.document?.trim()) {
-            newErrors.document = 'Documento é obrigatório';
-        }
+        // Documento agora é opcional
+        // Removida validação obrigatória conforme alteração na API
 
         if (formData.pessoaJuridica && !formData.corporateName?.trim()) {
             newErrors.corporateName = 'Razão social é obrigatória para cadastro jurídico';
         }
 
-        // Validar contatos - todos os campos são obrigatórios (API exige)
-        formData.contacts?.forEach((contact, index) => {
-            if (!contact.name?.trim()) {
-                newErrors[`contact_${index}_name`] = 'Nome do contato é obrigatório';
-            }
-            if (!contact.phone?.trim()) {
-                newErrors[`contact_${index}_phone`] = 'Telefone é obrigatório';
-            }
-            if (!contact.email?.trim()) {
-                newErrors[`contact_${index}_email`] = 'E-mail é obrigatório';
-            }
-            if (!contact.sector?.trim()) {
-                newErrors[`contact_${index}_sector`] = 'Setor/Parentesco é obrigatório';
-            }
-        });
+        // Validar contatos - campos opcionais
+        // Removida validação obrigatória conforme alteração na API
 
-        // Validar endereços - campos obrigatórios
-        formData.addresses?.forEach((address, index) => {
-            if (!address.street?.trim()) {
-                newErrors[`address_${index}_street`] = 'Logradouro é obrigatório';
-            }
-            if (!address.city?.trim()) {
-                newErrors[`address_${index}_city`] = 'Cidade é obrigatória';
-            }
-            if (!address.state?.trim()) {
-                newErrors[`address_${index}_state`] = 'Estado é obrigatório';
-            }
-        });
+        // Validar endereços - campos opcionais
+        // Removida validação obrigatória conforme alteração na API
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -204,11 +180,10 @@ export const PersonCreateForm: React.FC<PersonCreateFormProps> = ({
 
                     <div>
                         <DocumentInput
-                            label="Documento *"
+                            label="Documento"
                             value={formData.document || ''}
                             onChange={(value) => handleInputChange('document', value)}
                             error={errors.document}
-                            required
                         />
                     </div>
 
@@ -339,42 +314,38 @@ export const PersonCreateForm: React.FC<PersonCreateFormProps> = ({
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <Input
-                                        label="Nome *"
+                                        label="Nome"
                                         value={contact.name || ''}
                                         onChange={(value) => updateContact(index, 'name', value)}
                                         error={errors[`contact_${index}_name`]}
-                                        required
                                     />
                                 </div>
 
                                 <div>
                                     <Input
-                                        label="Setor/Parentesco *"
+                                        label="Setor/Parentesco"
                                         value={contact.sector || ''}
                                         onChange={(value) => updateContact(index, 'sector', value)}
                                         error={errors[`contact_${index}_sector`]}
-                                        required
                                     />
                                 </div>
 
                                 <div>
                                     <PhoneInput
-                                        label="Telefone *"
+                                        label="Telefone"
                                         value={contact.phone || ''}
                                         onChange={(value) => updateContact(index, 'phone', value)}
                                         error={errors[`contact_${index}_phone`]}
-                                        required
                                     />
                                 </div>
 
                                 <div>
                                     <Input
-                                        label="E-mail *"
+                                        label="E-mail"
                                         type="email"
                                         value={contact.email || ''}
                                         onChange={(value) => updateContact(index, 'email', value)}
                                         error={errors[`contact_${index}_email`]}
-                                        required
                                     />
                                 </div>
                             </div>
@@ -436,11 +407,10 @@ export const PersonCreateForm: React.FC<PersonCreateFormProps> = ({
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <Input
-                                        label="Logradouro *"
+                                        label="Logradouro"
                                         value={address.street || ''}
                                         onChange={(value) => updateAddress(index, 'street', value)}
                                         error={errors[`address_${index}_street`]}
-                                        required
                                     />
                                 </div>
                                 <div>
@@ -466,20 +436,18 @@ export const PersonCreateForm: React.FC<PersonCreateFormProps> = ({
                                 </div>
                                 <div>
                                     <Input
-                                        label="Cidade *"
+                                        label="Cidade"
                                         value={address.city || ''}
                                         onChange={(value) => updateAddress(index, 'city', value)}
                                         error={errors[`address_${index}_city`]}
-                                        required
                                     />
                                 </div>
                                 <div>
                                     <Input
-                                        label="Estado *"
+                                        label="Estado"
                                         value={address.state || ''}
                                         onChange={(value) => updateAddress(index, 'state', value)}
                                         error={errors[`address_${index}_state`]}
-                                        required
                                     />
                                 </div>
                                 <div>
