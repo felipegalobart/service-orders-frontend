@@ -5,14 +5,14 @@ import { UserList } from './UserList';
 import { UserForm } from './UserForm';
 import { apiService } from '../../../services/api';
 import { useAuth } from '../../../hooks/useAuth';
-import type { User, CreateUserRequest } from '../../../types/auth';
+import type { User, CreateUserRequest, UpdateUserRequest } from '../../../types/auth';
 
 interface UserModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-type ViewMode = 'list' | 'create';
+type ViewMode = 'list' | 'create' | 'edit';
 
 export const UserModal: React.FC<UserModalProps> = ({
     isOpen,
@@ -22,8 +22,10 @@ export const UserModal: React.FC<UserModalProps> = ({
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
     const [viewMode, setViewMode] = useState<ViewMode>('list');
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState<User | null>(null);
 
     // Carregar usuários quando o modal abrir
     useEffect(() => {
@@ -54,12 +56,10 @@ export const UserModal: React.FC<UserModalProps> = ({
 
         try {
             await apiService.createUser(userData);
-            // Recarregar a lista completa para garantir que está atualizada
             await loadUsers();
             setSuccessMessage(`Usuário "${userData.name}" criado com sucesso!`);
             setViewMode('list');
 
-            // Limpar mensagem de sucesso após 5 segundos
             setTimeout(() => {
                 setSuccessMessage(null);
             }, 5000);
@@ -68,14 +68,72 @@ export const UserModal: React.FC<UserModalProps> = ({
         }
     };
 
+    const handleEditUser = async (userData: UpdateUserRequest) => {
+        if (!selectedUser) return;
+
+        setLoading(true);
+        setError(null);
+        setSuccessMessage(null);
+
+        try {
+            await apiService.updateUser(selectedUser.id, userData);
+            await loadUsers();
+            setSuccessMessage(`Usuário "${userData.name || selectedUser.name}" atualizado com sucesso!`);
+            setViewMode('list');
+            setSelectedUser(null);
+
+            setTimeout(() => {
+                setSuccessMessage(null);
+            }, 5000);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteUser = async (user: User) => {
+        setLoading(true);
+        setError(null);
+        setSuccessMessage(null);
+
+        try {
+            await apiService.deleteUser(user.id);
+            await loadUsers();
+            setSuccessMessage(`Usuário "${user.name}" deletado com sucesso!`);
+            setDeleteConfirm(null);
+
+            setTimeout(() => {
+                setSuccessMessage(null);
+            }, 5000);
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Erro ao deletar usuário';
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleEditClick = (user: User) => {
+        setSelectedUser(user);
+        setViewMode('edit');
+        setError(null);
+        setSuccessMessage(null);
+    };
+
+    const handleDeleteClick = (user: User) => {
+        setDeleteConfirm(user);
+    };
+
     const handleBackToList = () => {
         setViewMode('list');
+        setSelectedUser(null);
         setError(null);
         setSuccessMessage(null);
     };
 
     const handleClose = () => {
         setViewMode('list');
+        setSelectedUser(null);
+        setDeleteConfirm(null);
         setError(null);
         setSuccessMessage(null);
         onClose();
@@ -86,9 +144,20 @@ export const UserModal: React.FC<UserModalProps> = ({
             case 'create':
                 return (
                     <UserForm
-                        onSave={handleCreateUser}
+                        onSave={handleCreateUser as (userData: CreateUserRequest | UpdateUserRequest) => Promise<void>}
                         onCancel={handleBackToList}
                         loading={loading}
+                    />
+                );
+
+            case 'edit':
+                return (
+                    <UserForm
+                        onSave={handleEditUser}
+                        onCancel={handleBackToList}
+                        loading={loading}
+                        user={selectedUser || undefined}
+                        isEditing={true}
                     />
                 );
 
@@ -147,7 +216,45 @@ export const UserModal: React.FC<UserModalProps> = ({
                             users={users || []}
                             currentUserId={currentUser?.id}
                             loading={loading}
+                            onEdit={handleEditClick}
+                            onDelete={handleDeleteClick}
                         />
+
+                        {/* Modal de confirmação de exclusão */}
+                        {deleteConfirm && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+                                    <div className="flex items-center mb-4">
+                                        <svg className="h-6 w-6 text-red-400 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        </svg>
+                                        <h3 className="text-lg font-semibold text-white">Confirmar Exclusão</h3>
+                                    </div>
+
+                                    <p className="text-gray-300 mb-6">
+                                        Tem certeza que deseja deletar o usuário <strong>{deleteConfirm.name}</strong>?
+                                        Esta ação não pode ser desfeita.
+                                    </p>
+
+                                    <div className="flex justify-end space-x-3">
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => setDeleteConfirm(null)}
+                                            disabled={loading}
+                                        >
+                                            Cancelar
+                                        </Button>
+                                        <Button
+                                            variant="danger"
+                                            onClick={() => handleDeleteUser(deleteConfirm)}
+                                            disabled={loading}
+                                        >
+                                            {loading ? 'Deletando...' : 'Deletar'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 );
         }

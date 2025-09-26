@@ -7,12 +7,16 @@ interface UserListProps {
     users: User[];
     currentUserId?: string;
     loading?: boolean;
+    onEdit?: (user: User) => void;
+    onDelete?: (user: User) => void;
 }
 
 export const UserList: React.FC<UserListProps> = ({
     users,
     currentUserId,
-    loading = false
+    loading = false,
+    onEdit,
+    onDelete
 }) => {
     if (loading) {
         return (
@@ -41,6 +45,8 @@ export const UserList: React.FC<UserListProps> = ({
                     key={user.id || `user-${index}`}
                     user={user}
                     isCurrentUser={user.id === currentUserId}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
                 />
             ))}
         </div>

@@ -1,31 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '../Input';
 import { Button } from '../Button';
-import type { CreateUserRequest } from '../../../types/auth';
+import type { CreateUserRequest, UpdateUserRequest, User } from '../../../types/auth';
 
 interface UserFormProps {
-    onSave: (userData: CreateUserRequest) => Promise<void>;
+    onSave: (userData: CreateUserRequest | UpdateUserRequest) => Promise<void>;
     onCancel: () => void;
     loading?: boolean;
+    user?: User;
+    isEditing?: boolean;
 }
 
 export const UserForm: React.FC<UserFormProps> = ({
     onSave,
     onCancel,
-    loading = false
+    loading = false,
+    user,
+    isEditing = false
 }) => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'user' as 'admin' | 'user'
+        role: 'user' as 'admin' | 'user',
+        isActive: true
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-    const isEditing = false; // Sempre criação de novo usuário
+    // Preencher formulário quando editando
+    useEffect(() => {
+        if (isEditing && user) {
+            setFormData({
+                name: user.name,
+                email: user.email,
+                password: '',
+                confirmPassword: '',
+                role: user.role,
+                isActive: user.isActive
+            });
+        }
+    }, [isEditing, user]);
 
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
@@ -40,16 +57,19 @@ export const UserForm: React.FC<UserFormProps> = ({
             newErrors.email = 'Email inválido';
         }
 
-        if (!formData.password.trim()) {
-            newErrors.password = 'Senha é obrigatória';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
-        }
+        // Validação de senha apenas para criação ou se senha for fornecida na edição
+        if (!isEditing || formData.password.trim()) {
+            if (!formData.password.trim()) {
+                newErrors.password = 'Senha é obrigatória';
+            } else if (formData.password.length < 6) {
+                newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
+            }
 
-        if (!formData.confirmPassword.trim()) {
-            newErrors.confirmPassword = 'Confirmação de senha é obrigatória';
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Senhas não coincidem';
+            if (!formData.confirmPassword.trim()) {
+                newErrors.confirmPassword = 'Confirmação de senha é obrigatória';
+            } else if (formData.password !== formData.confirmPassword) {
+                newErrors.confirmPassword = 'Senhas não coincidem';
+            }
         }
 
         setErrors(newErrors);
@@ -65,18 +85,35 @@ export const UserForm: React.FC<UserFormProps> = ({
 
         try {
             setSubmitError(null);
-            const userData: CreateUserRequest = {
-                name: formData.name,
-                email: formData.email,
-                password: formData.password,
-                role: formData.role
-            };
 
-            await onSave(userData);
+            if (isEditing) {
+                const userData: UpdateUserRequest = {
+                    name: formData.name,
+                    email: formData.email,
+                    role: formData.role,
+                    isActive: formData.isActive
+                };
+
+                // Incluir senha apenas se fornecida
+                if (formData.password.trim()) {
+                    userData.password = formData.password;
+                }
+
+                await onSave(userData);
+            } else {
+                const userData: CreateUserRequest = {
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password,
+                    role: formData.role
+                };
+
+                await onSave(userData);
+            }
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Erro ao criar usuário';
+            const errorMessage = error instanceof Error ? error.message : `Erro ao ${isEditing ? 'atualizar' : 'criar'} usuário`;
             setSubmitError(errorMessage);
-            console.error('Erro ao salvar usuário:', error);
+            console.error(`Erro ao ${isEditing ? 'atualizar' : 'criar'} usuário:`, error);
         }
     };
 
@@ -104,7 +141,7 @@ export const UserForm: React.FC<UserFormProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="bg-gray-700 rounded-lg p-4">
                 <h3 className="text-lg font-semibold text-white mb-4">
-                    Novo Usuário
+                    {isEditing ? 'Editar Usuário' : 'Novo Usuário'}
                 </h3>
 
                 {submitError && (
@@ -145,25 +182,27 @@ export const UserForm: React.FC<UserFormProps> = ({
 
                     <div>
                         <Input
-                            label="Senha *"
+                            label={isEditing ? "Nova Senha (deixe em branco para manter)" : "Senha *"}
                             type="password"
                             value={formData.password}
                             onChange={(value) => handleInputChange('password', value)}
                             error={errors.password}
-                            required
+                            required={!isEditing}
                         />
                     </div>
 
-                    <div>
-                        <Input
-                            label="Confirmar Senha *"
-                            type="password"
-                            value={formData.confirmPassword}
-                            onChange={(value) => handleInputChange('confirmPassword', value)}
-                            error={errors.confirmPassword}
-                            required
-                        />
-                    </div>
+                    {(!isEditing || formData.password.trim()) && (
+                        <div>
+                            <Input
+                                label={isEditing ? "Confirmar Nova Senha" : "Confirmar Senha *"}
+                                type="password"
+                                value={formData.confirmPassword}
+                                onChange={(value) => handleInputChange('confirmPassword', value)}
+                                error={errors.confirmPassword}
+                                required={!isEditing || formData.password.trim() !== ''}
+                            />
+                        </div>
+                    )}
 
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -178,6 +217,22 @@ export const UserForm: React.FC<UserFormProps> = ({
                             <option value="admin">Administrador</option>
                         </select>
                     </div>
+
+                    {isEditing && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Status
+                            </label>
+                            <select
+                                value={formData.isActive ? 'true' : 'false'}
+                                onChange={(e) => handleInputChange('isActive', e.target.value === 'true')}
+                                className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                            >
+                                <option value="true">Ativo</option>
+                                <option value="false">Inativo</option>
+                            </select>
+                        </div>
+                    )}
 
                 </div>
             </div>
@@ -196,7 +251,7 @@ export const UserForm: React.FC<UserFormProps> = ({
                     variant="mitsuwa"
                     disabled={loading}
                 >
-                    {loading ? 'Criando...' : 'Criar Usuário'}
+                    {loading ? (isEditing ? 'Atualizando...' : 'Criando...') : (isEditing ? 'Atualizar Usuário' : 'Criar Usuário')}
                 </Button>
             </div>
         </form>

@@ -22,7 +22,6 @@ export const API_CONFIG = {
     },
     USERS: {
       LIST: '/users',
-      CREATE: '/users',
       UPDATE: '/users',
       DELETE: '/users',
     }

@@ -5,6 +5,7 @@ import type { Person, UpdatePersonRequest, PersonListResponse, PaginationParams 
 // Classe para gerenciar requisições HTTP
 class ApiService {
   private defaultHeaders: Record<string, string>;
+  private userStatusCache: Map<string, boolean> = new Map();
 
   constructor() {
     this.defaultHeaders = API_CONFIG.DEFAULT_HEADERS;
@@ -175,9 +176,15 @@ class ApiService {
 
   // Métodos para usuários
   async getUsers(): Promise<User[]> {
-    return this.request<User[]>(API_CONFIG.ENDPOINTS.USERS.LIST, {
+    const users = await this.request<User[]>(API_CONFIG.ENDPOINTS.USERS.LIST, {
       method: 'GET',
     });
+    
+    // Usar cache para manter o estado de isActive entre requisições
+    return users.map(user => ({
+      ...user,
+      isActive: user.isActive !== undefined ? user.isActive : (this.userStatusCache.get(user.id) ?? true)
+    }));
   }
 
   async getUserById(id: string): Promise<User> {
@@ -195,14 +202,22 @@ class ApiService {
   }
 
   async updateUser(id: string, userData: UpdateUserRequest): Promise<User> {
-    return this.request<User>(`${API_CONFIG.ENDPOINTS.USERS.UPDATE}/${id}`, {
+    const response = await this.request<User>(`${API_CONFIG.ENDPOINTS.USERS.UPDATE}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(userData),
     });
+    
+    // Se a API não retornar isActive, usar o valor enviado e salvar no cache
+    if (response.isActive === undefined && userData.isActive !== undefined) {
+      response.isActive = userData.isActive;
+      this.userStatusCache.set(id, userData.isActive);
+    }
+    
+    return response;
   }
 
-  async deleteUser(id: string): Promise<void> {
-    return this.request<void>(`${API_CONFIG.ENDPOINTS.USERS.DELETE}/${id}`, {
+  async deleteUser(id: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`${API_CONFIG.ENDPOINTS.USERS.DELETE}/${id}`, {
       method: 'DELETE',
     });
   }
