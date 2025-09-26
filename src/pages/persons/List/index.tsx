@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, Button, Badge, LoadingSpinner, Pagination, AdvancedFilters, PersonDetailsModal, CreatePersonModal } from '../../../components/ui';
 import { apiService } from '../../../services/api';
-import { formatPhoneNumber } from '../../../utils/formatters';
+import { formatPhoneNumber, formatDocument } from '../../../utils/formatters';
 import type { Person, PersonListResponse, PaginationParams } from '../../../types/person';
 import type { FilterOptions } from '../../../components/ui/AdvancedFilters';
 
@@ -330,7 +330,7 @@ const PersonList: React.FC = () => {
                                             )}
                                             {person.document && (
                                                 <p className="text-sm text-gray-400 mb-2">
-                                                    {person.document}
+                                                    {formatDocument(person.document)}
                                                 </p>
                                             )}
                                             <div className="space-y-3 text-sm text-gray-300">

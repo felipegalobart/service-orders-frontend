@@ -4,7 +4,7 @@ import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { PersonEditForm } from './PersonEditForm';
 import { Notification, useNotification } from '../Notification';
-import { formatPhoneNumber } from '../../../utils/formatters';
+import { formatPhoneNumber, formatDocument } from '../../../utils/formatters';
 import { apiService } from '../../../services/api';
 import type { Person, UpdatePersonRequest } from '../../../types/person';
 
@@ -221,7 +221,7 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
                                             <label className="block text-sm font-medium text-gray-300 mb-1">
                                                 {currentPerson.pessoaJuridica ? 'CNPJ' : 'CPF'}
                                             </label>
-                                            <p className="text-sm text-white">{currentPerson.document}</p>
+                                            <p className="text-sm text-white">{currentPerson.document ? formatDocument(currentPerson.document) : ''}</p>
                                         </div>
                                         {currentPerson.stateRegistration && (
                                             <div>
