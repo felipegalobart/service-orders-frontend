@@ -209,9 +209,18 @@ export const formatCurrency = (value: number): string => {
 
 /**
  * Formata data no padrão brasileiro (DD/MM/AAAA)
+ * Evita problemas de timezone ao receber datas no formato YYYY-MM-DD
  */
 export const formatDate = (date: string | Date): string => {
   if (!date) return '';
+  
+  // Se for string no formato YYYY-MM-DD (sem horário), parsear manualmente
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date.split('T')[0])) {
+    const [year, month, day] = date.split('T')[0].split('-');
+    return `${day}/${month}/${year}`;
+  }
+  
+  // Para outros formatos, usar toLocaleDateString
   return new Date(date).toLocaleDateString('pt-BR');
 };
 
