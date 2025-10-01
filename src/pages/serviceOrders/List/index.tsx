@@ -4,7 +4,7 @@ import { Card, CardContent } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { LoadingSpinner } from '../../../components/ui/Loading';
-import { ServiceOrderFilters, CustomerDetails, StatusDropdown } from '../../../components/serviceOrders';
+import { CustomerDetails, StatusDropdown, OrderNumberSearch, FiltersModal } from '../../../components/serviceOrders';
 import { useServiceOrders } from '../../../hooks/useServiceOrders';
 import { formatDate, formatServiceOrderStatus, formatFinancialStatus } from '../../../utils/formatters';
 import type { ServiceOrderFilters as ServiceOrderFiltersType } from '../../../types/serviceOrder';
@@ -15,6 +15,9 @@ const ServiceOrderList: React.FC = () => {
         page: 1,
         limit: 10,
     });
+    const [orderNumberSearch, setOrderNumberSearch] = useState('');
+    const [hasSearchedOrderNumber, setHasSearchedOrderNumber] = useState(false);
+    const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
 
     const { data, isLoading, error } = useServiceOrders(filters);
 
@@ -22,9 +25,57 @@ const ServiceOrderList: React.FC = () => {
         setFilters(newFilters);
     };
 
-    const handleSearch = (search: string) => {
-        setFilters(prev => ({ ...prev, search, page: 1 }));
+    const handleOrderNumberSearch = () => {
+        setHasSearchedOrderNumber(true);
+        setFilters(prev => ({
+            ...prev,
+            orderNumber: orderNumberSearch,
+            page: 1
+        }));
     };
+
+    const handleOrderNumberChange = (value: string) => {
+        setOrderNumberSearch(value);
+        if (value === '') {
+            setHasSearchedOrderNumber(false);
+            setFilters(prev => ({
+                ...prev,
+                orderNumber: undefined,
+                page: 1
+            }));
+        }
+    };
+
+    const hasActiveFilters = () => {
+        return !!(
+            filters.status ||
+            filters.financial ||
+            filters.customerId ||
+            filters.customerName ||
+            filters.equipment ||
+            filters.model ||
+            filters.brand ||
+            filters.serialNumber ||
+            filters.dateFrom ||
+            filters.dateTo
+        );
+    };
+
+    const getActiveFiltersCount = () => {
+        let count = 0;
+        if (filters.status) count++;
+        if (filters.financial) count++;
+        if (filters.customerId) count++;
+        if (filters.customerName) count++;
+        if (filters.equipment) count++;
+        if (filters.model) count++;
+        if (filters.brand) count++;
+        if (filters.serialNumber) count++;
+        if (filters.dateFrom) count++;
+        if (filters.dateTo) count++;
+        return count;
+    };
+
 
 
     const getStatusBadgeVariant = (status: string) => {
@@ -92,12 +143,38 @@ const ServiceOrderList: React.FC = () => {
                 </div>
             </div>
 
-            {/* Filtros */}
-            <ServiceOrderFilters
-                filters={filters}
-                onFiltersChange={handleFiltersChange}
-                onSearch={handleSearch}
+            {/* Busca por Número da Ordem */}
+            <OrderNumberSearch
+                value={orderNumberSearch}
+                onChange={handleOrderNumberChange}
+                onSearch={handleOrderNumberSearch}
+                autoFocus={true}
+                isLoading={isLoading}
+                hasSearched={hasSearchedOrderNumber}
+                hasResults={(data?.data?.length || 0) > 0}
             />
+
+            {/* Botão de Filtros */}
+            <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                    <Button
+                        onClick={() => setIsFiltersModalOpen(true)}
+                        variant="secondary"
+                        className="flex items-center gap-2"
+                    >
+                        🔍 Filtros
+                        {hasActiveFilters() && (
+                            <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1">
+                                {getActiveFiltersCount()}
+                            </span>
+                        )}
+                    </Button>
+                </div>
+
+                <div className="text-sm text-gray-400">
+                    {data?.total || 0} ordens encontradas
+                </div>
+            </div>
 
             {/* Lista de Ordens */}
             <div className="grid gap-4">
@@ -382,6 +459,14 @@ const ServiceOrderList: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            {/* Modal de Filtros */}
+            <FiltersModal
+                filters={filters}
+                onFiltersChange={handleFiltersChange}
+                isOpen={isFiltersModalOpen}
+                onClose={() => setIsFiltersModalOpen(false)}
+            />
         </div>
     );
 };

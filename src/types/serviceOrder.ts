@@ -101,14 +101,15 @@ export type UpdateServiceOrderRequest = Partial<CreateServiceOrderRequest>;
 export interface ServiceOrderFilters {
   page?: number;
   limit?: number;
+  orderNumber?: string;
   status?: ServiceOrderStatus;
   financial?: FinancialStatus;
   customerId?: string;
+  customerName?: string;
   equipment?: string;
   model?: string;
   brand?: string;
   serialNumber?: string;
-  search?: string;
   dateFrom?: string;
   dateTo?: string;
 }

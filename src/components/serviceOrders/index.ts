@@ -10,3 +10,5 @@ export { ServiceOrderMetrics } from './ServiceOrderMetrics';
 export { StatusUpdateModal, FinancialStatusUpdateModal } from './StatusUpdateModal';
 export { ServiceOrderPrint } from './ServiceOrderPrint';
 export { StatusDropdown } from './StatusDropdown';
+export { OrderNumberSearch } from './OrderNumberSearch';
+export { FiltersModal } from './FiltersModal';

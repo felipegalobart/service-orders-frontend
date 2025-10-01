@@ -238,26 +238,201 @@ class ApiService {
   async getServiceOrders(filters?: ServiceOrderFilters): Promise<ServiceOrderListResponse> {
     const queryParams = new URLSearchParams();
     
-    // Sempre popular dados do cliente
-    queryParams.append('populate', 'customer');
+    // Determinar qual endpoint usar baseado nos filtros
+    let baseEndpoint = API_CONFIG.ENDPOINTS.SERVICE_ORDERS.LIST;
     
-    if (filters?.page) queryParams.append('page', filters.page.toString());
-    if (filters?.limit) queryParams.append('limit', filters.limit.toString());
-    if (filters?.status) queryParams.append('status', filters.status);
-    if (filters?.financial) queryParams.append('financial', filters.financial);
-    if (filters?.customerId) queryParams.append('customerId', filters.customerId);
-    if (filters?.equipment) queryParams.append('equipment', filters.equipment);
-    if (filters?.model) queryParams.append('model', filters.model);
-    if (filters?.brand) queryParams.append('brand', filters.brand);
-    if (filters?.serialNumber) queryParams.append('serialNumber', filters.serialNumber);
-    if (filters?.dateFrom) queryParams.append('dateFrom', filters.dateFrom);
-    if (filters?.dateTo) queryParams.append('dateTo', filters.dateTo);
+    // Verificar se há outros filtros além do customerName e orderNumber
+    const hasOtherFilters = !!(
+      filters?.status ||
+      filters?.financial ||
+      filters?.customerId ||
+      filters?.equipment ||
+      filters?.model ||
+      filters?.brand ||
+      filters?.serialNumber ||
+      filters?.dateFrom ||
+      filters?.dateTo
+    );
+
+    // Se há busca por número da ordem, sempre usar endpoint específico
+    if (filters?.orderNumber) {
+      console.log('🔍 DEBUG - Usando endpoint específico para orderNumber');
+      baseEndpoint = API_CONFIG.ENDPOINTS.SERVICE_ORDERS.BY_ORDER_NUMBER;
+      queryParams.append('q', filters.orderNumber);
+      queryParams.append('populate', 'customer');
+      if (filters?.page) queryParams.append('page', filters.page.toString());
+      if (filters?.limit) queryParams.append('limit', filters.limit.toString());
+    }
+    // Se há busca por nome do cliente, sempre usar endpoint específico
+    else if (filters?.customerName) {
+      console.log('🔍 DEBUG - Usando endpoint específico para customerName');
+      baseEndpoint = API_CONFIG.ENDPOINTS.SERVICE_ORDERS.BY_CUSTOMER_NAME;
+      queryParams.append('q', filters.customerName);
+      queryParams.append('populate', 'customer');
+      if (filters?.page) queryParams.append('page', filters.page.toString());
+      if (filters?.limit) queryParams.append('limit', filters.limit.toString());
+      
+      // Tentar adicionar outros filtros como parâmetros adicionais
+      if (filters?.status) {
+        console.log('🔍 DEBUG - Adicionando filtro status:', filters.status);
+        queryParams.append('status', filters.status);
+      }
+      if (filters?.financial) {
+        console.log('🔍 DEBUG - Adicionando filtro financial:', filters.financial);
+        queryParams.append('financial', filters.financial);
+      }
+      if (filters?.equipment) {
+        console.log('🔍 DEBUG - Adicionando filtro equipment:', filters.equipment);
+        queryParams.append('equipment', filters.equipment);
+      }
+      if (filters?.model) {
+        console.log('🔍 DEBUG - Adicionando filtro model:', filters.model);
+        queryParams.append('model', filters.model);
+      }
+      if (filters?.brand) {
+        console.log('🔍 DEBUG - Adicionando filtro brand:', filters.brand);
+        queryParams.append('brand', filters.brand);
+      }
+      if (filters?.serialNumber) {
+        console.log('🔍 DEBUG - Adicionando filtro serialNumber:', filters.serialNumber);
+        queryParams.append('serialNumber', filters.serialNumber);
+      }
+      if (filters?.dateFrom) {
+        console.log('🔍 DEBUG - Adicionando filtro dateFrom:', filters.dateFrom);
+        queryParams.append('dateFrom', filters.dateFrom);
+      }
+      if (filters?.dateTo) {
+        console.log('🔍 DEBUG - Adicionando filtro dateTo:', filters.dateTo);
+        queryParams.append('dateTo', filters.dateTo);
+      }
+    } else {
+      // Para outros casos, usar endpoint normal
+      // Sempre popular dados do cliente
+      queryParams.append('populate', 'customer');
+      
+      if (filters?.page) queryParams.append('page', filters.page.toString());
+      if (filters?.limit) queryParams.append('limit', filters.limit.toString());
+      if (filters?.status) queryParams.append('status', filters.status);
+      if (filters?.financial) queryParams.append('financial', filters.financial);
+      if (filters?.customerId) queryParams.append('customerId', filters.customerId);
+      if (filters?.equipment) queryParams.append('equipment', filters.equipment);
+      if (filters?.model) queryParams.append('model', filters.model);
+      if (filters?.brand) queryParams.append('brand', filters.brand);
+      if (filters?.serialNumber) queryParams.append('serialNumber', filters.serialNumber);
+      if (filters?.dateFrom) queryParams.append('dateFrom', filters.dateFrom);
+      if (filters?.dateTo) queryParams.append('dateTo', filters.dateTo);
+    }
     
-    const endpoint = `${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.LIST}?${queryParams.toString()}`;
+    const endpoint = `${baseEndpoint}?${queryParams.toString()}`;
     
-    return this.request<ServiceOrderListResponse>(endpoint, {
-      method: 'GET',
-    });
+    // Debug temporário
+    console.log('🔍 DEBUG - Filtros enviados:', filters);
+    console.log('🔍 DEBUG - Endpoint usado:', endpoint);
+    console.log('🔍 DEBUG - Query params:', queryParams.toString());
+    console.log('🔍 DEBUG - Base endpoint:', baseEndpoint);
+    console.log('🔍 DEBUG - Tem busca ativa: false');
+    console.log('🔍 DEBUG - Tem customerName:', !!filters?.customerName);
+    console.log('🔍 DEBUG - CustomerName valor:', filters?.customerName);
+    
+    console.log('🔍 DEBUG - Tem outros filtros:', hasOtherFilters);
+    if (filters?.customerName) {
+      console.log('🔍 DEBUG - Estratégia: CustomerName + filtros adicionais (endpoint específico)');
+    } else {
+      console.log('🔍 DEBUG - Estratégia: Endpoint normal');
+    }
+    
+    try {
+      const response = await this.request<ServiceOrderListResponse | ServiceOrder[]>(endpoint, {
+        method: 'GET',
+      });
+      
+      // Debug temporário - resposta da API
+      console.log('🔍 DEBUG - Resposta da API:', response);
+      console.log('🔍 DEBUG - Tipo da resposta:', Array.isArray(response) ? 'Array' : 'Object');
+      
+      // Se é busca por nome do cliente ou número da ordem, o backend pode retornar array ou objeto único
+      if ((filters?.customerName || filters?.orderNumber) && (Array.isArray(response) || (typeof response === 'object' && response !== null))) {
+        // Converter resposta para array se necessário
+        let responseArray: ServiceOrder[] = Array.isArray(response) 
+          ? response as ServiceOrder[] 
+          : [response as unknown as ServiceOrder];
+        let filteredData = responseArray;
+        
+        // Se há outros filtros, aplicar filtros no frontend
+        if (hasOtherFilters) {
+          console.log('🔍 DEBUG - Aplicando filtros no frontend');
+          filteredData = responseArray.filter(order => {
+            // Filtro por status
+            if (filters.status && order.status !== filters.status) {
+              return false;
+            }
+            
+            // Filtro por status financeiro
+            if (filters.financial && order.financial !== filters.financial) {
+              return false;
+            }
+            
+            // Filtro por equipamento
+            if (filters.equipment && !order.equipment.toLowerCase().includes(filters.equipment.toLowerCase())) {
+              return false;
+            }
+            
+            // Filtro por modelo
+            if (filters.model && !order.model?.toLowerCase().includes(filters.model.toLowerCase())) {
+              return false;
+            }
+            
+            // Filtro por marca
+            if (filters.brand && !order.brand?.toLowerCase().includes(filters.brand.toLowerCase())) {
+              return false;
+            }
+            
+            // Filtro por número de série
+            if (filters.serialNumber && !order.serialNumber?.toLowerCase().includes(filters.serialNumber.toLowerCase())) {
+              return false;
+            }
+            
+            return true;
+          });
+          
+          console.log('🔍 DEBUG - Dados originais:', responseArray.length);
+          console.log('🔍 DEBUG - Dados filtrados:', filteredData.length);
+        }
+        
+        const formattedResponse: ServiceOrderListResponse = {
+          data: filteredData,
+          total: filteredData.length,
+          page: filters.page || 1,
+          limit: filters.limit || 10,
+          totalPages: Math.ceil(filteredData.length / (filters.limit || 10)),
+        };
+        console.log('🔍 DEBUG - Resposta formatada:', formattedResponse);
+        return formattedResponse;
+      }
+      
+      // Para outros casos, retornar como está
+      const responseData = response as ServiceOrderListResponse;
+      console.log('🔍 DEBUG - Total de resultados:', responseData?.data?.length || 0);
+      console.log('🔍 DEBUG - Total do backend:', responseData?.total || 0);
+      
+      return responseData;
+    } catch (error) {
+      console.error('🔍 DEBUG - Erro na busca:', error);
+      
+      // Se é busca por número da ordem e não encontrou, retornar resultado vazio
+      if (filters?.orderNumber) {
+        console.log('🔍 DEBUG - Ordem não encontrada, retornando resultado vazio');
+        return {
+          data: [],
+          total: 0,
+          page: filters.page || 1,
+          limit: filters.limit || 10,
+          totalPages: 0,
+        };
+      }
+      
+      throw error;
+    }
   }
 
   async getServiceOrderById(id: string): Promise<ServiceOrder> {

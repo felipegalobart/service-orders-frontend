@@ -24,11 +24,15 @@ export const serviceOrderKeys = {
 
 // Hook para listar ordens de serviço
 export const useServiceOrders = (filters: ServiceOrderFilters = {}) => {
+  // Reduzir cache quando há busca ativa
+  const hasSearch = !!filters.search;
+  
   return useQuery({
     queryKey: serviceOrderKeys.list(filters),
     queryFn: () => apiService.getServiceOrders(filters),
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    gcTime: 10 * 60 * 1000, // 10 minutos
+    staleTime: hasSearch ? 0 : 5 * 60 * 1000, // Sem cache para busca
+    gcTime: hasSearch ? 0 : 10 * 60 * 1000, // Sem cache para busca
+    refetchOnWindowFocus: hasSearch, // Refetch quando foca na janela se há busca
   });
 };
 
