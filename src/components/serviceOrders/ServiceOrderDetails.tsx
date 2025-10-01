@@ -407,14 +407,14 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                             <td className="py-3 px-4 text-sm text-gray-400">{index + 1}</td>
                                             <td className="py-3 px-4 text-sm text-white font-medium">{service.description}</td>
                                             <td className="py-3 px-4 text-center text-sm text-gray-300">{service.quantity}</td>
-                                            <td className="py-3 px-4 text-right text-sm text-gray-300">{formatCurrency(service.value)}</td>
+                                            <td className="py-3 px-4 text-right text-sm text-gray-300">{formatCurrency(parseDecimal(service.value))}</td>
                                             <td className="py-3 px-4 text-right text-sm text-red-400">
-                                                {service.discount > 0 ? `-${formatCurrency(service.discount)}` : '-'}
+                                                {parseDecimal(service.discount) > 0 ? `-${formatCurrency(parseDecimal(service.discount))}` : '-'}
                                             </td>
                                             <td className="py-3 px-4 text-right text-sm text-green-400">
-                                                {service.addition > 0 ? `+${formatCurrency(service.addition)}` : '-'}
+                                                {parseDecimal(service.addition) > 0 ? `+${formatCurrency(parseDecimal(service.addition))}` : '-'}
                                             </td>
-                                            <td className="py-3 px-4 text-right text-sm font-bold text-white">{formatCurrency(service.total)}</td>
+                                            <td className="py-3 px-4 text-right text-sm font-bold text-white">{formatCurrency(parseDecimal(service.total))}</td>
                                         </tr>
                                     ))}
                                 </tbody>
