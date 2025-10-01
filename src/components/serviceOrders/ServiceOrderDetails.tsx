@@ -134,7 +134,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     }
 
     const isDeliveryOverdue = order.deliveryDate && isOverdue(order.deliveryDate);
-    
+
     // Converter Decimal128 para números
     const servicesSum = parseDecimal(order.servicesSum);
     const totalDiscount = parseDecimal(order.totalDiscount);

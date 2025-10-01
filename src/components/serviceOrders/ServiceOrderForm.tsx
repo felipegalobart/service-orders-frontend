@@ -25,7 +25,7 @@ interface ServiceOrderFormProps {
     mode: 'create' | 'edit';
 }
 
-const initialFormData: CreateServiceOrderRequest = {
+const initialFormData: any = {
     customerId: '',
     equipment: '',
     model: '',
@@ -37,7 +37,10 @@ const initialFormData: CreateServiceOrderRequest = {
     reportedDefect: '',
     warranty: false,
     isReturn: false,
+    status: 'confirmar',
     entryDate: getTodayDateString(),
+    approvalDate: '',
+    expectedDeliveryDate: '',
     deliveryDate: '',
     notes: '',
     financial: 'em_aberto',
@@ -51,7 +54,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
     mode,
 }) => {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState<CreateServiceOrderRequest>(initialFormData);
+    const [formData, setFormData] = useState<any>(initialFormData);
     const [, setSelectedCustomer] = useState<Person | null>(null);
     const [validationErrors, setValidationErrors] = useState<ServiceOrderValidationErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,7 +79,10 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 reportedDefect: order.reportedDefect || '',
                 warranty: order.warranty,
                 isReturn: order.isReturn,
+                status: order.status,
                 entryDate: order.entryDate.split('T')[0],
+                approvalDate: order.approvalDate ? order.approvalDate.split('T')[0] : '',
+                expectedDeliveryDate: order.expectedDeliveryDate ? order.expectedDeliveryDate.split('T')[0] : '',
                 deliveryDate: order.deliveryDate ? order.deliveryDate.split('T')[0] : '',
                 notes: order.notes || '',
                 financial: order.financial,
@@ -98,15 +104,15 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
         }
     }, [order, mode]);
 
-    const handleInputChange = (field: keyof CreateServiceOrderRequest, value: any) => {
-        setFormData(prev => ({
+    const handleInputChange = (field: string, value: any) => {
+        setFormData((prev: any) => ({
             ...prev,
             [field]: value,
         }));
 
         // Limpar erro do campo quando o usuário começar a digitar
         if (validationErrors[field as keyof ServiceOrderValidationErrors]) {
-            setValidationErrors(prev => ({
+            setValidationErrors((prev: any) => ({
                 ...prev,
                 [field]: undefined,
             }));
@@ -114,7 +120,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
     };
 
     const handleCustomerChange = (customerId: string, customer?: Person) => {
-        setFormData(prev => ({
+        setFormData((prev: any) => ({
             ...prev,
             customerId,
         }));
@@ -122,7 +128,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
 
         // Limpar erro do cliente
         if (validationErrors.customerId) {
-            setValidationErrors(prev => ({
+            setValidationErrors((prev: any) => ({
                 ...prev,
                 customerId: undefined,
             }));
@@ -130,9 +136,9 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
     };
 
     const handleServicesChange = (services: ServiceItem[]) => {
-        setFormData(prev => ({
+        setFormData((prev: any) => ({
             ...prev,
-            services: services.map(service => ({
+            services: services.map((service: any) => ({
                 description: service.description,
                 quantity: service.quantity,
                 value: service.value,
@@ -196,7 +202,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
 
     // Calcular totais
     const totals = formData.services?.reduce(
-        (acc, service) => ({
+        (acc: any, service: any) => ({
             servicesSum: acc.servicesSum + (service.quantity * service.value),
             totalDiscount: acc.totalDiscount + (service.discount || 0),
             totalAddition: acc.totalAddition + (service.addition || 0),
@@ -443,7 +449,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
 
             {/* Itens de Serviço */}
             <ServiceItemsManager
-                items={formData.services?.map(service => ({
+                items={formData.services?.map((service: any) => ({
                     ...service,
                     total: (service.quantity * service.value) - (service.discount || 0) + (service.addition || 0),
                 })) || []}
@@ -451,6 +457,103 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 errors={validationErrors.services}
                 disabled={isSubmitting}
             />
+
+            {/* Status da Ordem (apenas edição) */}
+            {mode === 'edit' && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Status da Ordem</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    Status Técnico
+                                </label>
+                                <select
+                                    value={formData.status}
+                                    onChange={(e) => {
+                                        const newStatus = e.target.value;
+                                        handleInputChange('status', newStatus);
+                                        
+                                        // Se mudou para aprovado, registrar data
+                                        if (newStatus === 'aprovado' && (!order?.status || order.status !== 'aprovado')) {
+                                            handleInputChange('approvalDate', new Date().toISOString().split('T')[0]);
+                                        }
+                                        
+                                        // Se mudou para entregue, registrar data
+                                        if (newStatus === 'entregue' && (!order?.status || order.status !== 'entregue')) {
+                                            handleInputChange('deliveryDate', new Date().toISOString().split('T')[0]);
+                                        }
+                                    }}
+                                    disabled={isSubmitting}
+                                    className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    <option value="confirmar">Confirmar</option>
+                                    <option value="aprovado">Aprovado</option>
+                                    <option value="pronto">Pronto</option>
+                                    <option value="entregue">Entregue</option>
+                                    <option value="reprovado">Reprovado</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    Data de Entrada
+                                </label>
+                                <Input
+                                    type="date"
+                                    value={formData.entryDate}
+                                    onChange={(value) => handleInputChange('entryDate', value)}
+                                    disabled={isSubmitting}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {formData.status === 'aprovado' || formData.approvalDate ? (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Data de Aprovação
+                                    </label>
+                                    <Input
+                                        type="date"
+                                        value={formData.approvalDate}
+                                        onChange={(value) => handleInputChange('approvalDate', value)}
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
+                            ) : null}
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    Previsão de Entrega
+                                </label>
+                                <Input
+                                    type="date"
+                                    value={formData.expectedDeliveryDate}
+                                    onChange={(value) => handleInputChange('expectedDeliveryDate', value)}
+                                    disabled={isSubmitting}
+                                />
+                            </div>
+
+                            {formData.status === 'entregue' || formData.deliveryDate ? (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Data de Entrega
+                                    </label>
+                                    <Input
+                                        type="date"
+                                        value={formData.deliveryDate}
+                                        onChange={(value) => handleInputChange('deliveryDate', value)}
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
+                            ) : null}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Informações Financeiras */}
             <Card>
