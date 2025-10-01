@@ -387,3 +387,29 @@ export const getTodayDateString = (): string => {
   const day = String(today.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
+
+/**
+ * Converte Decimal128 do MongoDB para número
+ * Aceita: number | string | { $numberDecimal: string } | objeto com toString()
+ */
+export const parseDecimal = (value: any): number => {
+  if (value === null || value === undefined) return 0;
+  
+  // Se já é número
+  if (typeof value === 'number') return value;
+  
+  // Se é string
+  if (typeof value === 'string') return parseFloat(value) || 0;
+  
+  // Se é objeto Decimal128 do MongoDB: { $numberDecimal: "123.45" }
+  if (value && typeof value === 'object' && value.$numberDecimal) {
+    return parseFloat(value.$numberDecimal) || 0;
+  }
+  
+  // Se tem método toString() (Decimal128 pode ter)
+  if (value && typeof value.toString === 'function') {
+    return parseFloat(value.toString()) || 0;
+  }
+  
+  return 0;
+};

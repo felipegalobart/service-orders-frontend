@@ -22,7 +22,8 @@ import {
     getFinancialStatusColor,
     isOverdue,
     formatDocument,
-    formatPhoneNumber
+    formatPhoneNumber,
+    parseDecimal
 } from '../../utils/formatters';
 import { useServiceOrder, useUpdateServiceOrderStatus, useUpdateServiceOrderFinancialStatus } from '../../hooks/useServiceOrders';
 import type { ServiceOrderStatus, FinancialStatus } from '../../types/serviceOrder';
@@ -133,7 +134,14 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     }
 
     const isDeliveryOverdue = order.deliveryDate && isOverdue(order.deliveryDate);
-    const totalAmount = order.servicesSum - order.totalDiscount + order.totalAddition;
+    
+    // Converter Decimal128 para números
+    const servicesSum = parseDecimal(order.servicesSum);
+    const totalDiscount = parseDecimal(order.totalDiscount);
+    const totalAddition = parseDecimal(order.totalAddition);
+    const totalAmountPaid = parseDecimal(order.totalAmountPaid);
+    const totalAmountLeft = parseDecimal(order.totalAmountLeft);
+    const totalAmount = servicesSum - totalDiscount + totalAddition;
 
     return (
         <div className="space-y-6">
@@ -376,18 +384,18 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                         <div className="space-y-2">
                                             <div className="flex justify-between">
                                                 <span className="text-sm text-gray-300">Subtotal:</span>
-                                                <span className="text-sm font-medium text-white">{formatCurrency(order.servicesSum)}</span>
+                                                <span className="text-sm font-medium text-white">{formatCurrency(servicesSum)}</span>
                                             </div>
-                                            {order.totalDiscount > 0 && (
+                                            {totalDiscount > 0 && (
                                                 <div className="flex justify-between">
                                                     <span className="text-sm text-gray-300">Descontos:</span>
-                                                    <span className="text-sm font-medium text-red-400">-{formatCurrency(order.totalDiscount)}</span>
+                                                    <span className="text-sm font-medium text-red-400">-{formatCurrency(totalDiscount)}</span>
                                                 </div>
                                             )}
-                                            {order.totalAddition > 0 && (
+                                            {totalAddition > 0 && (
                                                 <div className="flex justify-between">
                                                     <span className="text-sm text-gray-300">Acréscimos:</span>
-                                                    <span className="text-sm font-medium text-green-400">+{formatCurrency(order.totalAddition)}</span>
+                                                    <span className="text-sm font-medium text-green-400">+{formatCurrency(totalAddition)}</span>
                                                 </div>
                                             )}
                                             <div className="flex justify-between pt-2 border-t border-gray-600">
@@ -520,22 +528,22 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                             <div>
                                 <div className="flex justify-between items-center mb-2">
                                     <p className="text-sm text-gray-400">Valor Pago</p>
-                                    <p className="text-sm font-medium text-white">{formatCurrency(order.totalAmountPaid)}</p>
+                                    <p className="text-sm font-medium text-white">{formatCurrency(totalAmountPaid)}</p>
                                 </div>
                                 <div className="w-full bg-gray-700 rounded-full h-3">
                                     <div
                                         className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all"
-                                        style={{ width: formatPaymentPercentage(totalAmount, order.totalAmountPaid) }}
+                                        style={{ width: formatPaymentPercentage(totalAmount, totalAmountPaid) }}
                                     ></div>
                                 </div>
-                                <p className="text-xs text-gray-400 mt-1 text-right">{formatPaymentPercentage(totalAmount, order.totalAmountPaid)} pago</p>
+                                <p className="text-xs text-gray-400 mt-1 text-right">{formatPaymentPercentage(totalAmount, totalAmountPaid)} pago</p>
                             </div>
 
                             {/* Restante */}
                             <div className="pt-3 border-t border-gray-700">
                                 <div className="flex justify-between items-center">
                                     <p className="text-sm text-gray-400">Valor Restante</p>
-                                    <p className="text-xl font-bold text-red-400">{formatCurrency(order.totalAmountLeft)}</p>
+                                    <p className="text-xl font-bold text-red-400">{formatCurrency(totalAmountLeft)}</p>
                                 </div>
                             </div>
                         </CardContent>
