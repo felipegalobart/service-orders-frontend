@@ -5,6 +5,7 @@ import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { LoadingSpinner } from '../../../components/ui/Loading';
 import { CustomerDetails, StatusDropdown, OrderNumberSearch, FiltersModal } from '../../../components/serviceOrders';
+import { Pagination } from '../../../components/ui/Pagination';
 import { useServiceOrders } from '../../../hooks/useServiceOrders';
 import { formatDate, formatServiceOrderStatus, formatFinancialStatus } from '../../../utils/formatters';
 import type { ServiceOrderFilters as ServiceOrderFiltersType } from '../../../types/serviceOrder';
@@ -13,7 +14,7 @@ const ServiceOrderList: React.FC = () => {
     const navigate = useNavigate();
     const [filters, setFilters] = useState<ServiceOrderFiltersType>({
         page: 1,
-        limit: 10,
+        limit: 50,
     });
     const [orderNumberSearch, setOrderNumberSearch] = useState('');
     const [hasSearchedOrderNumber, setHasSearchedOrderNumber] = useState(false);
@@ -44,6 +45,32 @@ const ServiceOrderList: React.FC = () => {
                 page: 1
             }));
         }
+    };
+
+    const handleClearAllFilters = () => {
+        setFilters({
+            page: 1,
+            limit: 50,
+            status: undefined,
+            financial: undefined,
+            customerName: undefined,
+            orderNumber: undefined,
+            equipment: undefined,
+            model: undefined,
+            brand: undefined,
+            serialNumber: undefined,
+            dateFrom: undefined,
+            dateTo: undefined
+        });
+        setOrderNumberSearch('');
+        setHasSearchedOrderNumber(false);
+    };
+
+    const handlePageChange = (page: number) => {
+        setFilters(prev => ({
+            ...prev,
+            page
+        }));
     };
 
     const hasActiveFilters = () => {
@@ -148,6 +175,7 @@ const ServiceOrderList: React.FC = () => {
                 value={orderNumberSearch}
                 onChange={handleOrderNumberChange}
                 onSearch={handleOrderNumberSearch}
+                onClearFilters={handleClearAllFilters}
                 autoFocus={true}
                 isLoading={isLoading}
                 hasSearched={hasSearchedOrderNumber}
@@ -457,6 +485,21 @@ const ServiceOrderList: React.FC = () => {
                             Próxima
                         </Button>
                     </div>
+                </div>
+            )}
+
+            {/* Paginação */}
+            {data && data.total > 0 && (
+                <div className="mt-6">
+                    <Pagination
+                        currentPage={filters.page || 1}
+                        totalPages={Math.ceil(data.total / (filters.limit || 50))}
+                        totalItems={data.total}
+                        itemsPerPage={filters.limit || 50}
+                        onPageChange={handlePageChange}
+                        showBackToTop={true}
+                        className="bg-gray-800 p-4 rounded-lg border border-gray-600"
+                    />
                 </div>
             )}
 

@@ -5,6 +5,7 @@ interface OrderNumberSearchProps {
     value: string;
     onChange: (value: string) => void;
     onSearch: () => void;
+    onClearFilters?: () => void;
     placeholder?: string;
     autoFocus?: boolean;
     isLoading?: boolean;
@@ -16,6 +17,7 @@ export const OrderNumberSearch: React.FC<OrderNumberSearchProps> = ({
     value,
     onChange,
     onSearch,
+    onClearFilters,
     placeholder = "Número da ordem (ex: 123)",
     autoFocus = false,
     isLoading = false,
@@ -74,6 +76,16 @@ export const OrderNumberSearch: React.FC<OrderNumberSearchProps> = ({
                             className="px-4 py-2"
                         >
                             ✕ Limpar
+                        </Button>
+                    )}
+                    {onClearFilters && (
+                        <Button
+                            onClick={onClearFilters}
+                            variant="ghost"
+                            size="sm"
+                            className="px-4 py-2 text-gray-400 hover:text-white"
+                        >
+                            🗑️ Limpar Filtros
                         </Button>
                     )}
                 </div>
