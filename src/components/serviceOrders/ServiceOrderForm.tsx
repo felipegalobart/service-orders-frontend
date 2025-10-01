@@ -458,16 +458,11 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                                             handleInputChange('deliveryDate', new Date().toISOString().split('T')[0]);
                                         }
 
-                                        // Se voltou para confirmar, limpar datas específicas
+                                        // Se voltou para confirmar, limpar TODAS as datas
                                         if (newStatus === 'confirmar') {
-                                            // Limpar data de aprovação se estava aprovado
-                                            if (currentStatus === 'aprovado') {
-                                                handleInputChange('approvalDate', '');
-                                            }
-                                            // Limpar data de entrega se estava entregue
-                                            if (currentStatus === 'entregue') {
-                                                handleInputChange('deliveryDate', '');
-                                            }
+                                            handleInputChange('approvalDate', '');
+                                            handleInputChange('deliveryDate', '');
+                                            handleInputChange('expectedDeliveryDate', '');
                                         }
                                     }}
                                     disabled={isSubmitting}

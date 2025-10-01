@@ -160,190 +160,186 @@ const ServiceOrderList: React.FC = () => {
                                             </div>
 
                                             {/* Informações Principais */}
-                                            <div className="space-y-2 text-sm text-gray-300">
-                                                {/* Cliente */}
-                                                <div className="flex items-center space-x-2">
-                                                    <svg className="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                    </svg>
-                                                    <span className="text-gray-400">Cliente:</span>
-                                                    {order.customer?.name ? (
-                                                        <span className="text-white font-medium">{order.customer.name}</span>
-                                                    ) : (
-                                                        <CustomerName customerId={order.customerId} />
-                                                    )}
-                                                </div>
-
-                                                {/* Equipamento Completo */}
-                                                <div className="flex items-start space-x-2">
-                                                    <svg className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                    </svg>
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center space-x-2 flex-wrap">
-                                                            <span className="text-white font-medium">{order.equipment}</span>
-                                                            {order.brand && (
-                                                                <Badge variant="default" size="sm">{order.brand}</Badge>
-                                                            )}
-                                                            {order.model && (
-                                                                <span className="text-gray-400">• {order.model}</span>
-                                                            )}
-                                                        </div>
-                                                        <div className="flex items-center space-x-3 mt-1 text-xs">
-                                                            {order.serialNumber && (
-                                                                <span className="text-gray-400">
-                                                                    SN: <span className="text-gray-300">{order.serialNumber}</span>
-                                                                </span>
-                                                            )}
-                                                            {order.voltage && (
-                                                                <span className="text-gray-400">
-                                                                    ⚡ <span className="text-gray-300">{order.voltage}</span>
-                                                                </span>
-                                                            )}
-                                                            {order.accessories && (
-                                                                <span className="text-gray-400">
-                                                                    📦 <span className="text-gray-300">{order.accessories}</span>
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Timeline de Datas do Processo */}
-                                                <div className="space-y-1.5">
-                                                    {/* Linha 1: Data de Entrada */}
-                                                    <div className="flex items-center space-x-2">
-                                                        <svg className="h-4 w-4 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                                {/* Card de Cliente e Equipamento */}
+                                                <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
+                                                    <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                                                        <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                         </svg>
-                                                        <span className="text-gray-400">Entrada:</span>
-                                                        <span className="text-white font-medium">
-                                                            {formatDate(order.entryDate)}
-                                                        </span>
-                                                        {/* Tempo desde entrada */}
-                                                        {(() => {
-                                                            const entryDate = new Date(order.entryDate);
-                                                            const now = new Date();
-                                                            const diffTime = now.getTime() - entryDate.getTime();
-                                                            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                                                            if (diffDays > 0 && order.status !== 'entregue') {
-                                                                return (
-                                                                    <span className="text-blue-400 text-xs font-medium">
-                                                                        (há {diffDays} {diffDays === 1 ? 'dia' : 'dias'})
-                                                                    </span>
-                                                                );
-                                                            }
-                                                            return null;
-                                                        })()}
-                                                    </div>
+                                                        Cliente & Equipamento
+                                                    </h4>
 
-                                                    {/* Linha 2: Aprovação e Previsão */}
-                                                    <div className="flex items-center space-x-2">
-                                                        <svg className="h-4 w-4 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                                                        </svg>
-                                                        <div className="flex items-center space-x-2 flex-wrap text-xs">
-                                                            {/* Aprovação (quando status = aprovado, pronto ou entregue) */}
-                                                            {(order.status === 'aprovado' || order.status === 'pronto' || order.status === 'entregue') && (
-                                                                <>
-                                                                    <span className="text-gray-400">Aprovado:</span>
-                                                                    <span className="text-green-400">
-                                                                        {new Date(order.updatedAt).toLocaleDateString('pt-BR')}
-                                                                    </span>
-                                                                    <span className="text-gray-500">•</span>
-                                                                </>
-                                                            )}
-                                                            {/* Previsão de Entrega */}
-                                                            {order.deliveryDate && (
-                                                                <>
-                                                                    <span className="text-gray-400">Previsão:</span>
-                                                                    <span className={new Date(order.deliveryDate) < new Date() && order.status !== 'entregue' ? 'text-red-400 font-medium' : 'text-white'}>
-                                                                        {formatDate(order.deliveryDate)}
-                                                                    </span>
-                                                                    {new Date(order.deliveryDate) < new Date() && order.status !== 'entregue' && (
-                                                                        <Badge variant="danger" size="sm">Atrasada</Badge>
-                                                                    )}
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Linha 3: Conclusão e Entrega */}
-                                                    {(order.status === 'pronto' || order.status === 'entregue') && (
+                                                    <div className="space-y-3 text-sm">
+                                                        {/* Cliente */}
                                                         <div className="flex items-center space-x-2">
-                                                            <svg className="h-4 w-4 text-purple-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                            </svg>
-                                                            <div className="flex items-center space-x-2 flex-wrap text-xs">
-                                                                {order.status === 'pronto' && (
-                                                                    <>
-                                                                        <span className="text-gray-400">Pronto desde:</span>
-                                                                        <span className="text-purple-400 font-medium">
-                                                                            {new Date(order.updatedAt).toLocaleDateString('pt-BR')}
-                                                                        </span>
-                                                                        <Badge variant="success" size="sm">Aguardando Retirada</Badge>
-                                                                    </>
+                                                            <span className="text-gray-400">Cliente:</span>
+                                                            {order.customer?.name ? (
+                                                                <span className="text-white font-medium">{order.customer.name}</span>
+                                                            ) : (
+                                                                <CustomerName customerId={order.customerId} />
+                                                            )}
+                                                        </div>
+
+                                                        {/* Equipamento */}
+                                                        <div className="space-y-1">
+                                                            <div className="flex items-center space-x-2 flex-wrap">
+                                                                <span className="text-white font-medium">{order.equipment}</span>
+                                                                {order.brand && (
+                                                                    <Badge variant="default" size="sm">{order.brand}</Badge>
                                                                 )}
-                                                                {order.status === 'entregue' && (
-                                                                    <>
-                                                                        <span className="text-gray-400">Entregue em:</span>
-                                                                        <span className="text-green-400 font-medium">
-                                                                            {new Date(order.updatedAt).toLocaleDateString('pt-BR')}
-                                                                        </span>
-                                                                        {(() => {
-                                                                            const entryDate = new Date(order.entryDate);
-                                                                            const deliveredDate = new Date(order.updatedAt);
-                                                                            const diffTime = deliveredDate.getTime() - entryDate.getTime();
-                                                                            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                                                                            return (
-                                                                                <span className="text-gray-500">
-                                                                                    (concluída em {diffDays} {diffDays === 1 ? 'dia' : 'dias'})
-                                                                                </span>
-                                                                            );
-                                                                        })()}
-                                                                    </>
+                                                                {order.model && (
+                                                                    <span className="text-gray-400">• {order.model}</span>
+                                                                )}
+                                                            </div>
+                                                            <div className="flex items-center space-x-3 text-xs">
+                                                                {order.serialNumber && (
+                                                                    <span className="text-gray-400">
+                                                                        SN: <span className="text-gray-300">{order.serialNumber}</span>
+                                                                    </span>
+                                                                )}
+                                                                {order.voltage && (
+                                                                    <span className="text-gray-400">
+                                                                        ⚡ <span className="text-gray-300">{order.voltage}</span>
+                                                                    </span>
+                                                                )}
+                                                                {order.accessories && (
+                                                                    <span className="text-gray-400">
+                                                                        📦 <span className="text-gray-300">{order.accessories}</span>
+                                                                    </span>
                                                                 )}
                                                             </div>
                                                         </div>
-                                                    )}
+                                                    </div>
                                                 </div>
 
-                                                {/* Defeito Relatado */}
-                                                {order.reportedDefect && (
-                                                    <div className="flex items-start space-x-2 mt-2 pt-2 border-t border-gray-700">
-                                                        <svg className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                {/* Card de Status e Datas */}
+                                                <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
+                                                    <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                                                        <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
-                                                        <div className="flex-1">
-                                                            <span className="text-gray-400 text-xs font-medium">Defeito Relatado:</span>
-                                                            <p className="text-gray-300 text-sm mt-1">
-                                                                {order.reportedDefect.length > 150
-                                                                    ? `${order.reportedDefect.substring(0, 150)}...`
-                                                                    : order.reportedDefect
-                                                                }
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                )}
+                                                        Status & Timeline
+                                                    </h4>
 
-                                                {/* Observações do Cliente */}
-                                                {order.customerObservations && (
-                                                    <div className="flex items-start space-x-2">
-                                                        <svg className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                                                        </svg>
-                                                        <div className="flex-1">
-                                                            <span className="text-gray-400 text-xs font-medium">Observações:</span>
-                                                            <p className="text-gray-400 text-xs mt-1">
-                                                                {order.customerObservations.length > 100
-                                                                    ? `${order.customerObservations.substring(0, 100)}...`
-                                                                    : order.customerObservations
-                                                                }
-                                                            </p>
+                                                    <div className="space-y-2 text-sm">
+                                                        {/* Status Atual */}
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-gray-400">Status:</span>
+                                                            <div className="flex items-center space-x-2">
+                                                                <Badge variant={getStatusBadgeVariant(order.status)} size="sm">
+                                                                    {formatServiceOrderStatus(order.status)}
+                                                                </Badge>
+                                                                <Badge variant={getFinancialStatusBadgeVariant(order.financial)} size="sm">
+                                                                    {formatFinancialStatus(order.financial)}
+                                                                </Badge>
+                                                            </div>
                                                         </div>
+
+                                                        {/* Data de Entrada */}
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="text-gray-400">Entrada:</span>
+                                                            <div className="flex items-center space-x-2">
+                                                                <span className="text-white font-medium">
+                                                                    {formatDate(order.entryDate)}
+                                                                </span>
+                                                                {(() => {
+                                                                    const entryDate = new Date(order.entryDate);
+                                                                    const now = new Date();
+                                                                    const diffTime = now.getTime() - entryDate.getTime();
+                                                                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                                                                    if (diffDays > 0 && order.status !== 'entregue') {
+                                                                        return (
+                                                                            <span className="text-blue-400 text-xs">
+                                                                                ({diffDays}d)
+                                                                            </span>
+                                                                        );
+                                                                    }
+                                                                    return null;
+                                                                })()}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Aprovação */}
+                                                        {order.approvalDate && (
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-gray-400">Aprovado:</span>
+                                                                <span className="text-green-400 font-medium">
+                                                                    {formatDate(order.approvalDate)}
+                                                                </span>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Previsão de Entrega */}
+                                                        {order.expectedDeliveryDate && (
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-gray-400">Previsão:</span>
+                                                                <div className="flex items-center space-x-2">
+                                                                    <span className={new Date(order.expectedDeliveryDate) < new Date() && order.status !== 'entregue' ? 'text-red-400 font-medium' : 'text-white'}>
+                                                                        {formatDate(order.expectedDeliveryDate)}
+                                                                    </span>
+                                                                    {new Date(order.expectedDeliveryDate) < new Date() && order.status !== 'entregue' && (
+                                                                        <Badge variant="danger" size="sm">Atrasada</Badge>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Entrega */}
+                                                        {order.deliveryDate && (
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-gray-400">Entregue:</span>
+                                                                <span className="text-green-400 font-medium">
+                                                                    {formatDate(order.deliveryDate)}
+                                                                </span>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                )}
+                                                </div>
                                             </div>
+
+                                            {/* Defeito Relatado e Observações */}
+                                            {(order.reportedDefect || order.customerObservations) && (
+                                                <div className="mt-4 pt-4 border-t border-gray-700">
+                                                    <div className="space-y-3">
+                                                        {/* Defeito Relatado */}
+                                                        {order.reportedDefect && (
+                                                            <div className="flex items-start space-x-2">
+                                                                <svg className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                <div className="flex-1">
+                                                                    <span className="text-gray-400 text-xs font-medium">Defeito Relatado:</span>
+                                                                    <p className="text-gray-300 text-sm mt-1">
+                                                                        {order.reportedDefect.length > 150
+                                                                            ? `${order.reportedDefect.substring(0, 150)}...`
+                                                                            : order.reportedDefect
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Observações do Cliente */}
+                                                        {order.customerObservations && (
+                                                            <div className="flex items-start space-x-2">
+                                                                <svg className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                                                </svg>
+                                                                <div className="flex-1">
+                                                                    <span className="text-gray-400 text-xs font-medium">Observações:</span>
+                                                                    <p className="text-gray-400 text-xs mt-1">
+                                                                        {order.customerObservations.length > 100
+                                                                            ? `${order.customerObservations.substring(0, 100)}...`
+                                                                            : order.customerObservations
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 

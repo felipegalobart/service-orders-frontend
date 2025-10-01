@@ -69,6 +69,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 status: ServiceOrderStatus;
                 approvalDate?: string;
                 deliveryDate?: string;
+                expectedDeliveryDate?: string;
             } = { status: newStatus };
 
             // Se mudou para aprovado, adicionar data de aprovação
@@ -81,16 +82,11 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 updateData.deliveryDate = getTodayDateString();
             }
 
-            // Se voltou para confirmar, limpar datas específicas
+            // Se voltou para confirmar, limpar TODAS as datas
             if (newStatus === 'confirmar') {
-                // Limpar data de aprovação se estava aprovado
-                if (order.status === 'aprovado') {
-                    updateData.approvalDate = '';
-                }
-                // Limpar data de entrega se estava entregue
-                if (order.status === 'entregue') {
-                    updateData.deliveryDate = '';
-                }
+                updateData.approvalDate = '';
+                updateData.deliveryDate = '';
+                updateData.expectedDeliveryDate = '';
             }
 
             // Usar endpoint de UPDATE para incluir as datas

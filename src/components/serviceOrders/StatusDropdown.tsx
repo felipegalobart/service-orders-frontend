@@ -31,6 +31,7 @@ export const StatusDropdown: React.FC<StatusDropdownProps> = ({
                 status: ServiceOrderStatus;
                 approvalDate?: string;
                 deliveryDate?: string;
+                expectedDeliveryDate?: string;
             } = { status: newStatus };
 
             // Se mudou para aprovado, registrar data
@@ -43,16 +44,11 @@ export const StatusDropdown: React.FC<StatusDropdownProps> = ({
                 updateData.deliveryDate = new Date().toISOString();
             }
 
-            // Se voltou para confirmar, limpar datas específicas
+            // Se voltou para confirmar, limpar TODAS as datas
             if (newStatus === 'confirmar') {
-                // Limpar data de aprovação se estava aprovado
-                if (currentStatus === 'aprovado') {
-                    updateData.approvalDate = '';
-                }
-                // Limpar data de entrega se estava entregue
-                if (currentStatus === 'entregue') {
-                    updateData.deliveryDate = '';
-                }
+                updateData.approvalDate = '';
+                updateData.deliveryDate = '';
+                updateData.expectedDeliveryDate = '';
             }
 
             await updateStatusMutation.mutateAsync({

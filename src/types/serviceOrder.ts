@@ -138,6 +138,7 @@ export interface UpdateStatusRequest {
   status: ServiceOrderStatus;
   approvalDate?: string;
   deliveryDate?: string;
+  expectedDeliveryDate?: string;
 }
 
 export interface UpdateFinancialStatusRequest {
