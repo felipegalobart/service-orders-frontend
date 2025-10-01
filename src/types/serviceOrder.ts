@@ -50,6 +50,8 @@ export interface ServiceOrder {
   isReturn: boolean;
   status: ServiceOrderStatus;
   entryDate: string;
+  approvalDate?: string;
+  expectedDeliveryDate?: string;
   deliveryDate?: string;
   notes?: string;
   financial: FinancialStatus;
@@ -83,6 +85,8 @@ export interface CreateServiceOrderRequest {
   warranty?: boolean;
   isReturn?: boolean;
   entryDate?: string;
+  approvalDate?: string;
+  expectedDeliveryDate?: string;
   deliveryDate?: string;
   notes?: string;
   financial?: FinancialStatus;
@@ -132,6 +136,8 @@ export interface ServiceOrderMetrics {
 // Interface para atualização de status
 export interface UpdateStatusRequest {
   status: ServiceOrderStatus;
+  approvalDate?: string;
+  deliveryDate?: string;
 }
 
 export interface UpdateFinancialStatusRequest {

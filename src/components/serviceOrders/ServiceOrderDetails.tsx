@@ -64,9 +64,21 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         if (!order) return;
 
         try {
+            const statusUpdate: any = { status: newStatus };
+            
+            // Se mudou para aprovado, adicionar data de aprovação
+            if (newStatus === 'aprovado' && order.status !== 'aprovado') {
+                statusUpdate.approvalDate = new Date().toISOString();
+            }
+            
+            // Se mudou para entregue, adicionar data de entrega
+            if (newStatus === 'entregue' && order.status !== 'entregue') {
+                statusUpdate.deliveryDate = new Date().toISOString();
+            }
+
             await updateStatusMutation.mutateAsync({
                 id: orderId,
-                status: { status: newStatus }
+                status: statusUpdate
             });
             setShowStatusModal(false);
         } catch (error) {
@@ -405,19 +417,49 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                 </div>
                             </div>
 
-                            {/* Previsão */}
-                            {order.deliveryDate && (
+                            {/* Aprovação */}
+                            {order.approvalDate && (
                                 <div className="flex items-start gap-3">
                                     <div className="h-8 w-8 bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
                                         <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-xs text-gray-400 uppercase font-medium">Aprovado</p>
+                                        <p className="text-sm font-medium text-white">{formatDate(order.approvalDate)}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Previsão */}
+                            {order.expectedDeliveryDate && (
+                                <div className="flex items-start gap-3">
+                                    <div className="h-8 w-8 bg-yellow-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg className="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-xs text-gray-400 uppercase font-medium">Previsão</p>
                                         <p className={`text-sm font-medium ${isDeliveryOverdue && order.status !== 'entregue' ? 'text-red-400' : 'text-white'}`}>
-                                            {formatDate(order.deliveryDate)}
+                                            {formatDate(order.expectedDeliveryDate)}
                                         </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Entrega */}
+                            {order.deliveryDate && (
+                                <div className="flex items-start gap-3">
+                                    <div className="h-8 w-8 bg-green-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-xs text-gray-400 uppercase font-medium">Entregue</p>
+                                        <p className="text-sm font-medium text-green-400">{formatDate(order.deliveryDate)}</p>
                                     </div>
                                 </div>
                             )}
