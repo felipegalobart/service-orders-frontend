@@ -25,7 +25,7 @@ export const serviceOrderKeys = {
 // Hook para listar ordens de serviço
 export const useServiceOrders = (filters: ServiceOrderFilters = {}) => {
   // Reduzir cache quando há busca ativa
-  const hasSearch = !!filters.search;
+  const hasSearch = !!(filters.customerName || filters.orderNumber);
   
   return useQuery({
     queryKey: serviceOrderKeys.list(filters),

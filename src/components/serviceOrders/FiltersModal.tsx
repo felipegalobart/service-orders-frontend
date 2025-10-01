@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import type { ServiceOrderFilters as ServiceOrderFiltersType } from '../../types/serviceOrder';
+import type { ServiceOrderFilters as ServiceOrderFiltersType, ServiceOrderStatus, FinancialStatus } from '../../types/serviceOrder';
 
 interface FiltersModalProps {
     filters: ServiceOrderFiltersType;
@@ -79,6 +79,8 @@ export const FiltersModal: React.FC<FiltersModalProps> = ({
             ...filters,
             ...localFilters,
             page: 1,
+            status: localFilters.status as ServiceOrderStatus | undefined,
+            financial: localFilters.financial as FinancialStatus | undefined,
         };
         onFiltersChange(newFilters);
         onClose();

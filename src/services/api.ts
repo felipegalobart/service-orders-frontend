@@ -353,7 +353,7 @@ class ApiService {
       // Se é busca por nome do cliente ou número da ordem, o backend pode retornar array ou objeto único
       if ((filters?.customerName || filters?.orderNumber) && (Array.isArray(response) || (typeof response === 'object' && response !== null))) {
         // Converter resposta para array se necessário
-        let responseArray: ServiceOrder[] = Array.isArray(response) 
+        const responseArray: ServiceOrder[] = Array.isArray(response) 
           ? response as ServiceOrder[] 
           : [response as unknown as ServiceOrder];
         let filteredData = responseArray;

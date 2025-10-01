@@ -343,7 +343,6 @@ export const ServiceItemsManager: React.FC<ServiceItemsManagerProps> = ({
                                             disabled={disabled}
                                             size="sm"
                                             className="h-8 px-3"
-                                            title={editingIndex !== null ? 'Salvar (Enter)' : 'Adicionar (Enter)'}
                                         >
                                             {editingIndex !== null ? (
                                                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -362,7 +361,6 @@ export const ServiceItemsManager: React.FC<ServiceItemsManagerProps> = ({
                                                 disabled={disabled}
                                                 size="sm"
                                                 className="h-8 px-2"
-                                                title="Cancelar (Esc)"
                                             >
                                                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
