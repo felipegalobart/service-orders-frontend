@@ -6,6 +6,7 @@ import { Badge } from '../../../components/ui/Badge';
 import { LoadingSpinner } from '../../../components/ui/Loading';
 import { ServiceOrderFilters, CustomerName } from '../../../components/serviceOrders';
 import { useServiceOrders } from '../../../hooks/useServiceOrders';
+import { formatDate } from '../../../utils/formatters';
 import type { ServiceOrderFilters as ServiceOrderFiltersType } from '../../../types/serviceOrder';
 
 const ServiceOrderList: React.FC = () => {
@@ -227,7 +228,7 @@ const ServiceOrderList: React.FC = () => {
                                                         </svg>
                                                         <span className="text-gray-400">Entrada:</span>
                                                         <span className="text-white font-medium">
-                                                            {new Date(order.entryDate).toLocaleDateString('pt-BR')}
+                                                            {formatDate(order.entryDate)}
                                                         </span>
                                                         {/* Tempo desde entrada */}
                                                         {(() => {
@@ -267,7 +268,7 @@ const ServiceOrderList: React.FC = () => {
                                                                 <>
                                                                     <span className="text-gray-400">Previsão:</span>
                                                                     <span className={new Date(order.deliveryDate) < new Date() && order.status !== 'entregue' ? 'text-red-400 font-medium' : 'text-white'}>
-                                                                        {new Date(order.deliveryDate).toLocaleDateString('pt-BR')}
+                                                                        {formatDate(order.deliveryDate)}
                                                                     </span>
                                                                     {new Date(order.deliveryDate) < new Date() && order.status !== 'entregue' && (
                                                                         <Badge variant="danger" size="sm">Atrasada</Badge>
