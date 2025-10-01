@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiService } from '../../services/api';
 import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
@@ -33,6 +33,7 @@ interface ServiceOrderDetailsProps {
 
 export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderId }) => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const [showStatusModal, setShowStatusModal] = useState(false);
     const [showFinancialModal, setShowFinancialModal] = useState(false);
     const [newStatus, setNewStatus] = useState<ServiceOrderStatus>('confirmar');
@@ -64,22 +65,29 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         if (!order) return;
 
         try {
-            const statusUpdate: any = { status: newStatus };
-            
+            // Preparar dados de atualização
+            const updateData: {
+                status: ServiceOrderStatus;
+                approvalDate?: string;
+                deliveryDate?: string;
+            } = { status: newStatus };
+
             // Se mudou para aprovado, adicionar data de aprovação
             if (newStatus === 'aprovado' && order.status !== 'aprovado') {
-                statusUpdate.approvalDate = new Date().toISOString();
-            }
-            
-            // Se mudou para entregue, adicionar data de entrega
-            if (newStatus === 'entregue' && order.status !== 'entregue') {
-                statusUpdate.deliveryDate = new Date().toISOString();
+                updateData.approvalDate = new Date().toISOString();
             }
 
-            await updateStatusMutation.mutateAsync({
-                id: orderId,
-                status: statusUpdate
-            });
+            // Se mudou para entregue, adicionar data de entrega
+            if (newStatus === 'entregue' && order.status !== 'entregue') {
+                updateData.deliveryDate = new Date().toISOString();
+            }
+
+            // Usar endpoint de UPDATE para incluir as datas
+            await apiService.updateServiceOrder(orderId, updateData);
+
+            // Invalidar cache e refetch
+            await queryClient.invalidateQueries({ queryKey: ['serviceOrders'] });
+
             setShowStatusModal(false);
         } catch (error) {
             console.error('Erro ao atualizar status:', error);
@@ -544,7 +552,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Status Atual: <Badge variant={getServiceOrderStatusColor(order.status) as any} size="sm">{formatServiceOrderStatus(order.status)}</Badge>
+                            Status Atual: <Badge variant={getServiceOrderStatusColor(order.status) as 'default' | 'success' | 'warning' | 'danger' | 'info'} size="sm">{formatServiceOrderStatus(order.status)}</Badge>
                         </label>
                         <label className="block text-sm font-medium text-gray-300 mb-1">
                             Novo Status
@@ -581,7 +589,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Status Atual: <Badge variant={getFinancialStatusColor(order.financial) as any} size="sm">{formatFinancialStatus(order.financial)}</Badge>
+                            Status Atual: <Badge variant={getFinancialStatusColor(order.financial) as 'default' | 'success' | 'warning' | 'danger' | 'info'} size="sm">{formatFinancialStatus(order.financial)}</Badge>
                         </label>
                         <label className="block text-sm font-medium text-gray-300 mb-1">
                             Novo Status Financeiro
