@@ -4,7 +4,7 @@ import { Card, CardContent } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { LoadingSpinner } from '../../../components/ui/Loading';
-import { ServiceOrderFilters, CustomerName, StatusDropdown } from '../../../components/serviceOrders';
+import { ServiceOrderFilters, CustomerDetails, StatusDropdown } from '../../../components/serviceOrders';
 import { useServiceOrders } from '../../../hooks/useServiceOrders';
 import { formatDate, formatServiceOrderStatus, formatFinancialStatus } from '../../../utils/formatters';
 import type { ServiceOrderFilters as ServiceOrderFiltersType } from '../../../types/serviceOrder';
@@ -160,82 +160,71 @@ const ServiceOrderList: React.FC = () => {
                                             </div>
 
                                             {/* Informações Principais */}
-                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                                {/* Card de Cliente e Equipamento */}
+                                            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                                                {/* Card de Cliente */}
                                                 <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
                                                     <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
                                                         <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                         </svg>
-                                                        Cliente & Equipamento
+                                                        Cliente
                                                     </h4>
 
-                                                    <div className="space-y-3 text-sm">
-                                                        {/* Cliente */}
-                                                        <div className="flex items-center space-x-2">
-                                                            <span className="text-gray-400">Cliente:</span>
-                                                            {order.customer?.name ? (
-                                                                <span className="text-white font-medium">{order.customer.name}</span>
-                                                            ) : (
-                                                                <CustomerName customerId={order.customerId} />
+                                                    <div className="space-y-2 text-sm">
+                                                        {/* Usar CustomerDetails para carregar dados completos */}
+                                                        <CustomerDetails customerId={order.customerId} />
+                                                    </div>
+                                                </div>
+
+                                                {/* Card de Equipamento */}
+                                                <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
+                                                    <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                                                        <svg className="h-4 w-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                        </svg>
+                                                        Equipamento
+                                                    </h4>
+
+                                                    <div className="space-y-2 text-sm">
+                                                        <div className="flex items-center space-x-2 flex-wrap">
+                                                            <span className="text-white font-medium">{order.equipment}</span>
+                                                            {order.brand && (
+                                                                <Badge variant="default" size="sm">{order.brand}</Badge>
+                                                            )}
+                                                            {order.model && (
+                                                                <span className="text-gray-400">• {order.model}</span>
                                                             )}
                                                         </div>
-
-                                                        {/* Equipamento */}
-                                                        <div className="space-y-1">
-                                                            <div className="flex items-center space-x-2 flex-wrap">
-                                                                <span className="text-white font-medium">{order.equipment}</span>
-                                                                {order.brand && (
-                                                                    <Badge variant="default" size="sm">{order.brand}</Badge>
-                                                                )}
-                                                                {order.model && (
-                                                                    <span className="text-gray-400">• {order.model}</span>
-                                                                )}
-                                                            </div>
-                                                            <div className="flex items-center space-x-3 text-xs">
-                                                                {order.serialNumber && (
-                                                                    <span className="text-gray-400">
-                                                                        SN: <span className="text-gray-300">{order.serialNumber}</span>
-                                                                    </span>
-                                                                )}
-                                                                {order.voltage && (
-                                                                    <span className="text-gray-400">
-                                                                        ⚡ <span className="text-gray-300">{order.voltage}</span>
-                                                                    </span>
-                                                                )}
-                                                                {order.accessories && (
-                                                                    <span className="text-gray-400">
-                                                                        📦 <span className="text-gray-300">{order.accessories}</span>
-                                                                    </span>
-                                                                )}
-                                                            </div>
+                                                        <div className="flex items-center space-x-3 text-xs">
+                                                            {order.serialNumber && (
+                                                                <span className="text-gray-400">
+                                                                    SN: <span className="text-gray-300">{order.serialNumber}</span>
+                                                                </span>
+                                                            )}
+                                                            {order.voltage && (
+                                                                <span className="text-gray-400">
+                                                                    ⚡ <span className="text-gray-300">{order.voltage}</span>
+                                                                </span>
+                                                            )}
+                                                            {order.accessories && (
+                                                                <span className="text-gray-400">
+                                                                    📦 <span className="text-gray-300">{order.accessories}</span>
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                {/* Card de Status e Datas */}
+                                                {/* Card de Timeline */}
                                                 <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
                                                     <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
                                                         <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
-                                                        Status & Timeline
+                                                        Timeline
                                                     </h4>
 
                                                     <div className="space-y-2 text-sm">
-                                                        {/* Status Atual */}
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-gray-400">Status:</span>
-                                                            <div className="flex items-center space-x-2">
-                                                                <Badge variant={getStatusBadgeVariant(order.status)} size="sm">
-                                                                    {formatServiceOrderStatus(order.status)}
-                                                                </Badge>
-                                                                <Badge variant={getFinancialStatusBadgeVariant(order.financial)} size="sm">
-                                                                    {formatFinancialStatus(order.financial)}
-                                                                </Badge>
-                                                            </div>
-                                                        </div>
-
                                                         {/* Data de Entrada */}
                                                         <div className="flex items-center justify-between">
                                                             <span className="text-gray-400">Entrada:</span>
@@ -296,6 +285,26 @@ const ServiceOrderList: React.FC = () => {
                                                         )}
                                                     </div>
                                                 </div>
+
+                                                {/* Card de Controles de Status */}
+                                                <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
+                                                    <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                                                        <svg className="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        Controles
+                                                    </h4>
+
+                                                    <div
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        <StatusDropdown
+                                                            orderId={order._id}
+                                                            currentStatus={order.status}
+                                                            currentFinancial={order.financial}
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             {/* Defeito Relatado e Observações */}
@@ -340,20 +349,6 @@ const ServiceOrderList: React.FC = () => {
                                                     </div>
                                                 </div>
                                             )}
-                                        </div>
-                                    </div>
-
-                                    {/* Controles de Status */}
-                                    <div className="ml-4">
-                                        <div
-                                            className="bg-gray-700/50 p-3 rounded-lg border border-gray-600"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <StatusDropdown
-                                                orderId={order._id}
-                                                currentStatus={order.status}
-                                                currentFinancial={order.financial}
-                                            />
                                         </div>
                                     </div>
                                 </div>

@@ -2,6 +2,7 @@
 export { ServiceOrderFilters } from './ServiceOrderFilters';
 export { CustomerSelector } from './CustomerSelector';
 export { CustomerName } from './CustomerName';
+export { CustomerDetails } from './CustomerDetails';
 export { ServiceItemsManager } from './ServiceItemsManager';
 export { ServiceOrderForm } from './ServiceOrderForm';
 export { ServiceOrderDetails } from './ServiceOrderDetails';
