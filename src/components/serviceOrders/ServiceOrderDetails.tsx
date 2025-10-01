@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiService } from '../../services/api';
@@ -6,7 +6,6 @@ import { Button } from '../ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { LoadingSpinner } from '../ui/Loading';
-import { Modal } from '../ui/Modal';
 import {
     formatCurrency,
     formatDate,
@@ -35,10 +34,6 @@ interface ServiceOrderDetailsProps {
 export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderId }) => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const [showStatusModal, setShowStatusModal] = useState(false);
-    const [showFinancialModal, setShowFinancialModal] = useState(false);
-    const [newStatus, setNewStatus] = useState<ServiceOrderStatus>('confirmar');
-    const [newFinancialStatus, setNewFinancialStatus] = useState<FinancialStatus>('em_aberto');
 
     const { data: order, isLoading, error } = useServiceOrder(orderId);
     const updateStatusMutation = useUpdateServiceOrderStatus();
@@ -62,7 +57,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         navigate(`/service-orders/edit/${orderId}`);
     };
 
-    const handleStatusUpdate = async () => {
+    const handleStatusUpdate = async (newStatus: ServiceOrderStatus) => {
         if (!order) return;
 
         try {
@@ -72,12 +67,12 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 approvalDate?: string;
                 deliveryDate?: string;
             } = { status: newStatus };
-
+            
             // Se mudou para aprovado, adicionar data de aprovação
             if (newStatus === 'aprovado' && order.status !== 'aprovado') {
                 updateData.approvalDate = new Date().toISOString();
             }
-
+            
             // Se mudou para entregue, adicionar data de entrega
             if (newStatus === 'entregue' && order.status !== 'entregue') {
                 updateData.deliveryDate = new Date().toISOString();
@@ -85,17 +80,15 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
 
             // Usar endpoint de UPDATE para incluir as datas
             await apiService.updateServiceOrder(orderId, updateData);
-
+            
             // Invalidar cache e refetch
             await queryClient.invalidateQueries({ queryKey: ['serviceOrders'] });
-
-            setShowStatusModal(false);
         } catch (error) {
             console.error('Erro ao atualizar status:', error);
         }
     };
 
-    const handleFinancialStatusUpdate = async () => {
+    const handleFinancialStatusUpdate = async (newFinancialStatus: FinancialStatus) => {
         if (!order) return;
 
         try {
@@ -103,7 +96,6 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 id: orderId,
                 financial: { financial: newFinancialStatus }
             });
-            setShowFinancialModal(false);
         } catch (error) {
             console.error('Erro ao atualizar status financeiro:', error);
         }
@@ -174,32 +166,6 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
 
                 {/* Botões de Ação */}
                 <div className="flex gap-2">
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => {
-                            setNewStatus(order.status);
-                            setShowStatusModal(true);
-                        }}
-                    >
-                        <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Status
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => {
-                            setNewFinancialStatus(order.financial);
-                            setShowFinancialModal(true);
-                        }}
-                    >
-                        <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Financeiro
-                    </Button>
                     <Button variant="ghost" size="sm" onClick={handlePrint}>
                         <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -220,6 +186,59 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     </Button>
                 </div>
             </div>
+
+            {/* Controles Rápidos */}
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                        Controles Rápidos
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Status Técnico */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Status Técnico
+                            </label>
+                            <select
+                                value={order.status}
+                                onChange={(e) => handleStatusUpdate(e.target.value as ServiceOrderStatus)}
+                                className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="confirmar">Confirmar</option>
+                                <option value="aprovado">Aprovado</option>
+                                <option value="pronto">Pronto</option>
+                                <option value="entregue">Entregue</option>
+                                <option value="reprovado">Reprovado</option>
+                            </select>
+                        </div>
+
+                        {/* Status Financeiro */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Status Financeiro
+                            </label>
+                            <select
+                                value={order.financial}
+                                onChange={(e) => handleFinancialStatusUpdate(e.target.value as FinancialStatus)}
+                                className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="em_aberto">Em Aberto</option>
+                                <option value="pago">Pago</option>
+                                <option value="parcialmente_pago">Parcialmente Pago</option>
+                                <option value="deve">Deve</option>
+                                <option value="faturado">Faturado</option>
+                                <option value="vencido">Vencido</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Grid Principal - 2 Colunas */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -551,82 +570,6 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 </div>
             </div>
 
-            {/* Modais */}
-            <Modal
-                isOpen={showStatusModal}
-                onClose={() => setShowStatusModal(false)}
-                title="Alterar Status Técnico"
-            >
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Status Atual: <Badge variant={getServiceOrderStatusColor(order.status) as 'default' | 'success' | 'warning' | 'danger' | 'info'} size="sm">{formatServiceOrderStatus(order.status)}</Badge>
-                        </label>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                            Novo Status
-                        </label>
-                        <select
-                            value={newStatus}
-                            onChange={(e) => setNewStatus(e.target.value as ServiceOrderStatus)}
-                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="confirmar">Aguardando Confirmação</option>
-                            <option value="aprovado">Aprovado</option>
-                            <option value="pronto">Pronto</option>
-                            <option value="entregue">Entregue</option>
-                            <option value="reprovado">Reprovado</option>
-                        </select>
-                    </div>
-
-                    <div className="flex justify-end gap-3">
-                        <Button variant="ghost" onClick={() => setShowStatusModal(false)}>
-                            Cancelar
-                        </Button>
-                        <Button onClick={handleStatusUpdate} disabled={updateStatusMutation.isPending}>
-                            {updateStatusMutation.isPending ? 'Atualizando...' : 'Atualizar'}
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
-
-            <Modal
-                isOpen={showFinancialModal}
-                onClose={() => setShowFinancialModal(false)}
-                title="Alterar Status Financeiro"
-            >
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Status Atual: <Badge variant={getFinancialStatusColor(order.financial) as 'default' | 'success' | 'warning' | 'danger' | 'info'} size="sm">{formatFinancialStatus(order.financial)}</Badge>
-                        </label>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                            Novo Status Financeiro
-                        </label>
-                        <select
-                            value={newFinancialStatus}
-                            onChange={(e) => setNewFinancialStatus(e.target.value as FinancialStatus)}
-                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="em_aberto">Em Aberto</option>
-                            <option value="pago">Pago</option>
-                            <option value="parcialmente_pago">Parcialmente Pago</option>
-                            <option value="deve">Deve</option>
-                            <option value="faturado">Faturado</option>
-                            <option value="vencido">Vencido</option>
-                            <option value="cancelado">Cancelado</option>
-                        </select>
-                    </div>
-
-                    <div className="flex justify-end gap-3">
-                        <Button variant="ghost" onClick={() => setShowFinancialModal(false)}>
-                            Cancelar
-                        </Button>
-                        <Button onClick={handleFinancialStatusUpdate} disabled={updateFinancialStatusMutation.isPending}>
-                            {updateFinancialStatusMutation.isPending ? 'Atualizando...' : 'Atualizar'}
-                        </Button>
-                    </div>
-                </div>
-            </Modal>
         </div>
     );
 };

@@ -475,12 +475,12 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                                     onChange={(e) => {
                                         const newStatus = e.target.value;
                                         handleInputChange('status', newStatus);
-                                        
+
                                         // Se mudou para aprovado, registrar data
                                         if (newStatus === 'aprovado' && (!order?.status || order.status !== 'aprovado')) {
                                             handleInputChange('approvalDate', new Date().toISOString().split('T')[0]);
                                         }
-                                        
+
                                         // Se mudou para entregue, registrar data
                                         if (newStatus === 'entregue' && (!order?.status || order.status !== 'entregue')) {
                                             handleInputChange('deliveryDate', new Date().toISOString().split('T')[0]);
