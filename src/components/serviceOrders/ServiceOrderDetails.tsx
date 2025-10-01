@@ -22,6 +22,7 @@ import {
 } from '../../utils/formatters';
 import { useServiceOrder, useUpdateServiceOrderFinancialStatus, useDeleteServiceOrder } from '../../hooks/useServiceOrders';
 import { PersonDetailsModal } from '../ui/Modal/PersonDetailsModal';
+import { TimelineModal } from '../ui/Modal/TimelineModal';
 import type { ServiceOrderStatus, FinancialStatus } from '../../types/serviceOrder';
 
 interface ServiceOrderDetailsProps {
@@ -37,8 +38,9 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     const updateFinancialStatusMutation = useUpdateServiceOrderFinancialStatus();
     const deleteMutation = useDeleteServiceOrder();
 
-    // Estado para o modal de detalhes do cliente
+    // Estado para os modais
     const [isPersonModalOpen, setIsPersonModalOpen] = useState(false);
+    const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
 
     // Buscar dados do cliente se não vier populado
     const { data: customer } = useQuery({
@@ -125,6 +127,14 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
 
     const handleClosePersonModal = () => {
         setIsPersonModalOpen(false);
+    };
+
+    const handleOpenTimelineModal = () => {
+        setIsTimelineModalOpen(true);
+    };
+
+    const handleCloseTimelineModal = () => {
+        setIsTimelineModalOpen(false);
     };
 
     if (isLoading) {
@@ -340,13 +350,20 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 </Card>
 
                 {/* Timeline + Financeiro - Compacto */}
-                <Card>
+                <Card
+                    className="cursor-pointer hover:bg-gray-700/50 transition-colors duration-200 group"
+                    onClick={handleOpenTimelineModal}
+                >
                     <CardContent className="p-4">
                         <div className="flex items-center gap-2 mb-3">
-                            <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="h-4 w-4 text-gray-400 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <h3 className="text-xs font-semibold text-gray-400 uppercase">Timeline</h3>
+                            <h3 className="text-xs font-semibold text-gray-400 uppercase group-hover:text-blue-400 transition-colors">Timeline</h3>
+                            <svg className="h-3 w-3 text-gray-500 ml-auto group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
                         </div>
                         <div className="space-y-1">
                             <div className="flex justify-between items-center">
@@ -503,6 +520,13 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 person={customerData || null}
                 isOpen={isPersonModalOpen}
                 onClose={handleClosePersonModal}
+            />
+
+            {/* Modal de Timeline Detalhada */}
+            <TimelineModal
+                order={order}
+                isOpen={isTimelineModalOpen}
+                onClose={handleCloseTimelineModal}
             />
 
         </div>
