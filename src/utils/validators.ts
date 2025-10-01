@@ -195,7 +195,7 @@ export const validateServiceOrder = (data: CreateServiceOrderRequest): ServiceOr
     errors.general = 'Data de entrega não pode ser anterior à data de entrada';
   }
 
-  // Validação de serviços
+  // Validação de serviços (apenas se existirem)
   if (data.services && data.services.length > 0) {
     const serviceErrors: string[] = [];
     
@@ -207,8 +207,6 @@ export const validateServiceOrder = (data: CreateServiceOrderRequest): ServiceOr
     if (serviceErrors.length > 0) {
       errors.services = serviceErrors;
     }
-  } else {
-    errors.services = ['Pelo menos um serviço deve ser adicionado'];
   }
 
   // Validação de valores financeiros

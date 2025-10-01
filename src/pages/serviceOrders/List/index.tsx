@@ -4,9 +4,9 @@ import { Card, CardContent } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { LoadingSpinner } from '../../../components/ui/Loading';
-import { ServiceOrderFilters, CustomerName } from '../../../components/serviceOrders';
+import { ServiceOrderFilters, CustomerName, StatusDropdown } from '../../../components/serviceOrders';
 import { useServiceOrders } from '../../../hooks/useServiceOrders';
-import { formatDate } from '../../../utils/formatters';
+import { formatDate, formatServiceOrderStatus, formatFinancialStatus } from '../../../utils/formatters';
 import type { ServiceOrderFilters as ServiceOrderFiltersType } from '../../../types/serviceOrder';
 
 const ServiceOrderList: React.FC = () => {
@@ -39,8 +39,8 @@ const ServiceOrderList: React.FC = () => {
 
     const getStatusBadgeVariant = (status: string) => {
         switch (status) {
-            case 'confirmar': return 'warning';
-            case 'aprovado': return 'info';
+            case 'confirmar': return 'info';
+            case 'aprovado': return 'danger';
             case 'pronto': return 'success';
             case 'entregue': return 'success';
             case 'reprovado': return 'danger';
@@ -50,11 +50,11 @@ const ServiceOrderList: React.FC = () => {
 
     const getFinancialStatusBadgeVariant = (status: string) => {
         switch (status) {
-            case 'em_aberto': return 'warning';
+            case 'em_aberto': return 'info';
             case 'pago': return 'success';
-            case 'parcialmente_pago': return 'info';
+            case 'parcialmente_pago': return 'danger';
             case 'deve': return 'danger';
-            case 'faturado': return 'info';
+            case 'faturado': return 'success';
             case 'vencido': return 'danger';
             case 'cancelado': return 'default';
             default: return 'default';
@@ -151,13 +151,13 @@ const ServiceOrderList: React.FC = () => {
                                                 </h3>
                                                 <div className="flex items-center space-x-2 flex-wrap">
                                                     <Badge variant={getStatusBadgeVariant(order.status)}>
-                                                        {order.status}
+                                                        {formatServiceOrderStatus(order.status)}
                                                     </Badge>
                                                     <Badge variant={getFinancialStatusBadgeVariant(order.financial)}>
-                                                        {order.financial}
+                                                        {formatFinancialStatus(order.financial)}
                                                     </Badge>
                                                     {order.warranty && (
-                                                        <Badge variant="info" size="sm">
+                                                        <Badge variant="warning" size="sm">
                                                             Garantia
                                                         </Badge>
                                                     )}
@@ -357,36 +357,45 @@ const ServiceOrderList: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    {/* Botões de Ação */}
-                                    <div className="flex flex-col gap-2 ml-4">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleEditOrder(order._id);
-                                            }}
-                                            className="w-full"
+                                    {/* Controles de Status e Ações */}
+                                    <div className="flex flex-col gap-3 ml-4">
+                                        {/* Dropdowns de Status */}
+                                        <div
+                                            className="bg-gray-700/50 p-3 rounded-lg border border-gray-600"
+                                            onClick={(e) => e.stopPropagation()}
                                         >
-                                            <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                            Editar
-                                        </Button>
-                                        <Button
-                                            variant="danger"
-                                            size="sm"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteOrder(order._id);
-                                            }}
-                                            className="w-full"
-                                        >
-                                            <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                            Excluir
-                                        </Button>
+                                            <StatusDropdown
+                                                orderId={order._id}
+                                                currentStatus={order.status}
+                                                currentFinancial={order.financial}
+                                            />
+                                        </div>
+
+                                        {/* Botões de Ação */}
+                                        <div className="flex flex-col gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleEditOrder(order._id)}
+                                                className="w-full"
+                                            >
+                                                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                Editar
+                                            </Button>
+                                            <Button
+                                                variant="danger"
+                                                size="sm"
+                                                onClick={() => handleDeleteOrder(order._id)}
+                                                className="w-full"
+                                            >
+                                                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                Excluir
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>

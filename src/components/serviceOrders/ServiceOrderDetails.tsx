@@ -22,9 +22,10 @@ import {
     isOverdue,
     formatDocument,
     formatPhoneNumber,
-    parseDecimal
+    parseDecimal,
+    getTodayDateString
 } from '../../utils/formatters';
-import { useServiceOrder, useUpdateServiceOrderStatus, useUpdateServiceOrderFinancialStatus } from '../../hooks/useServiceOrders';
+import { useServiceOrder, useUpdateServiceOrderFinancialStatus } from '../../hooks/useServiceOrders';
 import type { ServiceOrderStatus, FinancialStatus } from '../../types/serviceOrder';
 
 interface ServiceOrderDetailsProps {
@@ -36,7 +37,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     const queryClient = useQueryClient();
 
     const { data: order, isLoading, error } = useServiceOrder(orderId);
-    const updateStatusMutation = useUpdateServiceOrderStatus();
+
     const updateFinancialStatusMutation = useUpdateServiceOrderFinancialStatus();
 
     // Buscar dados do cliente se não vier populado
@@ -67,20 +68,20 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 approvalDate?: string;
                 deliveryDate?: string;
             } = { status: newStatus };
-            
+
             // Se mudou para aprovado, adicionar data de aprovação
             if (newStatus === 'aprovado' && order.status !== 'aprovado') {
-                updateData.approvalDate = new Date().toISOString();
+                updateData.approvalDate = getTodayDateString();
             }
-            
+
             // Se mudou para entregue, adicionar data de entrega
             if (newStatus === 'entregue' && order.status !== 'entregue') {
-                updateData.deliveryDate = new Date().toISOString();
+                updateData.deliveryDate = getTodayDateString();
             }
 
             // Usar endpoint de UPDATE para incluir as datas
             await apiService.updateServiceOrder(orderId, updateData);
-            
+
             // Invalidar cache e refetch
             await queryClient.invalidateQueries({ queryKey: ['serviceOrders'] });
         } catch (error) {
