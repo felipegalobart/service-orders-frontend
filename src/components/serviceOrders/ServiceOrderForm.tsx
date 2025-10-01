@@ -384,33 +384,82 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                id="warranty"
-                                checked={formData.warranty}
-                                onChange={(e) => handleInputChange('warranty', e.target.checked)}
+                    {/* Botões Toggle para Garantia e Retorno */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Garantia */}
+                        <div className="flex flex-col items-center space-y-3">
+                            <div className="text-sm font-medium text-gray-300">Em Garantia</div>
+                            <button
+                                type="button"
+                                onClick={() => handleInputChange('warranty', !formData.warranty)}
                                 disabled={isSubmitting}
-                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <label htmlFor="warranty" className="text-sm font-medium text-gray-300">
-                                Em Garantia
-                            </label>
+                                className={`
+                                    relative inline-flex h-12 w-24 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-opacity-50
+                                    ${formData.warranty
+                                        ? 'bg-green-600 focus:ring-green-300 shadow-lg shadow-green-500/25'
+                                        : 'bg-gray-600 focus:ring-gray-300 hover:bg-gray-500'
+                                    }
+                                    ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105'}
+                                `}
+                            >
+                                <span
+                                    className={`
+                                        inline-flex h-10 w-10 transform rounded-full bg-white shadow-lg transition-transform duration-300 items-center justify-center
+                                        ${formData.warranty ? 'translate-x-6' : 'translate-x-1'}
+                                    `}
+                                >
+                                    {formData.warranty ? (
+                                        <svg className="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                    ) : (
+                                        <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                        </svg>
+                                    )}
+                                </span>
+                            </button>
+                            <div className={`text-xs font-medium transition-colors ${formData.warranty ? 'text-green-400' : 'text-gray-500'}`}>
+                                {formData.warranty ? 'SIM - Em Garantia' : 'NÃO - Fora de Garantia'}
+                            </div>
                         </div>
 
-                        <div className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                id="isReturn"
-                                checked={formData.isReturn}
-                                onChange={(e) => handleInputChange('isReturn', e.target.checked)}
+                        {/* Retorno */}
+                        <div className="flex flex-col items-center space-y-3">
+                            <div className="text-sm font-medium text-gray-300">É Retorno</div>
+                            <button
+                                type="button"
+                                onClick={() => handleInputChange('isReturn', !formData.isReturn)}
                                 disabled={isSubmitting}
-                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <label htmlFor="isReturn" className="text-sm font-medium text-gray-700">
-                                É Retorno
-                            </label>
+                                className={`
+                                    relative inline-flex h-12 w-24 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-opacity-50
+                                    ${formData.isReturn
+                                        ? 'bg-orange-600 focus:ring-orange-300 shadow-lg shadow-orange-500/25'
+                                        : 'bg-gray-600 focus:ring-gray-300 hover:bg-gray-500'
+                                    }
+                                    ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105'}
+                                `}
+                            >
+                                <span
+                                    className={`
+                                        inline-flex h-10 w-10 transform rounded-full bg-white shadow-lg transition-transform duration-300 items-center justify-center
+                                        ${formData.isReturn ? 'translate-x-6' : 'translate-x-1'}
+                                    `}
+                                >
+                                    {formData.isReturn ? (
+                                        <svg className="h-5 w-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                                        </svg>
+                                    ) : (
+                                        <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                                        </svg>
+                                    )}
+                                </span>
+                            </button>
+                            <div className={`text-xs font-medium transition-colors ${formData.isReturn ? 'text-orange-400' : 'text-gray-500'}`}>
+                                {formData.isReturn ? 'SIM - É Retorno' : 'NÃO - Primeira Vez'}
+                            </div>
                         </div>
                     </div>
                 </CardContent>
