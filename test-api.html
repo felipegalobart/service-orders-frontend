@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API</title>
+</head>
+<body>
+    <h1>Test Service Orders API</h1>
+    <button onclick="testLogin()">1. Login</button>
+    <button onclick="testGetOrders()">2. Get Orders</button>
+    <button onclick="checkLocalStorage()">3. Check LocalStorage</button>
+    <pre id="result"></pre>
+
+    <script>
+        const result = document.getElementById('result');
+
+        async function testLogin() {
+            try {
+                const response = await fetch('http://localhost:3000/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'cursor_user@teste.com',
+                        password: '123456'
+                    })
+                });
+                const data = await response.json();
+                localStorage.setItem('auth_token', data.access_token);
+                localStorage.setItem('auth_user', JSON.stringify(data.user));
+                result.textContent = 'Login successful!\n' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function testGetOrders() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                result.textContent = 'Using token: ' + token + '\n\n';
+                
+                const response = await fetch('http://localhost:3000/service-orders', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                result.textContent += 'Response:\n' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                result.textContent += '\nError: ' + error.message;
+            }
+        }
+
+        function checkLocalStorage() {
+            result.textContent = 'LocalStorage contents:\n';
+            result.textContent += 'auth_token: ' + localStorage.getItem('auth_token') + '\n';
+            result.textContent += 'auth_user: ' + localStorage.getItem('auth_user');
+        }
+    </script>
+</body>
+</html>

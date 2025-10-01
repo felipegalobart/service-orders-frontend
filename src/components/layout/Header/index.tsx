@@ -63,6 +63,15 @@ const Header: React.FC = () => {
                             >
                                 Cadastros
                             </Link>
+                            <Link
+                                to="/service-orders"
+                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/service-orders')
+                                    ? 'bg-red-600 text-white'
+                                    : 'text-gray-300 hover:text-white hover:bg-gray-800'
+                                    }`}
+                            >
+                                Ordens de Serviço
+                            </Link>
 
                             {/* User info and logout */}
                             <div className="flex items-center space-x-4">

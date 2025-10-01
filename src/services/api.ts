@@ -1,6 +1,18 @@
 import { API_CONFIG, buildApiUrl } from '../config/api';
 import type { LoginRequest, LoginResponse, CreateUserRequest, UpdateUserRequest, User } from '../types/auth';
 import type { Person, UpdatePersonRequest, PersonListResponse, PaginationParams } from '../types/person';
+import type { 
+  ServiceOrder, 
+  CreateServiceOrderRequest, 
+  UpdateServiceOrderRequest, 
+  ServiceOrderFilters, 
+  ServiceOrderListResponse, 
+  ServiceOrderStatus, 
+  UpdateStatusRequest, 
+  UpdateFinancialStatusRequest, 
+  SequenceInfo, 
+  SearchResponse 
+} from '../types/serviceOrder';
 
 // Classe para gerenciar requisições HTTP
 class ApiService {
@@ -219,6 +231,166 @@ class ApiService {
   async deleteUser(id: string): Promise<{ message: string }> {
     return this.request<{ message: string }>(`${API_CONFIG.ENDPOINTS.USERS.DELETE}/${id}`, {
       method: 'DELETE',
+    });
+  }
+
+  // Métodos para Service Orders
+  async getServiceOrders(filters?: ServiceOrderFilters): Promise<ServiceOrderListResponse> {
+    const queryParams = new URLSearchParams();
+    
+    // Sempre popular dados do cliente
+    queryParams.append('populate', 'customer');
+    
+    if (filters?.page) queryParams.append('page', filters.page.toString());
+    if (filters?.limit) queryParams.append('limit', filters.limit.toString());
+    if (filters?.status) queryParams.append('status', filters.status);
+    if (filters?.financial) queryParams.append('financial', filters.financial);
+    if (filters?.customerId) queryParams.append('customerId', filters.customerId);
+    if (filters?.equipment) queryParams.append('equipment', filters.equipment);
+    if (filters?.model) queryParams.append('model', filters.model);
+    if (filters?.brand) queryParams.append('brand', filters.brand);
+    if (filters?.serialNumber) queryParams.append('serialNumber', filters.serialNumber);
+    if (filters?.dateFrom) queryParams.append('dateFrom', filters.dateFrom);
+    if (filters?.dateTo) queryParams.append('dateTo', filters.dateTo);
+    
+    const endpoint = `${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.LIST}?${queryParams.toString()}`;
+    
+    return this.request<ServiceOrderListResponse>(endpoint, {
+      method: 'GET',
+    });
+  }
+
+  async getServiceOrderById(id: string): Promise<ServiceOrder> {
+    return this.request<ServiceOrder>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.LIST}/${id}?populate=customer`, {
+      method: 'GET',
+    });
+  }
+
+  async createServiceOrder(orderData: CreateServiceOrderRequest): Promise<ServiceOrder> {
+    return this.request<ServiceOrder>(API_CONFIG.ENDPOINTS.SERVICE_ORDERS.CREATE, {
+      method: 'POST',
+      body: JSON.stringify(orderData),
+    });
+  }
+
+  async updateServiceOrder(id: string, orderData: UpdateServiceOrderRequest): Promise<ServiceOrder> {
+    return this.request<ServiceOrder>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.UPDATE}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(orderData),
+    });
+  }
+
+  async deleteServiceOrder(id: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.DELETE}/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Buscas específicas
+  async searchServiceOrders(term: string): Promise<SearchResponse> {
+    const queryParams = new URLSearchParams();
+    queryParams.append('populate', 'customer');
+    queryParams.append('q', term);
+    
+    return this.request<SearchResponse>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.SEARCH}?${queryParams.toString()}`, {
+      method: 'GET',
+    });
+  }
+
+  async getServiceOrdersByOrderNumber(orderNumber: number): Promise<ServiceOrder[]> {
+    const queryParams = new URLSearchParams();
+    queryParams.append('q', orderNumber.toString());
+    
+    return this.request<ServiceOrder[]>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.BY_ORDER_NUMBER}?${queryParams.toString()}`, {
+      method: 'GET',
+    });
+  }
+
+  async getServiceOrdersByCustomer(customerId: string): Promise<ServiceOrder[]> {
+    const queryParams = new URLSearchParams();
+    queryParams.append('populate', 'customer');
+    queryParams.append('customerId', customerId);
+    
+    return this.request<ServiceOrder[]>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.BY_CUSTOMER}?${queryParams.toString()}`, {
+      method: 'GET',
+    });
+  }
+
+  async getServiceOrdersByStatus(status: ServiceOrderStatus): Promise<ServiceOrder[]> {
+    const queryParams = new URLSearchParams();
+    queryParams.append('populate', 'customer');
+    queryParams.append('q', status);
+    
+    return this.request<ServiceOrder[]>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.BY_STATUS}?${queryParams.toString()}`, {
+      method: 'GET',
+    });
+  }
+
+  async getServiceOrdersByEquipment(equipment: string): Promise<ServiceOrder[]> {
+    const queryParams = new URLSearchParams();
+    queryParams.append('populate', 'customer');
+    queryParams.append('q', equipment);
+    
+    return this.request<ServiceOrder[]>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.BY_EQUIPMENT}?${queryParams.toString()}`, {
+      method: 'GET',
+    });
+  }
+
+  async getServiceOrdersByBrand(brand: string): Promise<ServiceOrder[]> {
+    const queryParams = new URLSearchParams();
+    queryParams.append('populate', 'customer');
+    queryParams.append('q', brand);
+    
+    return this.request<ServiceOrder[]>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.BY_BRAND}?${queryParams.toString()}`, {
+      method: 'GET',
+    });
+  }
+
+  async getServiceOrdersBySerialNumber(serialNumber: string): Promise<ServiceOrder[]> {
+    const queryParams = new URLSearchParams();
+    queryParams.append('populate', 'customer');
+    queryParams.append('q', serialNumber);
+    
+    return this.request<ServiceOrder[]>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.BY_SERIAL_NUMBER}?${queryParams.toString()}`, {
+      method: 'GET',
+    });
+  }
+
+  async getServiceOrdersByCustomerName(customerName: string): Promise<ServiceOrder[]> {
+    const queryParams = new URLSearchParams();
+    queryParams.append('populate', 'customer');
+    queryParams.append('q', customerName);
+    
+    return this.request<ServiceOrder[]>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.BY_CUSTOMER_NAME}?${queryParams.toString()}`, {
+      method: 'GET',
+    });
+  }
+
+  // Gestão de status
+  async updateServiceOrderStatus(id: string, status: UpdateStatusRequest): Promise<ServiceOrder> {
+    return this.request<ServiceOrder>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.UPDATE}/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify(status),
+    });
+  }
+
+  async updateServiceOrderFinancialStatus(id: string, financial: UpdateFinancialStatusRequest): Promise<ServiceOrder> {
+    return this.request<ServiceOrder>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.UPDATE}/${id}/financial-status`, {
+      method: 'PUT',
+      body: JSON.stringify(financial),
+    });
+  }
+
+  // Sequência numérica
+  async getCurrentSequenceNumber(): Promise<{ currentNumber: number }> {
+    return this.request<{ currentNumber: number }>(API_CONFIG.ENDPOINTS.SERVICE_ORDERS.SEQUENCE_CURRENT, {
+      method: 'GET',
+    });
+  }
+
+  async getSequenceInfo(): Promise<SequenceInfo> {
+    return this.request<SequenceInfo>(API_CONFIG.ENDPOINTS.SERVICE_ORDERS.SEQUENCE_INFO, {
+      method: 'GET',
     });
   }
 }

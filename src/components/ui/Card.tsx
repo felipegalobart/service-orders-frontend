@@ -27,7 +27,7 @@ export const Card: React.FC<CardProps> = ({
         lg: 'shadow-lg',
     };
 
-    const classes = `rounded-xl border border-gray-200 ${paddingClasses[padding]} ${shadowClasses[shadow]} ${className}`;
+    const classes = `rounded-xl border ${paddingClasses[padding]} ${shadowClasses[shadow]} ${className}`;
 
     return (
         <div className={classes} onClick={onClick}>
@@ -46,7 +46,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
     className = '',
 }) => {
     return (
-        <div className={`border-b border-gray-200 pb-4 mb-4 ${className}`}>
+        <div className={`border-b border-gray-700 pb-4 mb-4 ${className}`}>
             {children}
         </div>
     );
@@ -62,7 +62,7 @@ export const CardTitle: React.FC<CardTitleProps> = ({
     className = '',
 }) => {
     return (
-        <h3 className={`text-lg font-semibold ${className}`}>
+        <h3 className={`text-lg font-semibold text-white ${className}`}>
             {children}
         </h3>
     );

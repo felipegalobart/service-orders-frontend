@@ -194,3 +194,196 @@ export const BRAZILIAN_STATES = [
   { value: 'SE', label: 'Sergipe' },
   { value: 'TO', label: 'Tocantins' }
 ];
+
+// ===== SERVICE ORDER FORMATTERS =====
+
+/**
+ * Formata valor monetário em reais brasileiros
+ */
+export const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
+};
+
+/**
+ * Formata data no padrão brasileiro (DD/MM/AAAA)
+ */
+export const formatDate = (date: string | Date): string => {
+  if (!date) return '';
+  return new Date(date).toLocaleDateString('pt-BR');
+};
+
+/**
+ * Formata data e hora no padrão brasileiro (DD/MM/AAAA HH:MM)
+ */
+export const formatDateTime = (date: string | Date): string => {
+  if (!date) return '';
+  return new Date(date).toLocaleString('pt-BR');
+};
+
+/**
+ * Formata status técnico da ordem de serviço
+ */
+export const formatServiceOrderStatus = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    confirmar: 'Aguardando Confirmação',
+    aprovado: 'Aprovado',
+    pronto: 'Pronto',
+    entregue: 'Entregue',
+    reprovado: 'Reprovado',
+  };
+  return statusMap[status] || status;
+};
+
+/**
+ * Formata status financeiro da ordem de serviço
+ */
+export const formatFinancialStatus = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    em_aberto: 'Em Aberto',
+    pago: 'Pago',
+    parcialmente_pago: 'Parcialmente Pago',
+    deve: 'Deve',
+    faturado: 'Faturado',
+    vencido: 'Vencido',
+    cancelado: 'Cancelado',
+  };
+  return statusMap[status] || status;
+};
+
+/**
+ * Formata tipo de pagamento
+ */
+export const formatPaymentType = (type: string): string => {
+  const typeMap: Record<string, string> = {
+    cash: 'À Vista',
+    installment: 'Parcelado',
+    store_credit: 'Crédito na Loja',
+  };
+  return typeMap[type] || type;
+};
+
+/**
+ * Retorna a cor do badge para status técnico
+ */
+export const getServiceOrderStatusColor = (status: string): 'default' | 'success' | 'warning' | 'danger' | 'info' => {
+  const colors: Record<string, 'default' | 'success' | 'warning' | 'danger' | 'info'> = {
+    confirmar: 'warning',
+    aprovado: 'info',
+    pronto: 'success',
+    entregue: 'success',
+    reprovado: 'danger',
+  };
+  return colors[status] || 'default';
+};
+
+/**
+ * Retorna a cor do badge para status financeiro
+ */
+export const getFinancialStatusColor = (status: string): 'default' | 'success' | 'warning' | 'danger' | 'info' => {
+  const colors: Record<string, 'default' | 'success' | 'warning' | 'danger' | 'info'> = {
+    em_aberto: 'warning',
+    pago: 'success',
+    parcialmente_pago: 'info',
+    deve: 'danger',
+    faturado: 'info',
+    vencido: 'danger',
+    cancelado: 'default',
+  };
+  return colors[status] || 'default';
+};
+
+/**
+ * Calcula o total de um item de serviço
+ */
+export const calculateServiceItemTotal = (
+  quantity: number,
+  value: number,
+  discount: number = 0,
+  addition: number = 0
+): number => {
+  const subtotal = quantity * value;
+  return subtotal - discount + addition;
+};
+
+/**
+ * Formata número da ordem de serviço com zeros à esquerda
+ */
+export const formatOrderNumber = (orderNumber: number): string => {
+  return orderNumber.toString().padStart(6, '0');
+};
+
+/**
+ * Calcula dias entre duas datas
+ */
+export const calculateDaysBetween = (startDate: string | Date, endDate: string | Date): number => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = Math.abs(end.getTime() - start.getTime());
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
+/**
+ * Verifica se uma data está vencida
+ */
+export const isOverdue = (date: string | Date): boolean => {
+  return new Date(date) < new Date();
+};
+
+/**
+ * Formata tempo de processamento
+ */
+export const formatProcessingTime = (entryDate: string | Date, deliveryDate?: string | Date): string => {
+  if (!deliveryDate) {
+    const days = calculateDaysBetween(entryDate, new Date());
+    return `${days} dias em processamento`;
+  }
+  
+  const days = calculateDaysBetween(entryDate, deliveryDate);
+  return `${days} dias`;
+};
+
+/**
+ * Formata informações de parcelamento
+ */
+export const formatInstallmentInfo = (installmentCount: number, paidInstallments: number): string => {
+  if (installmentCount <= 1) return 'À vista';
+  return `${paidInstallments}/${installmentCount} parcelas`;
+};
+
+/**
+ * Calcula percentual de pagamento
+ */
+export const calculatePaymentPercentage = (totalAmount: number, paidAmount: number): number => {
+  if (totalAmount === 0) return 0;
+  return Math.round((paidAmount / totalAmount) * 100);
+};
+
+/**
+ * Formata percentual de pagamento
+ */
+export const formatPaymentPercentage = (totalAmount: number, paidAmount: number): string => {
+  const percentage = calculatePaymentPercentage(totalAmount, paidAmount);
+  return `${percentage}%`;
+};
+
+/**
+ * Formata texto para MAIÚSCULO (para campos de ordem de serviço)
+ */
+export const formatUpperCase = (value: string): string => {
+  if (!value) return value;
+  return value.toUpperCase();
+};
+
+/**
+ * Retorna a data de hoje no formato YYYY-MM-DD (sem problemas de timezone)
+ */
+export const getTodayDateString = (): string => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};

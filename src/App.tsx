@@ -7,6 +7,7 @@ import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Home from './pages/dashboard/Home';
 import PersonList from './pages/persons/List';
+import { ServiceOrderList, ServiceOrderCreate, ServiceOrderEdit, ServiceOrderView, ServiceOrderDashboard } from './pages/serviceOrders';
 
 function App() {
   return (
@@ -26,6 +27,13 @@ function App() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Home />} />
             <Route path="persons" element={<PersonList />} />
+
+            {/* Service Orders Routes */}
+            <Route path="service-orders" element={<ServiceOrderList />} />
+            <Route path="service-orders/create" element={<ServiceOrderCreate />} />
+            <Route path="service-orders/edit/:id" element={<ServiceOrderEdit />} />
+            <Route path="service-orders/view/:id" element={<ServiceOrderView />} />
+            <Route path="service-orders/dashboard" element={<ServiceOrderDashboard />} />
           </Route>
 
           {/* Rota 404 */}

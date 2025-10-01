@@ -24,6 +24,22 @@ export const API_CONFIG = {
       LIST: '/users',
       UPDATE: '/users',
       DELETE: '/users',
+    },
+    SERVICE_ORDERS: {
+      LIST: '/service-orders',
+      CREATE: '/service-orders',
+      UPDATE: '/service-orders',
+      DELETE: '/service-orders',
+      SEARCH: '/service-orders/search',
+      BY_ORDER_NUMBER: '/service-orders/by-order-number',
+      BY_CUSTOMER: '/service-orders/by-customer',
+      BY_STATUS: '/service-orders/by-status',
+      BY_EQUIPMENT: '/service-orders/by-equipment',
+      BY_BRAND: '/service-orders/by-brand',
+      BY_SERIAL_NUMBER: '/service-orders/by-serial-number',
+      BY_CUSTOMER_NAME: '/service-orders/by-customer-name',
+      SEQUENCE_CURRENT: '/service-orders/sequence/current',
+      SEQUENCE_INFO: '/service-orders/sequence/info',
     }
   },
   
