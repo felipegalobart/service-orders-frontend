@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { Textarea } from '../ui/Textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { LoadingSpinner } from '../ui/Loading';
@@ -13,7 +14,6 @@ import { validateServiceOrder, hasValidationErrors } from '../../utils/validator
 import { formatCurrency, formatUpperCase, getTodayDateString } from '../../utils/formatters';
 import type {
     ServiceOrder,
-    CreateServiceOrderRequest,
     UpdateServiceOrderRequest,
     ServiceItem,
     ServiceOrderValidationErrors
@@ -242,110 +242,113 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 </div>
             )}
 
-            {/* Informações do Cliente */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Informações do Cliente</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                            Cliente *
-                        </label>
-                        <CustomerSelector
-                            value={formData.customerId}
-                            onChange={handleCustomerChange}
-                            error={validationErrors.customerId}
-                            disabled={isSubmitting}
-                        />
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Informações do Equipamento */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Informações do Equipamento</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                            Equipamento *
-                        </label>
-                        <Input
-                            value={formData.equipment}
-                            onChange={(value) => handleInputChange('equipment', formatUpperCase(value))}
-                            placeholder="Ex: NOTEBOOK DELL INSPIRON 15"
-                            disabled={isSubmitting}
-                            error={validationErrors.equipment}
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Cliente e Equipamento - Lado a Lado */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Informações do Cliente */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Informações do Cliente</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Modelo
+                                Cliente *
                             </label>
-                            <Input
-                                value={formData.model}
-                                onChange={(value) => handleInputChange('model', formatUpperCase(value))}
-                                placeholder="Ex: INSPIRON 15 3000"
+                            <CustomerSelector
+                                value={formData.customerId}
+                                onChange={handleCustomerChange}
+                                error={validationErrors.customerId}
                                 disabled={isSubmitting}
                             />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Informações do Equipamento */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Informações do Equipamento</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                                Equipamento *
+                            </label>
+                            <Input
+                                value={formData.equipment}
+                                onChange={(value) => handleInputChange('equipment', formatUpperCase(value))}
+                                placeholder="Ex: NOTEBOOK DELL INSPIRON 15"
+                                disabled={isSubmitting}
+                                error={validationErrors.equipment}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    Modelo
+                                </label>
+                                <Input
+                                    value={formData.model}
+                                    onChange={(value) => handleInputChange('model', formatUpperCase(value))}
+                                    placeholder="Ex: INSPIRON 15 3000"
+                                    disabled={isSubmitting}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    Marca
+                                </label>
+                                <Input
+                                    value={formData.brand}
+                                    onChange={(value) => handleInputChange('brand', formatUpperCase(value))}
+                                    placeholder="Ex: DELL"
+                                    disabled={isSubmitting}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    Número de Série
+                                </label>
+                                <Input
+                                    value={formData.serialNumber}
+                                    onChange={(value) => handleInputChange('serialNumber', formatUpperCase(value))}
+                                    placeholder="Ex: DL123456789"
+                                    disabled={isSubmitting}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    Voltagem
+                                </label>
+                                <Input
+                                    value={formData.voltage}
+                                    onChange={(value) => handleInputChange('voltage', formatUpperCase(value))}
+                                    placeholder="Ex: 110V, 220V"
+                                    disabled={isSubmitting}
+                                />
+                            </div>
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Marca
+                                Acessórios
                             </label>
                             <Input
-                                value={formData.brand}
-                                onChange={(value) => handleInputChange('brand', formatUpperCase(value))}
-                                placeholder="Ex: DELL"
+                                value={formData.accessories}
+                                onChange={(value) => handleInputChange('accessories', formatUpperCase(value))}
+                                placeholder="Ex: CARREGADOR, MOUSE, ETC."
                                 disabled={isSubmitting}
                             />
                         </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Número de Série
-                            </label>
-                            <Input
-                                value={formData.serialNumber}
-                                onChange={(value) => handleInputChange('serialNumber', formatUpperCase(value))}
-                                placeholder="Ex: DL123456789"
-                                disabled={isSubmitting}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Voltagem
-                            </label>
-                            <Input
-                                value={formData.voltage}
-                                onChange={(value) => handleInputChange('voltage', formatUpperCase(value))}
-                                placeholder="Ex: 110V, 220V"
-                                disabled={isSubmitting}
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                            Acessórios
-                        </label>
-                        <Input
-                            value={formData.accessories}
-                            onChange={(value) => handleInputChange('accessories', formatUpperCase(value))}
-                            placeholder="Ex: CARREGADOR, MOUSE, ETC."
-                            disabled={isSubmitting}
-                        />
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </div>
 
             {/* Informações do Serviço */}
             <Card>
@@ -413,39 +416,6 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 </CardContent>
             </Card>
 
-            {/* Datas */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Datas</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Data de Entrada *
-                            </label>
-                            <Input
-                                type="date"
-                                value={formData.entryDate}
-                                onChange={(value) => handleInputChange('entryDate', value)}
-                                disabled={isSubmitting}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Data de Entrega (Previsão)
-                            </label>
-                            <Input
-                                type="date"
-                                value={formData.deliveryDate}
-                                onChange={(value) => handleInputChange('deliveryDate', value)}
-                                disabled={isSubmitting}
-                            />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
 
             {/* Itens de Serviço */}
             <ServiceItemsManager
@@ -458,14 +428,15 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 disabled={isSubmitting}
             />
 
-            {/* Status da Ordem (apenas edição) */}
-            {mode === 'edit' && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Status da Ordem</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Status e Financeiro - Lado a Lado */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Status da Ordem (apenas edição) */}
+                {mode === 'edit' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Status da Ordem</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-1">
                                     Status Técnico
@@ -474,16 +445,29 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                                     value={formData.status}
                                     onChange={(e) => {
                                         const newStatus = e.target.value;
+                                        const currentStatus = formData.status;
                                         handleInputChange('status', newStatus);
 
                                         // Se mudou para aprovado, registrar data
-                                        if (newStatus === 'aprovado' && (!order?.status || order.status !== 'aprovado')) {
+                                        if (newStatus === 'aprovado' && currentStatus !== 'aprovado') {
                                             handleInputChange('approvalDate', new Date().toISOString().split('T')[0]);
                                         }
 
                                         // Se mudou para entregue, registrar data
-                                        if (newStatus === 'entregue' && (!order?.status || order.status !== 'entregue')) {
+                                        if (newStatus === 'entregue' && currentStatus !== 'entregue') {
                                             handleInputChange('deliveryDate', new Date().toISOString().split('T')[0]);
+                                        }
+
+                                        // Se voltou para confirmar, limpar datas específicas
+                                        if (newStatus === 'confirmar') {
+                                            // Limpar data de aprovação se estava aprovado
+                                            if (currentStatus === 'aprovado') {
+                                                handleInputChange('approvalDate', '');
+                                            }
+                                            // Limpar data de entrega se estava entregue
+                                            if (currentStatus === 'entregue') {
+                                                handleInputChange('deliveryDate', '');
+                                            }
                                         }
                                     }}
                                     disabled={isSubmitting}
@@ -497,20 +481,32 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                                 </select>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">
-                                    Data de Entrada
-                                </label>
-                                <Input
-                                    type="date"
-                                    value={formData.entryDate}
-                                    onChange={(value) => handleInputChange('entryDate', value)}
-                                    disabled={isSubmitting}
-                                />
-                            </div>
-                        </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Data de Entrada *
+                                    </label>
+                                    <Input
+                                        type="date"
+                                        value={formData.entryDate}
+                                        onChange={(value) => handleInputChange('entryDate', value)}
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Previsão de Entrega
+                                    </label>
+                                    <Input
+                                        type="date"
+                                        value={formData.expectedDeliveryDate}
+                                        onChange={(value) => handleInputChange('expectedDeliveryDate', value)}
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
+                            </div>
+
                             {formData.status === 'aprovado' || formData.approvalDate ? (
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -525,18 +521,6 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                                 </div>
                             ) : null}
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">
-                                    Previsão de Entrega
-                                </label>
-                                <Input
-                                    type="date"
-                                    value={formData.expectedDeliveryDate}
-                                    onChange={(value) => handleInputChange('expectedDeliveryDate', value)}
-                                    disabled={isSubmitting}
-                                />
-                            </div>
-
                             {formData.status === 'entregue' || formData.deliveryDate ? (
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">
@@ -550,18 +534,16 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                                     />
                                 </div>
                             ) : null}
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
+                        </CardContent>
+                    </Card>
+                )}
 
-            {/* Informações Financeiras */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Informações Financeiras</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Informações Financeiras */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Informações Financeiras</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">
                                 Status Financeiro
@@ -597,56 +579,56 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                                 <option value="store_credit">Crédito na Loja</option>
                             </select>
                         </div>
-                    </div>
 
-                    {formData.paymentType === 'installment' && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Número de Parcelas
-                            </label>
-                            <Input
-                                type="number"
-                                value={formData.installmentCount?.toString() || '1'}
-                                onChange={(value) => handleInputChange('installmentCount', parseInt(value) || 1)}
-                                min="1"
-                                max="12"
-                                disabled={isSubmitting}
-                            />
-                        </div>
-                    )}
+                        {formData.paymentType === 'installment' && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">
+                                    Número de Parcelas
+                                </label>
+                                <Input
+                                    type="number"
+                                    value={formData.installmentCount?.toString() || '1'}
+                                    onChange={(value) => handleInputChange('installmentCount', parseInt(value) || 1)}
+                                    min="1"
+                                    max="12"
+                                    disabled={isSubmitting}
+                                />
+                            </div>
+                        )}
 
-                    {/* Resumo Financeiro */}
-                    <div className="p-4 bg-gray-700 rounded-md">
-                        <h4 className="font-medium text-white mb-3">Resumo Financeiro</h4>
-                        <div className="space-y-2">
-                            <div className="flex justify-between">
-                                <span className="text-sm text-gray-300">Subtotal dos Serviços:</span>
-                                <span className="text-sm font-medium">
-                                    {formatCurrency(totals.servicesSum)}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-gray-300">Total de Descontos:</span>
-                                <span className="text-sm font-medium text-red-600">
-                                    -{formatCurrency(totals.totalDiscount)}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-gray-300">Total de Acréscimos:</span>
-                                <span className="text-sm font-medium text-green-600">
-                                    +{formatCurrency(totals.totalAddition)}
-                                </span>
-                            </div>
-                            <div className="flex justify-between pt-2 border-t border-gray-300">
-                                <span className="font-medium text-white">Total da Ordem:</span>
-                                <span className="text-lg font-bold text-white">
-                                    {formatCurrency(totalAmount)}
-                                </span>
+                        {/* Resumo Financeiro */}
+                        <div className="p-4 bg-gray-700 rounded-md">
+                            <h4 className="font-medium text-white mb-3">Resumo Financeiro</h4>
+                            <div className="space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-gray-300">Subtotal dos Serviços:</span>
+                                    <span className="text-sm font-medium">
+                                        {formatCurrency(totals.servicesSum)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-gray-300">Total de Descontos:</span>
+                                    <span className="text-sm font-medium text-red-600">
+                                        -{formatCurrency(totals.totalDiscount)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-gray-300">Total de Acréscimos:</span>
+                                    <span className="text-sm font-medium text-green-600">
+                                        +{formatCurrency(totals.totalAddition)}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between pt-2 border-t border-gray-300">
+                                    <span className="font-medium text-white">Total da Ordem:</span>
+                                    <span className="text-lg font-bold text-white">
+                                        {formatCurrency(totalAmount)}
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </div>
 
             {/* Observações Adicionais */}
             <Card>
@@ -654,19 +636,15 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                     <CardTitle>Observações Adicionais</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
-                            Notas Internas
-                        </label>
-                        <textarea
-                            value={formData.notes}
-                            onChange={(e) => handleInputChange('notes', formatUpperCase(e.target.value))}
-                            placeholder="OBSERVAÇÕES INTERNAS SOBRE A ORDEM DE SERVIÇO..."
-                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            rows={3}
-                            disabled={isSubmitting}
-                        />
-                    </div>
+                    <Textarea
+                        label="Notas Internas"
+                        value={formData.notes}
+                        onChange={(value) => handleInputChange('notes', formatUpperCase(value))}
+                        placeholder="OBSERVAÇÕES INTERNAS SOBRE A ORDEM DE SERVIÇO... (Use Enter para quebras de linha)"
+                        rows={4}
+                        disabled={isSubmitting}
+                        maxLength={1000}
+                    />
                 </CardContent>
             </Card>
 

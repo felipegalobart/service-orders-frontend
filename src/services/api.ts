@@ -368,7 +368,7 @@ class ApiService {
 
   // Gestão de status
   async updateServiceOrderStatus(id: string, status: UpdateStatusRequest): Promise<ServiceOrder> {
-    return this.request<ServiceOrder>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.UPDATE}/${id}/status`, {
+    return this.request<ServiceOrder>(`${API_CONFIG.ENDPOINTS.SERVICE_ORDERS.UPDATE}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(status),
     });

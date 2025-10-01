@@ -1,5 +1,6 @@
 import React from 'react';
-import { useUpdateServiceOrderStatus, useUpdateServiceOrderFinancialStatus } from '../../hooks/useServiceOrders';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUpdateServiceOrderStatus, useUpdateServiceOrderFinancialStatus, serviceOrderKeys } from '../../hooks/useServiceOrders';
 import type { ServiceOrderStatus, FinancialStatus } from '../../types/serviceOrder';
 
 interface StatusDropdownProps {
@@ -17,6 +18,7 @@ export const StatusDropdown: React.FC<StatusDropdownProps> = ({
     onStatusChange,
     disabled = false,
 }) => {
+    const queryClient = useQueryClient();
     const updateStatusMutation = useUpdateServiceOrderStatus();
     const updateFinancialStatusMutation = useUpdateServiceOrderFinancialStatus();
 
@@ -24,10 +26,47 @@ export const StatusDropdown: React.FC<StatusDropdownProps> = ({
         if (newStatus === currentStatus) return;
 
         try {
+            // Preparar dados de atualização
+            const updateData: {
+                status: ServiceOrderStatus;
+                approvalDate?: string;
+                deliveryDate?: string;
+            } = { status: newStatus };
+
+            // Se mudou para aprovado, registrar data
+            if (newStatus === 'aprovado' && currentStatus !== 'aprovado') {
+                updateData.approvalDate = new Date().toISOString();
+            }
+
+            // Se mudou para entregue, registrar data
+            if (newStatus === 'entregue' && currentStatus !== 'entregue') {
+                updateData.deliveryDate = new Date().toISOString();
+            }
+
+            // Se voltou para confirmar, limpar datas específicas
+            if (newStatus === 'confirmar') {
+                // Limpar data de aprovação se estava aprovado
+                if (currentStatus === 'aprovado') {
+                    updateData.approvalDate = '';
+                }
+                // Limpar data de entrega se estava entregue
+                if (currentStatus === 'entregue') {
+                    updateData.deliveryDate = '';
+                }
+            }
+
             await updateStatusMutation.mutateAsync({
                 id: orderId,
-                status: { status: newStatus }
+                status: updateData
             });
+
+            // Forçar invalidação adicional para garantir atualização
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
+
+            // Forçar refetch imediato
+            await queryClient.refetchQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
             onStatusChange?.();
         } catch (error) {
             console.error('Erro ao atualizar status:', error);

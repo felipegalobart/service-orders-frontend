@@ -20,7 +20,7 @@ import {
     parseDecimal,
     getTodayDateString
 } from '../../utils/formatters';
-import { useServiceOrder, useUpdateServiceOrderFinancialStatus, useDeleteServiceOrder } from '../../hooks/useServiceOrders';
+import { useServiceOrder, useUpdateServiceOrderFinancialStatus, useDeleteServiceOrder, serviceOrderKeys } from '../../hooks/useServiceOrders';
 import { PersonDetailsModal } from '../ui/Modal/PersonDetailsModal';
 import { TimelineModal } from '../ui/Modal/TimelineModal';
 import type { ServiceOrderStatus, FinancialStatus } from '../../types/serviceOrder';
@@ -81,11 +81,32 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 updateData.deliveryDate = getTodayDateString();
             }
 
+            // Se voltou para confirmar, limpar datas específicas
+            if (newStatus === 'confirmar') {
+                // Limpar data de aprovação se estava aprovado
+                if (order.status === 'aprovado') {
+                    updateData.approvalDate = '';
+                }
+                // Limpar data de entrega se estava entregue
+                if (order.status === 'entregue') {
+                    updateData.deliveryDate = '';
+                }
+            }
+
             // Usar endpoint de UPDATE para incluir as datas
             await apiService.updateServiceOrder(orderId, updateData);
 
+            // Fechar modal de timeline se estiver aberto para forçar atualização
+            if (isTimelineModalOpen) {
+                setIsTimelineModalOpen(false);
+            }
+
             // Invalidar cache e refetch
-            await queryClient.invalidateQueries({ queryKey: ['serviceOrders'] });
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
+            // Forçar refetch imediato
+            await queryClient.refetchQueries({ queryKey: serviceOrderKeys.detail(orderId) });
         } catch (error) {
             console.error('Erro ao atualizar status:', error);
         }
@@ -475,42 +496,44 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     <CardHeader>
                         <CardTitle>Informações do Serviço</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        {order.reportedDefect && (
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <svg className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-1.964-1.333-2.732 0L3.732 16c-.77 1.333.192 3 1.732 3z" />
-                                    </svg>
-                                    <h4 className="font-semibold text-white">Defeito Relatado</h4>
+                    <CardContent>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            {order.reportedDefect && (
+                                <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <svg className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-1.964-1.333-2.732 0L3.732 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        <h4 className="font-semibold text-white text-sm">Defeito Relatado</h4>
+                                    </div>
+                                    <p className="text-sm text-gray-300 leading-relaxed">{order.reportedDefect}</p>
                                 </div>
-                                <p className="text-sm text-gray-300 bg-gray-700 p-3 rounded-md">{order.reportedDefect}</p>
-                            </div>
-                        )}
+                            )}
 
-                        {order.customerObservations && (
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                                    </svg>
-                                    <h4 className="font-semibold text-white">Observações do Cliente</h4>
+                            {order.customerObservations && (
+                                <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                        </svg>
+                                        <h4 className="font-semibold text-white text-sm">Observações do Cliente</h4>
+                                    </div>
+                                    <p className="text-sm text-gray-300 leading-relaxed">{order.customerObservations}</p>
                                 </div>
-                                <p className="text-sm text-gray-300 bg-gray-700 p-3 rounded-md">{order.customerObservations}</p>
-                            </div>
-                        )}
+                            )}
 
-                        {order.notes && (
-                            <div>
-                                <div className="flex items-center gap-2 mb-2">
-                                    <svg className="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    <h4 className="font-semibold text-white">Notas Internas</h4>
+                            {order.notes && (
+                                <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <svg className="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <h4 className="font-semibold text-white text-sm">Notas Internas</h4>
+                                    </div>
+                                    <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">{order.notes}</div>
                                 </div>
-                                <p className="text-sm text-gray-300 bg-gray-700 p-3 rounded-md">{order.notes}</p>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </CardContent>
                 </Card>
             )}

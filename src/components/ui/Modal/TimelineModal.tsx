@@ -256,7 +256,7 @@ export const TimelineModal: React.FC<TimelineModalProps> = ({
                         )}
 
                         {/* Serviços Concluídos */}
-                        {order.status === 'pronto' || order.status === 'entregue' ? (
+                        {order.status === 'pronto' ? (
                             <div className="relative flex items-start gap-4">
                                 <div className="relative z-10">
                                     {getStatusIcon('pronto')}
@@ -264,9 +264,7 @@ export const TimelineModal: React.FC<TimelineModalProps> = ({
                                 <div className="flex-1 bg-blue-700/20 rounded-lg p-4 border border-blue-600/30">
                                     <div className="flex items-center justify-between mb-2">
                                         <h3 className="text-lg font-semibold text-blue-400">Serviços Concluídos</h3>
-                                        <span className="text-sm text-gray-400">
-                                            {order.deliveryDate ? formatDate(order.deliveryDate) : 'Em andamento'}
-                                        </span>
+                                        <span className="text-sm text-gray-400">Pronto para entrega</span>
                                     </div>
                                     <p className="text-gray-300 text-sm mb-3">
                                         Todos os serviços foram executados e estão prontos para entrega.

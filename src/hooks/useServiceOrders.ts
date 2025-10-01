@@ -144,6 +144,9 @@ export const useUpdateServiceOrderStatus = () => {
       // Atualizar cache da ordem específica
       queryClient.setQueryData(serviceOrderKeys.detail(updatedOrder._id), updatedOrder);
       
+      // Invalidar a query específica para garantir atualização
+      queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(updatedOrder._id) });
+      
       // Invalidar listas e buscas por status
       queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
       queryClient.invalidateQueries({ queryKey: serviceOrderKeys.byStatus(updatedOrder.status) });
