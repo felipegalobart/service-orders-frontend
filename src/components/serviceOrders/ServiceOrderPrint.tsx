@@ -51,7 +51,7 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order, onC
                         ORDEM DE SERVIÇO
                     </h1>
                     <p className="text-lg text-gray-600">
-                        #{formatOrderNumber(order.orderNumber)}
+                        OS: {formatOrderNumber(order.orderNumber)}
                     </p>
                     <div className="mt-4 text-sm text-gray-500">
                         <p>Data de Criação: {formatDateTime(order.createdAt)}</p>

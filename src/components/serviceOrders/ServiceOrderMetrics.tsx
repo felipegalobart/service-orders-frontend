@@ -283,7 +283,7 @@ export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ classN
                                         <div key={order._id} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
                                             <div>
                                                 <p className="text-sm font-medium text-white">
-                                                    #{order.orderNumber}
+                                                    OS: {order.orderNumber}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
                                                     {order.equipment}

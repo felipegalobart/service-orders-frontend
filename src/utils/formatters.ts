@@ -318,10 +318,10 @@ export const calculateServiceItemTotal = (
 };
 
 /**
- * Formata número da ordem de serviço com zeros à esquerda
+ * Formata número da ordem de serviço
  */
 export const formatOrderNumber = (orderNumber: number): string => {
-  return orderNumber.toString().padStart(6, '0');
+  return orderNumber.toString();
 };
 
 /**

@@ -128,7 +128,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     const handleDelete = async () => {
         if (!order) return;
 
-        if (confirm(`Tem certeza que deseja excluir a ordem de serviço #${formatOrderNumber(order.orderNumber)}?`)) {
+        if (confirm(`Tem certeza que deseja excluir a ordem de serviço OS: ${formatOrderNumber(order.orderNumber)}?`)) {
             try {
                 await deleteMutation.mutateAsync(order._id);
                 navigate('/service-orders');
@@ -196,7 +196,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                         </div>
                         <div>
                             <h1 className="text-5xl font-black bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-2xl animate-pulse">
-                                #{formatOrderNumber(order.orderNumber)}
+                                OS: {formatOrderNumber(order.orderNumber)}
                             </h1>
                             <div className="flex items-center gap-2 mt-2 flex-wrap">
                                 <Badge variant={getServiceOrderStatusColor(order.status) as 'default' | 'success' | 'warning' | 'danger' | 'info'}>

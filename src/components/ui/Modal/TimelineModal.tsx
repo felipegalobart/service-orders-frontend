@@ -192,7 +192,7 @@ export const TimelineModal: React.FC<TimelineModalProps> = ({
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-bold text-white">
-                                Ordem #{order.orderNumber}
+                                Ordem OS: {order.orderNumber}
                             </h2>
                             <p className="text-gray-400">Timeline completa do processo</p>
                         </div>

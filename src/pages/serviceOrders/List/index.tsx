@@ -242,7 +242,7 @@ const ServiceOrderList: React.FC = () => {
                                             {/* Cabeçalho com número e badges */}
                                             <div className="flex items-center space-x-3 mb-3">
                                                 <h3 className="text-2xl font-bold text-white">
-                                                    #{order.orderNumber.toString().padStart(4, '0')}
+                                                    OS: {order.orderNumber}
                                                 </h3>
                                                 <div className="flex items-center space-x-2 flex-wrap">
                                                     <Badge variant={getStatusBadgeVariant(order.status)}>
