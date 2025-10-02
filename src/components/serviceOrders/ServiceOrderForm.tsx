@@ -177,7 +177,12 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 await updateMutation.mutateAsync({ id: order._id, data: submitData });
             }
 
-            navigate('/service-orders');
+            // Redirecionar baseado no modo
+            if (mode === 'edit' && order) {
+                navigate(`/service-orders/view/${order._id}`);
+            } else {
+                navigate('/service-orders');
+            }
         } catch (error) {
             console.error('Erro ao salvar ordem de serviço:', error);
             setValidationErrors({
