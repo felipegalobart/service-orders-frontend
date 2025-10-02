@@ -19,6 +19,13 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
+          {/* Rota de impressão (sem layout) */}
+          <Route path="/service-orders/print/:id" element={
+            <ProtectedRoute>
+              <ServiceOrderPrintPage />
+            </ProtectedRoute>
+          } />
+
           {/* Rotas protegidas (com layout) */}
           <Route path="/" element={
             <ProtectedRoute>
@@ -34,7 +41,6 @@ function App() {
             <Route path="service-orders/create" element={<ServiceOrderCreate />} />
             <Route path="service-orders/edit/:id" element={<ServiceOrderEdit />} />
             <Route path="service-orders/view/:id" element={<ServiceOrderView />} />
-            <Route path="service-orders/print/:id" element={<ServiceOrderPrintPage />} />
             <Route path="service-orders/dashboard" element={<ServiceOrderDashboard />} />
           </Route>
 

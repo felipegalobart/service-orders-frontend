@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useServiceOrder } from '../../../hooks/useServiceOrders';
+import { apiService } from '../../../services/api';
 import { ServiceOrderPrint } from '../../../components/serviceOrders/ServiceOrderPrint';
 import { LoadingSpinner } from '../../../components/ui/Loading';
 
@@ -10,15 +12,31 @@ export const ServiceOrderPrintPage: React.FC = () => {
 
     const { data: order, isLoading, error } = useServiceOrder(id!);
 
+    // Buscar dados do cliente se não vier populado
+    const { data: customer } = useQuery({
+        queryKey: ['customer', order?.customerId],
+        queryFn: () => apiService.getPersonById(order!.customerId),
+        enabled: !!order && !order.customer,
+        staleTime: 10 * 60 * 1000,
+    });
+
+    // Criar order com dados do cliente populados
+    const orderWithCustomer = useMemo(() => {
+        return order ? {
+            ...order,
+            customer: order.customer || customer
+        } : null;
+    }, [order, customer]);
+
     useEffect(() => {
         // Se os dados carregaram, foca na janela para impressão
-        if (order && !isLoading) {
+        if (orderWithCustomer && !isLoading) {
             // Pequeno delay para garantir que o conteúdo foi renderizado
             setTimeout(() => {
                 window.print();
             }, 500);
         }
-    }, [order, isLoading]);
+    }, [orderWithCustomer, isLoading]);
 
     const handleClose = () => {
         navigate(-1); // Volta para a página anterior
@@ -26,17 +44,17 @@ export const ServiceOrderPrintPage: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+            <div className="min-h-screen bg-white flex items-center justify-center">
                 <LoadingSpinner />
             </div>
         );
     }
 
-    if (error || !order) {
+    if (error || !orderWithCustomer) {
         return (
-            <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+            <div className="min-h-screen bg-white flex items-center justify-center">
                 <div className="text-center">
-                    <h2 className="text-2xl font-bold text-white mb-4">Erro ao carregar ordem</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Erro ao carregar ordem</h2>
                     <button
                         onClick={handleClose}
                         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -49,8 +67,8 @@ export const ServiceOrderPrintPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <ServiceOrderPrint order={order} onClose={handleClose} />
+        <div className="min-h-screen bg-white">
+            <ServiceOrderPrint order={orderWithCustomer} />
         </div>
     );
 };
