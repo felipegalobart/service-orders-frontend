@@ -122,7 +122,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     };
 
     const handlePrint = () => {
-        window.print();
+        navigate(`/service-orders/print/${orderId}`);
     };
 
     const handleDelete = async () => {

@@ -8,6 +8,7 @@ import Register from './pages/auth/Register';
 import Home from './pages/dashboard/Home';
 import PersonList from './pages/persons/List';
 import { ServiceOrderList, ServiceOrderCreate, ServiceOrderEdit, ServiceOrderView, ServiceOrderDashboard } from './pages/serviceOrders';
+import { ServiceOrderPrintPage } from './pages/serviceOrders/Print';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
             <Route path="service-orders/create" element={<ServiceOrderCreate />} />
             <Route path="service-orders/edit/:id" element={<ServiceOrderEdit />} />
             <Route path="service-orders/view/:id" element={<ServiceOrderView />} />
+            <Route path="service-orders/print/:id" element={<ServiceOrderPrintPage />} />
             <Route path="service-orders/dashboard" element={<ServiceOrderDashboard />} />
           </Route>
 
