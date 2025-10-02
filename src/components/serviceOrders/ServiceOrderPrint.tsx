@@ -13,15 +13,6 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order, onC
         window.print();
     };
 
-    const handleExportPDF = () => {
-        // Implementar exportação para PDF
-        console.log('Exportar para PDF:', order);
-    };
-
-    const handleExportExcel = () => {
-        // Implementar exportação para Excel
-        console.log('Exportar para Excel:', order);
-    };
 
     return (
         <>
