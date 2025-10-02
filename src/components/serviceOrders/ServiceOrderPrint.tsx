@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatDate, formatOrderNumber } from '../../utils/formatters';
+import { formatDate, formatOrderNumber, formatPhoneNumber, formatUpperCase } from '../../utils/formatters';
 import type { ServiceOrder } from '../../types/serviceOrder';
 
 interface ServiceOrderPrintProps {
@@ -15,7 +15,7 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                 {/* Cabeçalho da Empresa */}
                 <div className="text-center mb-1 ">
                     {/* Logo da Mitsuwa */}
-                    <div className="w-full mb-3">
+                    <div className="w-full mb-2">
                         <img
                             src="/LogoMitsuwaBranco.jpg"
                             alt="Logo Mitsuwa"
@@ -23,71 +23,71 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                         />
                     </div>
 
-                    <div className="mb-2">
-                        <h1 className="text-base font-bold text-gray-900">MITSUWA ELETRO MECANICA LTDA</h1>
-                        <p className="text-xs text-gray-600">AUTORIZADA: HERCULES MOTORES TRAPP - TRAMONTINA</p>
-                    </div>
+                    {/* Grid de 3 colunas com informações da empresa */}
+                    <div className="grid grid-cols-2 gap-1 mb-1 mt-1">
+                        {/* Coluna 1: Número da OS */}
+                        <div className="text-center border border-gray-400 rounded-lg p-1">
+                            <p>MITSUWA ELETRO MECANICA LTDA</p>
+                            <p className="text-3xl font-bold text-gray-900">OS N° {formatOrderNumber(order.orderNumber)}</p>
+                        </div>
 
-                    <div className="text-xs text-gray-600 mb-2">
-                        <p>Telefone: 4479-1814 - WHATSAPP: 3458-5898</p>
-                        <p>Av. Martim Francisco, 1478 - Camilópolis - Santo André - SP</p>
-                    </div>
-
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900">OS N° {formatOrderNumber(order.orderNumber)}</h2>
+                        {/* Coluna 3: Contatos */}
+                        <div className="text-center text-xs text-gray-600 border border-gray-400 rounded-lg p-1">
+                            <p>Telefone: 4479-1814</p>
+                            <p>WHATSAPP: 3458-5898</p>
+                            <p>Av. Martim Francisco, 1478</p>
+                            <p>Camilópolis - Santo André - SP</p>
+                        </div>
                     </div>
                 </div>
 
                 {/* Dados do Cliente e Equipamento */}
-                <div className="grid grid-cols-2 gap-6 mb-4">
+                <div className="grid grid-cols-2 gap-6 mb-1">
                     <div>
                         <div className="space-y-1">
                             <div className="flex">
-                                <span className="w-16 font-semibold">Nome:</span>
-                                <span>{order.customer?.name || order.customerId || 'Cliente não informado'}</span>
+                                <span className="w-20 font-semibold">Nome:</span>
+                                <span>{formatUpperCase(order.customer?.name || order.customerId || 'Cliente não informado')}</span>
                             </div>
                             <div className="flex">
-                                <span className="w-16 font-semibold">Produto:</span>
-                                <span>{order.equipment}</span>
+                                <span className="w-20 font-semibold">Produto:</span>
+                                <span>{formatUpperCase(order.equipment)}</span>
                             </div>
                             <div className="flex">
-                                <span className="w-16 font-semibold">Modelo:</span>
-                                <span>{order.model || '-'}</span>
+                                <span className="w-20 font-semibold">Modelo:</span>
+                                <span>{formatUpperCase(order.model || '-')}</span>
                             </div>
                             <div className="flex">
-                                <span className="w-16 font-semibold">Entrada:</span>
+                                <span className="w-20 font-semibold">Entrada:</span>
                                 <span>{formatDate(order.entryDate)}</span>
                             </div>
-                            <div className="flex">
-                                <span className="w-16 font-semibold">Email:</span>
-                                <span>{order.customer?.contacts?.find(c => c.email)?.email || 'mitsuwa@mitsuwa.com.br'}</span>
-                            </div>
+
                         </div>
                     </div>
                     <div>
                         <div className="space-y-1">
                             <div className="flex">
-                                <span className="w-16 font-semibold">Telefone:</span>
-                                <span>{order.customer?.contacts?.find(c => c.phone)?.phone || '-'}</span>
+                                <span className="w-20 font-semibold">Telefone:</span>
+                                <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
                             </div>
                             <div className="flex">
-                                <span className="w-16 font-semibold">Acessórios:</span>
-                                <span>{order.accessories || '-'}</span>
+                                <span className="w-20 font-semibold">Acessórios:</span>
+                                <span>{formatUpperCase(order.accessories || '-')}</span>
                             </div>
                             <div className="flex">
-                                <span className="w-16 font-semibold">Fabricante:</span>
-                                <span>{order.brand || '-'}</span>
+                                <span className="w-20 font-semibold">Fabricante:</span>
+                                <span>{formatUpperCase(order.brand || '-')}</span>
                             </div>
                             <div className="flex">
-                                <span className="w-16 font-semibold">Celular:</span>
-                                <span>{order.customer?.contacts?.find(c => c.phone)?.phone || '-'}</span>
+                                <span className="w-20 font-semibold">Celular:</span>
+                                <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Observações */}
-                <div className="mb-4 border border-gray-400 p-2">
+                <div className="mb-2 border border-gray-400 p-2">
                     <h3 className="font-bold mb-1 text-xs">OBSERVAÇÕES</h3>
                     <div className="space-y-0 text-xs">
                         <p>• GARANTIA DOS SERVIÇOS EFETUADOS: 90 DIAS</p>
@@ -103,16 +103,16 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                 </div>
 
                 {/* Seção do Orçamento */}
-                <div className="mb-4">
+                <div className="mb-1">
                     <div className="grid grid-cols-2 gap-6 mb-1">
                         <div>
                             <div className="flex">
-                                <span className="w-16 font-semibold">Entrada:</span>
-                                <span>{formatDate(order.entryDate)}</span>
+                                <span className="w-24 font-semibold text-xl">Entrada:</span>
+                                <span className="text-xl">{formatDate(order.entryDate)}</span>
                             </div>
                         </div>
-                        <div className="text-center">
-                            <h2 className="text-xl font-bold">Orçamento N° {formatOrderNumber(order.orderNumber)}</h2>
+                        <div className="">
+                            <h2 className="text-3xl font-bold">OS N° {formatOrderNumber(order.orderNumber)}</h2>
                         </div>
                     </div>
 
@@ -120,68 +120,65 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                         <div>
                             <div className="space-y-1">
                                 <div className="flex">
-                                    <span className="w-16 font-semibold">Nome:</span>
-                                    <span>{order.customer?.name || order.customerId || 'Cliente não informado'}</span>
+                                    <span className="w-20 font-semibold">Nome:</span>
+                                    <span>{formatUpperCase(order.customer?.name || order.customerId || 'Cliente não informado')}</span>
                                 </div>
                                 <div className="flex">
-                                    <span className="w-16 font-semibold">Aprovado</span>
+                                    <span className="w-20 font-semibold">Aprovado</span>
                                     <span className="min-w-20">_____ / _____ / _____</span>
                                 </div>
                                 <div className="flex">
-                                    <span className="w-16 font-semibold">Obs:</span>
-                                    <span>{order.notes || '-'}</span>
+                                    <span className="w-20 font-semibold">Produto:</span>
+                                    <span>{formatUpperCase(order.equipment)}</span>
                                 </div>
                                 <div className="flex">
-                                    <span className="w-16 font-semibold">Produto:</span>
-                                    <span>{order.equipment}</span>
+                                    <span className="w-20 font-semibold">Fabricante:</span>
+                                    <span>{formatUpperCase(order.brand || '-')}</span>
                                 </div>
                                 <div className="flex">
-                                    <span className="w-16 font-semibold">Fabricante:</span>
-                                    <span>{order.brand || '-'}</span>
+                                    <span className="w-20 font-semibold">Modelo:</span>
+                                    <span>{formatUpperCase(order.model || '-')}</span>
                                 </div>
                             </div>
                         </div>
                         <div>
                             <div className="space-y-1">
                                 <div className="flex">
-                                    <span className="w-16 font-semibold">Telefone:</span>
-                                    <span>{order.customer?.contacts?.find(c => c.phone)?.phone || '-'}</span>
+                                    <span className="w-20 font-semibold">Telefone:</span>
+                                    <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
                                 </div>
                                 <div className="flex">
-                                    <span className="w-16 font-semibold">Previsão:</span>
+                                    <span className="w-20 font-semibold">Previsão:</span>
                                     <span className="min-w-20">_____ / _____ / _____</span>
                                 </div>
                                 <div className="flex">
-                                    <span className="w-16 font-semibold">Celular:</span>
-                                    <span>{order.customer?.contacts?.find(c => c.phone)?.phone || '-'}</span>
+                                    <span className="w-20 font-semibold">Celular:</span>
+                                    <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
                                 </div>
                                 <div className="flex">
-                                    <span className="w-16 font-semibold">Tensão:</span>
-                                    <span>{order.voltage || '-'}</span>
+                                    <span className="w-20 font-semibold">Tensão:</span>
+                                    <span>{formatUpperCase(order.voltage || '-')}</span>
                                 </div>
                                 <div className="flex items-center">
-                                    <span className="w-16 font-semibold">Garantia?</span>
+                                    <span className="w-20 font-semibold">Garantia?</span>
                                     <input type="checkbox" checked={order.warranty} readOnly className="ml-2" />
                                 </div>
-                                <div className="flex">
-                                    <span className="w-16 font-semibold">Modelo:</span>
-                                    <span>{order.model || '-'}</span>
-                                </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Campo de Defeito */}
-                <div className="mb-4">
+                <div className="mb-1">
                     <div className="flex">
-                        <span className="w-16 font-semibold">Defeito:</span>
-                        <span>{order.reportedDefect || '-'}</span>
+                        <span className="w-20 font-semibold">Defeito:</span>
+                        <span>{formatUpperCase(order.reportedDefect || '-')}</span>
                     </div>
                 </div>
 
                 {/* Tabela de Itens de Serviço - Para preenchimento manual */}
-                <div className="mb-4">
+                <div className="mb-5">
                     <table className="w-full border-collapse" style={{ border: '1px dashed #000' }}>
                         <thead>
                             <tr>
@@ -205,15 +202,25 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                     </table>
 
                     {/* Total - Para preenchimento manual */}
-                    <div className="mt-2 text-right">
-                        <span className="font-bold text-base">VALOR TOTAL: R$ ________________</span>
+                    <div className="mt-4  text-right">
+                        <span className="font-bold text-base">VALOR TOTAL: R$ ______________________</span>
                     </div>
                 </div>
 
 
                 {/* Rodapé */}
-                <div className="text-center text-xs text-gray-600 border-t border-dashed border-gray-600 h-20 pt-4 mt-4">
-                    <p>OS:{formatOrderNumber(order.orderNumber)} - OS:{formatOrderNumber(order.orderNumber)} - OS:{formatOrderNumber(order.orderNumber)}</p>
+                <div className="border-t border-dashed border-gray-600 h-20 pt-4 mt-4">
+                    <div className="grid grid-cols-3 gap-4 text-center mt-2">
+                        <div className="text-4xl text-gray-600">
+                            <p>OS:{formatOrderNumber(order.orderNumber)}</p>
+                        </div>
+                        <div className="text-4xl text-gray-600">
+                            <p>OS:{formatOrderNumber(order.orderNumber)}</p>
+                        </div>
+                        <div className="text-4xl text-gray-600">
+                            <p>OS:{formatOrderNumber(order.orderNumber)}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -314,9 +321,44 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
           .border-t { border-top: 1px solid #000 !important; }
           .border-r { border-right: 1px solid #000 !important; }
           
+          /* Bordas circulares para impressão */
+          .rounded-lg {
+            border-radius: 0.5rem !important;
+          }
+          
+          /* Padding para as divs circuladas */
+          .p-3 {
+            padding: 0.75rem !important;
+          }
+          
           /* Grid compacto */
           .grid { display: grid !important; }
           .grid-cols-2 { grid-template-columns: 1fr 1fr !important; }
+          .grid-cols-3 { grid-template-columns: 1fr 1fr 1fr !important; }
+          
+          /* Flexbox para impressão - evitar compressão */
+          .flex { 
+            display: flex !important; 
+            flex-wrap: nowrap !important;
+            align-items: flex-start !important;
+          }
+          
+          /* Larguras fixas para labels na impressão */
+          .w-20 { 
+            width: 5rem !important; 
+            min-width: 5rem !important;
+            flex-shrink: 0 !important;
+          }
+          .w-16 { 
+            width: 4rem !important; 
+            min-width: 4rem !important;
+            flex-shrink: 0 !important;
+          }
+          .w-24 { 
+            width: 6rem !important; 
+            min-width: 6rem !important;
+            flex-shrink: 0 !important;
+          }
           .gap-8 { gap: 0.5rem !important; }
           .gap-4 { gap: 0.3rem !important; }
           
