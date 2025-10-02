@@ -171,9 +171,16 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
 
                 {/* Campo de Defeito */}
                 <div className="mb-1">
-                    <div className="flex">
-                        <span className="w-20 font-semibold">Defeito:</span>
-                        <span>{formatUpperCase(order.reportedDefect || '-')}</span>
+                    <div className="flex items-center">
+                        <span className="w-20 font-semibold flex-shrink-0">Defeito:</span>
+                        <span className="flex-1 truncate" style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: 'calc(100% - 5rem)'
+                        }}>
+                            {formatUpperCase(order.reportedDefect || '-')}
+                        </span>
                     </div>
                 </div>
 
@@ -348,6 +355,18 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
             width: 5rem !important; 
             min-width: 5rem !important;
             flex-shrink: 0 !important;
+          }
+          
+          /* Campo de defeito - uma linha só com truncate */
+          .truncate {
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+          }
+          
+          .flex-1 {
+            flex: 1 !important;
+            max-width: calc(100% - 5rem) !important;
           }
           .w-16 { 
             width: 4rem !important; 
