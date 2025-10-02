@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fonte Spranq Eco Sans para economia de tinta */
+@font-face {
+  font-family: 'Spranq Eco Sans';
+  src: url('/fonts/spranq_eco_sans_regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Animações para notificações */
 @keyframes slide-in {
   from {

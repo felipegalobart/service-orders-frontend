@@ -10,16 +10,16 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
     return (
         <>
             {/* Conteúdo da ordem - visível na tela e na impressão */}
-            <div className="bg-white text-black p-4 max-w-4xl mx-auto text-xs">
+            <div className="bg-white text-black p-4 max-w-4xl mx-auto text-xs eco-font-test">
 
                 {/* Cabeçalho da Empresa */}
-                <div className="text-center mb-4 border-b border-gray-400 pb-3">
+                <div className="text-center mb-1 ">
                     {/* Logo da Mitsuwa */}
-                    <div className="flex justify-center mb-3">
+                    <div className="w-full mb-3">
                         <img
                             src="/LogoMitsuwaBranco.jpg"
                             alt="Logo Mitsuwa"
-                            className="h-12 w-auto object-contain"
+                            className="w-full h-auto object-contain"
                         />
                     </div>
 
@@ -55,7 +55,7 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                                 <span>{order.model || '-'}</span>
                             </div>
                             <div className="flex">
-                                <span className="w-16 font-semibold">Data Entrada:</span>
+                                <span className="w-16 font-semibold">Entrada:</span>
                                 <span>{formatDate(order.entryDate)}</span>
                             </div>
                             <div className="flex">
@@ -79,10 +79,6 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                                 <span>{order.brand || '-'}</span>
                             </div>
                             <div className="flex">
-                                <span className="w-16 font-semibold">Data Saída:</span>
-                                <span>{order.deliveryDate ? formatDate(order.deliveryDate) : '-'}</span>
-                            </div>
-                            <div className="flex">
                                 <span className="w-16 font-semibold">Celular:</span>
                                 <span>{order.customer?.contacts?.find(c => c.phone)?.phone || '-'}</span>
                             </div>
@@ -97,25 +93,21 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                         <p>• GARANTIA DOS SERVIÇOS EFETUADOS: 90 DIAS</p>
                         <p>• VALIDADE DO ORÇAMENTO: 30 DIAS</p>
                         <p>• OS APARELHOS QUE NÃO FOREM RETIRADOS EM 90 DIAS, SERÃO VENDIDOS PELO PREÇO DO ORÇAMENTO</p>
-                        {order.customerObservations && (
-                            <div className="mt-1 pt-1 border-t border-gray-300">
-                                <p><strong>Cliente:</strong> {order.customerObservations}</p>
-                            </div>
-                        )}
-                        {order.reportedDefect && (
-                            <div className="mt-1">
-                                <p><strong>Defeito:</strong> {order.reportedDefect}</p>
-                            </div>
-                        )}
+
                     </div>
+                </div>
+
+                {/* Linha de recorte */}
+                <div className="my-4 border-t border-dashed border-gray-600 text-center">
+                    <span className="text-xs text-gray-500 bg-white px-2">--- RECORTAR AQUI ---</span>
                 </div>
 
                 {/* Seção do Orçamento */}
                 <div className="mb-4">
-                    <div className="grid grid-cols-2 gap-6 mb-4">
+                    <div className="grid grid-cols-2 gap-6 mb-1">
                         <div>
                             <div className="flex">
-                                <span className="w-16 font-semibold">Data Entrada:</span>
+                                <span className="w-16 font-semibold">Entrada:</span>
                                 <span>{formatDate(order.entryDate)}</span>
                             </div>
                         </div>
@@ -124,7 +116,7 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6 mb-4">
+                    <div className="grid grid-cols-2 gap-6 mb-1">
                         <div>
                             <div className="space-y-1">
                                 <div className="flex">
@@ -132,12 +124,8 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                                     <span>{order.customer?.name || order.customerId || 'Cliente não informado'}</span>
                                 </div>
                                 <div className="flex">
-                                    <span className="w-16 font-semibold">Aprovado dia?</span>
-                                    <span>{order.approvalDate ? formatDate(order.approvalDate) : '/ /'}</span>
-                                </div>
-                                <div className="flex">
-                                    <span className="w-16 font-semibold">Defeito:</span>
-                                    <span>{order.reportedDefect || '-'}</span>
+                                    <span className="w-16 font-semibold">Aprovado</span>
+                                    <span className="min-w-20">_____ / _____ / _____</span>
                                 </div>
                                 <div className="flex">
                                     <span className="w-16 font-semibold">Obs:</span>
@@ -161,7 +149,7 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                                 </div>
                                 <div className="flex">
                                     <span className="w-16 font-semibold">Previsão:</span>
-                                    <span>{order.expectedDeliveryDate ? formatDate(order.expectedDeliveryDate) : '/ /'}</span>
+                                    <span className="min-w-20">_____ / _____ / _____</span>
                                 </div>
                                 <div className="flex">
                                     <span className="w-16 font-semibold">Celular:</span>
@@ -184,25 +172,33 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                     </div>
                 </div>
 
+                {/* Campo de Defeito */}
+                <div className="mb-4">
+                    <div className="flex">
+                        <span className="w-16 font-semibold">Defeito:</span>
+                        <span>{order.reportedDefect || '-'}</span>
+                    </div>
+                </div>
+
                 {/* Tabela de Itens de Serviço - Para preenchimento manual */}
                 <div className="mb-4">
                     <table className="w-full border-collapse" style={{ border: '1px dashed #000' }}>
                         <thead>
                             <tr>
-                                <th className="border-r border-dashed border-gray-400 p-1 text-left font-bold" style={{ borderRight: '1px dashed #000' }}>DESCRIÇÃO</th>
-                                <th className="border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000' }}>VALOR UNT.</th>
-                                <th className="border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000' }}>QTD</th>
-                                <th className="p-1 text-center font-bold">TOTAL</th>
+                                <th className="w-3/5 border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000' }}>DESCRIÇÃO</th>
+                                <th className="w-1/5 border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000' }}>VALOR UNT.</th>
+                                <th className="w-1/12 border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000' }}>QTD</th>
+                                <th className="w-1/5 p-1 text-center font-bold">TOTAL</th>
                             </tr>
                         </thead>
                         <tbody>
                             {/* Linhas em branco para preenchimento manual */}
                             {Array.from({ length: 10 }).map((_, index) => (
                                 <tr key={`line-${index}`}>
-                                    <td className="border-r border-dashed border-gray-400 p-1 h-4" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000' }}>&nbsp;</td>
-                                    <td className="border-r border-dashed border-gray-400 p-1 text-center h-4" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000' }}>&nbsp;</td>
-                                    <td className="border-r border-dashed border-gray-400 p-1 text-center h-4" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000' }}>&nbsp;</td>
-                                    <td className="p-1 text-center h-4" style={{ borderBottom: '1px dashed #000' }}>&nbsp;</td>
+                                    <td className="w-3/5 border-r border-dashed border-gray-400 p-1 h-4" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000' }}>&nbsp;</td>
+                                    <td className="w-1/5 border-r border-dashed border-gray-400 p-1 text-center h-4" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000' }}>&nbsp;</td>
+                                    <td className="w-1/12 border-r border-dashed border-gray-400 p-1 text-center h-4" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000' }}>&nbsp;</td>
+                                    <td className="w-1/5 p-1 text-center h-4" style={{ borderBottom: '1px dashed #000' }}>&nbsp;</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -216,13 +212,29 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
 
 
                 {/* Rodapé */}
-                <div className="text-center text-xs text-gray-600 border-t border-gray-400 pt-4 mt-4">
+                <div className="text-center text-xs text-gray-600 border-t border-dashed border-gray-600 h-20 pt-4 mt-4">
                     <p>OS:{formatOrderNumber(order.orderNumber)} - OS:{formatOrderNumber(order.orderNumber)} - OS:{formatOrderNumber(order.orderNumber)}</p>
                 </div>
             </div>
 
             {/* Estilos específicos para impressão */}
             <style>{`
+        /* Fonte eco para impressão - declaração local com múltiplas tentativas */
+        @font-face {
+          font-family: 'Spranq Eco Sans Print';
+          src: url('/fonts/spranq_eco_sans_regular.ttf') format('truetype'),
+               url('./fonts/spranq_eco_sans_regular.ttf') format('truetype'),
+               url('fonts/spranq_eco_sans_regular.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: block;
+        }
+        
+        /* Aplicar fonte eco na tela para teste */
+        .eco-font-test {
+          font-family: 'Spranq Eco Sans Print', Arial, sans-serif !important;
+        }
+        
         @media print {
           @page {
             size: A5;
@@ -236,6 +248,17 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
             font-size: 8px;
             line-height: 1.1;
             color: black;
+            font-family: 'Spranq Eco Sans Print', Arial, sans-serif !important;
+          }
+          
+          /* Aplicar fonte eco para todos os elementos na impressão */
+          *, div, span, p, h1, h2, h3, th, td {
+            font-family: 'Spranq Eco Sans Print', 'Arial Narrow', Arial, sans-serif !important;
+          }
+          
+          /* Fallback adicional - usar fonte mais leve */
+          .eco-font-test {
+            font-family: 'Spranq Eco Sans Print', 'Arial Narrow', Arial, sans-serif !important;
           }
           
           .print\\:hidden {
@@ -302,6 +325,7 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
             width: 100% !important; 
             border-collapse: collapse !important;
             font-size: 7px !important;
+            font-family: 'Spranq Eco Sans', Arial, sans-serif !important;
           }
           
           th, td { 
@@ -315,6 +339,25 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
           /* Linhas pontilhadas específicas */
           .border-dashed {
             border-style: dashed !important;
+          }
+          
+          /* Linha de recorte */
+          .border-gray-600 {
+            border-color: #4b5563 !important;
+          }
+          
+          /* Texto de recorte */
+          .text-gray-500 {
+            color: #6b7280 !important;
+          }
+          
+          /* Campos sublinhados para preenchimento manual */
+          .border-b {
+            border-bottom: 1px solid #000 !important;
+          }
+          
+          .min-w-20 {
+            min-width: 5rem !important;
           }
           
           /* Flexbox */
@@ -350,9 +393,12 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
           
           /* Imagem do logo */
           img {
+            width: 100% !important;
             max-width: 100% !important;
             height: auto !important;
             max-height: 4rem !important;
+            object-fit: contain !important;
+            display: block !important;
           }
         }
       `}</style>
