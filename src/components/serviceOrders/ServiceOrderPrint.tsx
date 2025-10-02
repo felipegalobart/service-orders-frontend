@@ -182,20 +182,20 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                     <table className="w-full border-collapse" style={{ border: '1px dashed #000' }}>
                         <thead>
                             <tr>
-                                <th className="w-3/5 border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000' }}>DESCRIÇÃO</th>
-                                <th className="w-1/5 border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000' }}>VALOR UNT.</th>
-                                <th className="w-1/12 border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000' }}>QTD</th>
-                                <th className="w-1/5 p-1 text-center font-bold">TOTAL</th>
+                                <th className="w-3/5 border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000', height: '1.2rem' }}>DESCRIÇÃO</th>
+                                <th className="w-1/5 border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000', height: '1.2rem' }}>VALOR UNT.</th>
+                                <th className="w-1/12 border-r border-dashed border-gray-400 p-1 text-center font-bold" style={{ borderRight: '1px dashed #000', height: '1.2rem' }}>QTD</th>
+                                <th className="w-1/5 p-1 text-center font-bold" style={{ height: '1.2rem' }}>TOTAL</th>
                             </tr>
                         </thead>
                         <tbody>
                             {/* Linhas em branco para preenchimento manual */}
                             {Array.from({ length: 10 }).map((_, index) => (
                                 <tr key={`line-${index}`}>
-                                    <td className="w-3/5 border-r border-dashed border-gray-400 p-1 h-4" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000' }}>&nbsp;</td>
-                                    <td className="w-1/5 border-r border-dashed border-gray-400 p-1 text-center h-4" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000' }}>&nbsp;</td>
-                                    <td className="w-1/12 border-r border-dashed border-gray-400 p-1 text-center h-4" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000' }}>&nbsp;</td>
-                                    <td className="w-1/5 p-1 text-center h-4" style={{ borderBottom: '1px dashed #000' }}>&nbsp;</td>
+                                    <td className="w-3/5 border-r border-dashed border-gray-400 p-1" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000', height: '1.2rem' }}>&nbsp;</td>
+                                    <td className="w-1/5 border-r border-dashed border-gray-400 p-1 text-center" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000', height: '1.2rem' }}>&nbsp;</td>
+                                    <td className="w-1/12 border-r border-dashed border-gray-400 p-1 text-center" style={{ borderRight: '1px dashed #000', borderBottom: '1px dashed #000', height: '1.2rem' }}>&nbsp;</td>
+                                    <td className="w-1/5 p-1 text-center" style={{ borderBottom: '1px dashed #000', height: '1.2rem' }}>&nbsp;</td>
                                 </tr>
                             ))}
                         </tbody>
