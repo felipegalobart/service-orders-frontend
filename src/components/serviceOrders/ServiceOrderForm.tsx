@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
@@ -53,6 +53,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
     mode,
 }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [formData, setFormData] = useState<any>(initialFormData);
     const [, setSelectedCustomer] = useState<Person | null>(null);
     const [validationErrors, setValidationErrors] = useState<ServiceOrderValidationErrors>({});
@@ -198,6 +199,9 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
     ) || { servicesSum: 0, totalDiscount: 0, totalAddition: 0 };
 
     const totalAmount = totals.servicesSum - totals.totalDiscount + totals.totalAddition;
+
+    // Verificar se deve focar nos serviços
+    const shouldFocusServices = location.search.includes('focus=services');
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -614,6 +618,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 onChange={handleServicesChange}
                 errors={validationErrors.services}
                 disabled={isSubmitting}
+                autoFocus={shouldFocusServices}
             />
 
             {/* Botões de Ação */}

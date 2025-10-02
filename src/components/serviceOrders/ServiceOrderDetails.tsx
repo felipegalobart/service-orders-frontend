@@ -154,6 +154,10 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         setIsTimelineModalOpen(false);
     };
 
+    const handleEditServices = () => {
+        navigate(`/service-orders/edit/${orderId}?focus=services`);
+    };
+
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -411,13 +415,24 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
             </div>
 
             {/* Itens de Serviço - Sempre Visível */}
-            <Card>
+            <Card
+                className="cursor-pointer hover:bg-gray-700/50 transition-all duration-300 hover:shadow-lg"
+                onClick={handleEditServices}
+            >
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                        </svg>
-                        Itens de Serviço
+                    <CardTitle className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <svg className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                            </svg>
+                            Itens de Serviço
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-blue-400">
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            <span>Clique para editar</span>
+                        </div>
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="overflow-x-auto">

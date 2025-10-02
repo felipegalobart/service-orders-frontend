@@ -12,6 +12,7 @@ interface ServiceItemsManagerProps {
     onChange: (items: ServiceItem[]) => void;
     errors?: string[];
     disabled?: boolean;
+    autoFocus?: boolean;
 }
 
 interface ServiceItemFormData {
@@ -35,6 +36,7 @@ export const ServiceItemsManager: React.FC<ServiceItemsManagerProps> = ({
     onChange,
     errors = [],
     disabled = false,
+    autoFocus = false,
 }) => {
     const [formData, setFormData] = useState<ServiceItemFormData>(initialFormData);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -54,6 +56,15 @@ export const ServiceItemsManager: React.FC<ServiceItemsManagerProps> = ({
         formData.discount,
         formData.addition
     );
+
+    // Auto-focus quando prop for true
+    useEffect(() => {
+        if (autoFocus && descriptionInputRef.current) {
+            setTimeout(() => {
+                descriptionInputRef.current?.focus();
+            }, 100);
+        }
+    }, [autoFocus]);
 
     // Calcular totais gerais
     const totals = items.reduce(
