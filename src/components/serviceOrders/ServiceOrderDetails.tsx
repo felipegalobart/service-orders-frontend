@@ -24,6 +24,7 @@ import { useServiceOrder, useUpdateServiceOrderFinancialStatus, useDeleteService
 import { PersonDetailsModal } from '../ui/Modal/PersonDetailsModal';
 import { TimelineModal } from '../ui/Modal/TimelineModal';
 import { ServiceOrderReactPDF } from './ServiceOrderReactPDF';
+import { ServiceOrderMobileImage } from './ServiceOrderMobileImage';
 import type { ServiceOrderStatus, FinancialStatus } from '../../types/serviceOrder';
 
 interface ServiceOrderDetailsProps {
@@ -239,17 +240,20 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                             </svg>
                             Imprimir
                         </Button>
-                        <Button
-                            variant="secondary"
-                            size="md"
-                            onClick={handleShowPDFReport}
-                            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                        >
-                            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Relatório PDF
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="secondary"
+                                size="md"
+                                onClick={handleShowPDFReport}
+                                className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Relatório PDF
+                            </Button>
+                            <ServiceOrderMobileImage order={order} customerData={customerData} />
+                        </div>
                         <Button
                             variant="secondary"
                             size="md"
