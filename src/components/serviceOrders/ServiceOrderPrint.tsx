@@ -7,6 +7,7 @@ interface ServiceOrderPrintProps {
 }
 
 export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) => {
+
     return (
         <>
             {/* Conteúdo da ordem - visível na tela e na impressão */}
@@ -275,6 +276,11 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
             font-family: 'Spranq Eco Sans Print', 'Arial Narrow', Arial, sans-serif !important;
           }
           
+          .print\\:hidden {
+            display: none !important;
+          }
+          
+          /* Ocultar botão de PDF na impressão */
           .print\\:hidden {
             display: none !important;
           }

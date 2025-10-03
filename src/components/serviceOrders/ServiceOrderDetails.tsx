@@ -23,6 +23,7 @@ import {
 import { useServiceOrder, useUpdateServiceOrderFinancialStatus, useDeleteServiceOrder, serviceOrderKeys } from '../../hooks/useServiceOrders';
 import { PersonDetailsModal } from '../ui/Modal/PersonDetailsModal';
 import { TimelineModal } from '../ui/Modal/TimelineModal';
+import { ServiceOrderReactPDF } from './ServiceOrderReactPDF';
 import type { ServiceOrderStatus, FinancialStatus } from '../../types/serviceOrder';
 
 interface ServiceOrderDetailsProps {
@@ -41,6 +42,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     // Estado para os modais
     const [isPersonModalOpen, setIsPersonModalOpen] = useState(false);
     const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
+    const [showPDFReport, setShowPDFReport] = useState(false);
 
     // Buscar dados do cliente se não vier populado
     const { data: customer } = useQuery({
@@ -123,6 +125,14 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
 
     const handlePrint = () => {
         navigate(`/service-orders/print/${orderId}`);
+    };
+
+    const handleShowPDFReport = () => {
+        setShowPDFReport(true);
+    };
+
+    const handleClosePDFReport = () => {
+        setShowPDFReport(false);
     };
 
     const handleDelete = async () => {
@@ -228,6 +238,17 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                             </svg>
                             Imprimir
+                        </Button>
+                        <Button
+                            variant="secondary"
+                            size="md"
+                            onClick={handleShowPDFReport}
+                            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Relatório PDF
                         </Button>
                         <Button
                             variant="secondary"
@@ -562,6 +583,29 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 isOpen={isTimelineModalOpen}
                 onClose={handleCloseTimelineModal}
             />
+
+            {/* Componente de Relatório PDF */}
+            {showPDFReport && order && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-md">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-2xl font-bold text-gray-900">Relatório PDF</h2>
+                            <button
+                                onClick={handleClosePDFReport}
+                                className="text-gray-500 hover:text-gray-700 text-2xl"
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="text-center mb-6">
+                            <p className="text-gray-600 mb-4">
+                                Clique no botão abaixo para gerar o relatório em PDF da ordem de serviço <strong>OS {formatOrderNumber(order.orderNumber)}</strong>.
+                            </p>
+                            <ServiceOrderReactPDF order={order} customerData={customerData} />
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </div>
     );
