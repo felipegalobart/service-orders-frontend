@@ -9,107 +9,116 @@ interface ServiceOrderReactPDFProps {
     customerData?: Person;
 }
 
-// Estilos CSS modernos para o PDF
+// Estilos CSS compactos para o PDF
 const styles = StyleSheet.create({
     page: {
         flexDirection: 'column',
         backgroundColor: '#FFFFFF',
-        padding: 20,
+        padding: 15,
         fontFamily: 'Helvetica',
     },
     header: {
         alignItems: 'center',
-        marginBottom: 25,
-        borderBottomWidth: 2,
+        marginBottom: 15,
+        borderBottomWidth: 1,
         borderBottomColor: '#2563eb',
-        paddingBottom: 15,
+        paddingBottom: 8,
     },
     logo: {
         width: '100%',
-        height: 60,
-        marginBottom: 10,
+        height: 40,
+        marginBottom: 5,
         objectFit: 'contain',
     },
     companyName: {
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: 'bold',
         color: '#1e40af',
-        marginBottom: 8,
-    },
-    contactInfo: {
-        fontSize: 10,
-        color: '#64748b',
         marginBottom: 3,
     },
+    contactInfo: {
+        fontSize: 8,
+        color: '#64748b',
+        marginBottom: 2,
+    },
     documentTitle: {
-        fontSize: 24,
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#dc2626',
         textAlign: 'center',
-        marginBottom: 20,
+        marginBottom: 10,
         backgroundColor: '#fef2f2',
-        padding: 10,
-        borderRadius: 8,
+        padding: 5,
+        borderRadius: 4,
     },
     section: {
-        marginBottom: 20,
+        marginBottom: 10,
         backgroundColor: '#f8fafc',
-        padding: 15,
-        borderRadius: 8,
-        borderLeftWidth: 4,
+        padding: 8,
+        borderRadius: 4,
+        borderLeftWidth: 3,
         borderLeftColor: '#2563eb',
     },
     sectionTitle: {
-        fontSize: 14,
+        fontSize: 10,
         fontWeight: 'bold',
         color: '#1e40af',
-        marginBottom: 10,
+        marginBottom: 5,
         textTransform: 'uppercase',
     },
     infoGrid: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 10,
+        marginBottom: 5,
     },
     infoItem: {
         flex: 1,
-        marginRight: 10,
+        marginRight: 5,
     },
     infoLabel: {
-        fontSize: 10,
+        fontSize: 8,
         fontWeight: 'bold',
         color: '#374151',
-        marginBottom: 2,
+        marginBottom: 1,
     },
     infoValue: {
-        fontSize: 11,
+        fontSize: 8,
         color: '#111827',
         backgroundColor: '#ffffff',
-        padding: 5,
-        borderRadius: 4,
-        borderWidth: 1,
+        padding: 2,
+        borderRadius: 2,
+        borderWidth: 0.5,
         borderColor: '#e5e7eb',
     },
     statusBadge: {
         backgroundColor: '#dc2626',
         color: '#ffffff',
-        padding: 8,
-        borderRadius: 20,
-        fontSize: 12,
+        padding: 3,
+        borderRadius: 10,
+        fontSize: 8,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    financialStatusBadge: {
+        backgroundColor: '#059669',
+        color: '#ffffff',
+        padding: 3,
+        borderRadius: 10,
+        fontSize: 8,
         fontWeight: 'bold',
         textAlign: 'center',
     },
     servicesTable: {
-        marginTop: 15,
+        marginTop: 8,
     },
     tableHeader: {
         flexDirection: 'row',
         backgroundColor: '#1e40af',
-        padding: 10,
-        borderRadius: 8,
+        padding: 4,
+        borderRadius: 4,
     },
     tableHeaderText: {
-        fontSize: 10,
+        fontSize: 7,
         fontWeight: 'bold',
         color: '#ffffff',
         flex: 1,
@@ -117,75 +126,75 @@ const styles = StyleSheet.create({
     },
     tableRow: {
         flexDirection: 'row',
-        padding: 8,
-        borderBottomWidth: 1,
+        padding: 3,
+        borderBottomWidth: 0.5,
         borderBottomColor: '#e5e7eb',
         backgroundColor: '#ffffff',
     },
     tableRowAlt: {
         flexDirection: 'row',
-        padding: 8,
-        borderBottomWidth: 1,
+        padding: 3,
+        borderBottomWidth: 0.5,
         borderBottomColor: '#e5e7eb',
         backgroundColor: '#f9fafb',
     },
     tableRowText: {
-        fontSize: 9,
+        fontSize: 7,
         flex: 1,
         textAlign: 'center',
         color: '#374151',
     },
     totalSection: {
-        marginTop: 15,
+        marginTop: 8,
         backgroundColor: '#f0f9ff',
-        padding: 15,
-        borderRadius: 8,
-        borderWidth: 2,
+        padding: 8,
+        borderRadius: 4,
+        borderWidth: 1,
         borderColor: '#0ea5e9',
     },
     totalRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 5,
+        marginBottom: 2,
     },
     totalLabel: {
-        fontSize: 12,
+        fontSize: 9,
         fontWeight: 'bold',
         color: '#0369a1',
     },
     totalValue: {
-        fontSize: 14,
+        fontSize: 10,
         fontWeight: 'bold',
         color: '#059669',
     },
     observations: {
         backgroundColor: '#fef3c7',
-        padding: 15,
-        borderRadius: 8,
-        borderLeftWidth: 4,
+        padding: 8,
+        borderRadius: 4,
+        borderLeftWidth: 3,
         borderLeftColor: '#f59e0b',
-        marginTop: 15,
+        marginTop: 8,
     },
     warranty: {
         backgroundColor: '#dcfce7',
-        padding: 10,
-        borderRadius: 6,
-        borderLeftWidth: 4,
+        padding: 5,
+        borderRadius: 3,
+        borderLeftWidth: 3,
         borderLeftColor: '#22c55e',
-        marginTop: 10,
+        marginTop: 5,
     },
     signature: {
-        marginTop: 30,
+        marginTop: 10,
         alignItems: 'center',
     },
     signatureLine: {
-        width: 200,
+        width: 150,
         height: 1,
         backgroundColor: '#000000',
-        marginBottom: 5,
+        marginBottom: 2,
     },
     signatureText: {
-        fontSize: 10,
+        fontSize: 7,
         color: '#6b7280',
     },
 });
@@ -201,6 +210,29 @@ const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }
         totalDesconto = order.services.reduce((sum, service) => sum + parseDecimal(service.discount || 0), 0);
         totalAdicional = order.services.reduce((sum, service) => sum + parseDecimal(service.addition || 0), 0);
     }
+
+    // Função para determinar a cor do badge financeiro
+    const getFinancialStatusStyle = (status: string) => {
+        const financialStatus = status?.toLowerCase() || '';
+        switch (financialStatus) {
+            case 'pago':
+                return { backgroundColor: '#059669', color: '#ffffff' }; // Verde
+            case 'parcialmente_pago':
+                return { backgroundColor: '#0ea5e9', color: '#ffffff' }; // Azul
+            case 'em_aberto':
+                return { backgroundColor: '#f59e0b', color: '#ffffff' }; // Amarelo
+            case 'deve':
+                return { backgroundColor: '#dc2626', color: '#ffffff' }; // Vermelho
+            case 'faturado':
+                return { backgroundColor: '#8b5cf6', color: '#ffffff' }; // Roxo
+            case 'vencido':
+                return { backgroundColor: '#ef4444', color: '#ffffff' }; // Vermelho escuro
+            case 'cancelado':
+                return { backgroundColor: '#6b7280', color: '#ffffff' }; // Cinza
+            default:
+                return { backgroundColor: '#6b7280', color: '#ffffff' }; // Cinza padrão
+        }
+    };
 
     // Debug: mostrar dados no console
     console.log('PDF Debug - Order:', order);
@@ -227,26 +259,30 @@ const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>INFORMAÇÕES DA ORDEM</Text>
                     <View style={styles.infoGrid}>
-
                         <View style={styles.infoItem}>
                             <Text style={styles.infoLabel}>Status:</Text>
                             <Text style={styles.statusBadge}>{formatUpperCase(order.status)}</Text>
                         </View>
                         <View style={styles.infoItem}>
-                            <Text style={styles.infoLabel}>Status Financeiro:</Text>
-                            <Text style={styles.infoValue}>{formatUpperCase(order.financial || 'Pendente')}</Text>
+                            <Text style={styles.infoLabel}>Financeiro:</Text>
+                            <Text style={[styles.financialStatusBadge, getFinancialStatusStyle(order.financial || 'Pendente')]}>
+                                {formatUpperCase(order.financial || 'Pendente')}
+                            </Text>
                         </View>
                     </View>
                     <View style={styles.infoGrid}>
                         <View style={styles.infoItem}>
-                            <Text style={styles.infoLabel}>Data de Entrada:</Text>
-                            <Text style={styles.infoValue}>{order.entryDate ? formatDate(order.entryDate) : 'Não informado'}</Text>
+                            <Text style={styles.infoLabel}>Entrada:</Text>
+                            <Text style={styles.infoValue}>{order.entryDate ? formatDate(order.entryDate) : '-'}</Text>
                         </View>
                         <View style={styles.infoItem}>
-                            <Text style={styles.infoLabel}>Data de Saída:</Text>
-                            <Text style={styles.infoValue}>{order.deliveryDate ? formatDate(order.deliveryDate) : 'Em andamento'}</Text>
+                            <Text style={styles.infoLabel}>Aprovação:</Text>
+                            <Text style={styles.infoValue}>{order.approvalDate ? formatDate(order.approvalDate) : '-'}</Text>
                         </View>
-
+                        <View style={styles.infoItem}>
+                            <Text style={styles.infoLabel}>Saída:</Text>
+                            <Text style={styles.infoValue}>{order.deliveryDate ? formatDate(order.deliveryDate) : '-'}</Text>
+                        </View>
                     </View>
                 </View>
 
@@ -259,18 +295,12 @@ const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }
                             <Text style={styles.infoValue}>{formatUpperCase(fullCustomer?.name || order.customerId || 'Cliente não informado')}</Text>
                         </View>
                         <View style={styles.infoItem}>
-                            <Text style={styles.infoLabel}>Documento:</Text>
-                            <Text style={styles.infoValue}>{fullCustomer?.document || 'Não informado'}</Text>
-                        </View>
-                    </View>
-                    <View style={styles.infoGrid}>
-                        <View style={styles.infoItem}>
                             <Text style={styles.infoLabel}>Telefone:</Text>
-                            <Text style={styles.infoValue}>{fullCustomer?.contacts?.find((c) => c.phone)?.phone || 'Não informado'}</Text>
+                            <Text style={styles.infoValue}>{fullCustomer?.contacts?.find((c) => c.phone)?.phone || '-'}</Text>
                         </View>
                         <View style={styles.infoItem}>
-                            <Text style={styles.infoLabel}>Email:</Text>
-                            <Text style={styles.infoValue}>{(fullCustomer?.contacts?.find((c) => c.email)?.email || 'mitsuwa@mitsuwa.com.br').toLowerCase()}</Text>
+                            <Text style={styles.infoLabel}>Documento:</Text>
+                            <Text style={styles.infoValue}>{fullCustomer?.document || '-'}</Text>
                         </View>
                     </View>
                     {fullCustomer?.addresses && fullCustomer.addresses.length > 0 && (
@@ -301,21 +331,11 @@ const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }
                         </View>
                         <View style={styles.infoItem}>
                             <Text style={styles.infoLabel}>Modelo:</Text>
-                            <Text style={styles.infoValue}>{formatUpperCase(order.model || 'Não informado')}</Text>
+                            <Text style={styles.infoValue}>{formatUpperCase(order.model || '-')}</Text>
                         </View>
                         <View style={styles.infoItem}>
                             <Text style={styles.infoLabel}>Fabricante:</Text>
-                            <Text style={styles.infoValue}>{formatUpperCase(order.brand || 'Não informado')}</Text>
-                        </View>
-                    </View>
-                    <View style={styles.infoGrid}>
-                        <View style={styles.infoItem}>
-                            <Text style={styles.infoLabel}>Acessórios:</Text>
-                            <Text style={styles.infoValue}>{formatUpperCase(order.accessories || 'Não informado')}</Text>
-                        </View>
-                        <View style={styles.infoItem}>
-                            <Text style={styles.infoLabel}>Tensão:</Text>
-                            <Text style={styles.infoValue}>{formatUpperCase(order.voltage || 'Não informado')}</Text>
+                            <Text style={styles.infoValue}>{formatUpperCase(order.brand || '-')}</Text>
                         </View>
                     </View>
                 </View>
