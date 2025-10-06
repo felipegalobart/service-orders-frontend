@@ -65,7 +65,7 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
-                    link.download = `OS-${formatOrderNumber(order.orderNumber)}-mobile.png`;
+                    link.download = `OS ${formatOrderNumber(order.orderNumber)}.png`;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
@@ -74,6 +74,62 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
             }, 'image/png');
         } catch (error) {
             console.error('Erro ao gerar imagem:', error);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    // Nova função para enviar via WhatsApp
+    const sendToWhatsApp = async () => {
+        if (!cardRef.current) return;
+
+        setIsGenerating(true);
+        try {
+            const canvas = await html2canvas(cardRef.current, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                width: 400,
+                scrollX: 0,
+                scrollY: 0,
+            });
+
+            // Converter para blob
+            canvas.toBlob(async (blob) => {
+                if (blob) {
+                    // Criar FormData para enviar via WhatsApp
+                    const formData = new FormData();
+                    formData.append('file', blob, `OS ${formatOrderNumber(order.orderNumber)}.png`);
+                    
+                    // Mensagem personalizada
+                    const message = `📋 *Orçamento de Serviço*\n\n` +
+                        `🏢 *MITSUWA ELETRO MECÂNICA*\n` +
+                        `📄 OS: ${formatOrderNumber(order.orderNumber)}\n` +
+                        `👤 Cliente: ${formatUpperCase(fullCustomer?.name || order.customerId || 'N/A')}\n` +
+                        `🔧 Equipamento: ${formatUpperCase(order.equipment)}\n` +
+                        `💰 Valor: ${formatCurrency(parseDecimal(order.totalAmountLeft) || totalGeral)}\n\n` +
+                        `📞 Telefone: 4479-1814\n` +
+                        `💬 WhatsApp: 3458-5898\n\n` +
+                        `⏰ *Validade: 30 dias*\n` +
+                        `🛡️ *Garantia: 90 dias*`;
+
+                    // Obter número do telefone do cliente
+                    const phoneNumber = fullCustomer?.contacts?.find((c) => c.phone)?.phone?.replace(/\D/g, '');
+                    
+                    if (phoneNumber) {
+                        // Abrir WhatsApp Web com mensagem e imagem
+                        const whatsappUrl = `https://wa.me/55${phoneNumber}?text=${encodeURIComponent(message)}`;
+                        window.open(whatsappUrl, '_blank');
+                    } else {
+                        // Se não tiver telefone, abrir WhatsApp sem número específico
+                        const whatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+                        window.open(whatsappUrl, '_blank');
+                    }
+                }
+            }, 'image/png');
+        } catch (error) {
+            console.error('Erro ao gerar imagem para WhatsApp:', error);
         } finally {
             setIsGenerating(false);
         }

@@ -426,7 +426,7 @@ export const ServiceOrderReactPDF: React.FC<ServiceOrderReactPDFProps> = ({ orde
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Orcamento_OS_${formatOrderNumber(order.orderNumber)}.pdf`;
+            a.download = `OS ${formatOrderNumber(order.orderNumber)}.pdf`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
