@@ -11,7 +11,7 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
     return (
         <>
             {/* Conteúdo da ordem - visível na tela e na impressão */}
-            <div className="bg-white text-black p-4 max-w-4xl mx-auto text-xs eco-font-test">
+            <div className="bg-white text-black p-4 max-w-4xl mx-auto text-xs line-height-1 eco-font-test">
 
                 {/* Cabeçalho da Empresa */}
                 <div className="text-center mb-1 ">
@@ -88,8 +88,8 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                 </div>
 
                 {/* Observações */}
-                <div className="mb-2 border border-gray-400 p-2">
-                    <h3 className="font-bold mb-1 text-xs">OBSERVAÇÕES</h3>
+                <div className="mb-2 border border-gray-400 p-2 text-center">
+                    <h3 className="font-bold mb-1 text-xl">OBSERVAÇÕES</h3>
                     <div className="space-y-0 text-xs">
                         <p>• GARANTIA DOS SERVIÇOS EFETUADOS: 90 DIAS</p>
                         <p>• VALIDADE DO ORÇAMENTO: 30 DIAS</p>
@@ -113,7 +113,7 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
                             </div>
                         </div>
                         <div className="">
-                            <h2 className="text-3xl font-bold">OS N° {formatOrderNumber(order.orderNumber)}</h2>
+                            <h2 className="text-4xl font-bold">OS N° {formatOrderNumber(order.orderNumber)}</h2>
                         </div>
                     </div>
 
@@ -217,8 +217,8 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
 
 
                 {/* Rodapé */}
-                <div className="border-t border-dashed border-gray-600 h-8 pt-1 mt-1">
-                    <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="border-t border-dashed border-gray-600 h-8 pt-4 mt-1">
+                    <div className="grid grid-cols-3 gap-4 text-center pt-3">
                         <div className="text-4xl font-bold text-black">
                             <p>OS:{formatOrderNumber(order.orderNumber)}</p>
                         </div>
@@ -261,7 +261,7 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
             padding: 0;
             background: white;
             font-size: 8px;
-            line-height: 1.1;
+            line-height: 0.9;
             color: black;
             font-family: 'Spranq Eco Sans Print', Arial, sans-serif !important;
           }
@@ -293,32 +293,33 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
           }
           
           /* Reduzir espaçamentos para A5 - mais compacto */
-          .p-4 { padding: 0.05rem !important; }
-          .p-3 { padding: 0.04rem !important; }
-          .p-2 { padding: 0.03rem !important; }
-          .p-1 { padding: 0.02rem !important; }
-          .mb-6 { margin-bottom: 0.1rem !important; }
-          .mb-5 { margin-bottom: 0.08rem !important; }
-          .mb-4 { margin-bottom: 0.06rem !important; }
-          .mb-3 { margin-bottom: 0.04rem !important; }
-          .mb-2 { margin-bottom: 0.03rem !important; }
-          .mb-1 { margin-bottom: 0.02rem !important; }
-          .mt-4 { margin-top: 0.06rem !important; }
-          .mt-2 { margin-top: 0.03rem !important; }
-          .mt-1 { margin-top: 0.02rem !important; }
-          .pt-4 { padding-top: 0.05rem !important; }
-          .pt-2 { padding-top: 0.03rem !important; }
-          .pt-1 { padding-top: 0.02rem !important; }
+          .p-4 { padding: 0.03rem !important; }
+          .p-3 { padding: 0.02rem !important; }
+          .p-2 { padding: 0.01rem !important; }
+          .p-1 { padding: 0.01rem !important; }
+          .mb-6 { margin-bottom: 0.06rem !important; }
+          .mb-5 { margin-bottom: 0.05rem !important; }
+          .mb-4 { margin-bottom: 0.04rem !important; }
+          .mb-3 { margin-bottom: 0.03rem !important; }
+          .mb-2 { margin-bottom: 0.02rem !important; }
+          .mb-1 { margin-bottom: 0.01rem !important; }
+          .mt-4 { margin-top: 0.04rem !important; }
+          .mt-2 { margin-top: 0.02rem !important; }
+          .mt-1 { margin-top: 0.01rem !important; }
+          .pt-5 { padding-top: 0.015rem !important; }
+          .pt-4 { padding-top: 0.03rem !important; }
+          .pt-2 { padding-top: 0.02rem !important; }
+          .pt-1 { padding-top: 0.01rem !important; }
           
           /* Tamanhos de fonte compactos para A5 */
-          .text-xs { font-size: 7px !important; }
-          .text-sm { font-size: 8px !important; }
-          .text-base { font-size: 9px !important; }
-          .text-lg { font-size: 10px !important; }
-          .text-xl { font-size: 12px !important; }
-          .text-2xl { font-size: 14px !important; }
-          .text-3xl { font-size: 16px !important; }
-          .text-4xl { font-size: 26px !important; }
+          .text-xs { font-size: 9px !important; }
+          .text-sm { font-size: 10px !important; }
+          .text-base { font-size: 11px !important; }
+          .text-lg { font-size: 12px !important; }
+          .text-xl { font-size: 14px !important; }
+          .text-2xl { font-size: 16px !important; }
+          .text-3xl { font-size: 18px !important; }
+          .text-4xl { font-size: 30px !important; }
           
           /* Cores para impressão */
           .bg-white { background: white !important; }
