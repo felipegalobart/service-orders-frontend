@@ -68,7 +68,7 @@ export const ServiceOrderPrintPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-white">
-            <ServiceOrderPrint order={orderWithCustomer} />
+            <ServiceOrderPrint order={orderWithCustomer} onBack={handleClose} />
         </div>
     );
 };

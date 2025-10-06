@@ -1,15 +1,44 @@
 import React from 'react';
 import { formatDate, formatOrderNumber, formatPhoneNumber, formatUpperCase } from '../../utils/formatters';
 import type { ServiceOrder } from '../../types/serviceOrder';
+import { Button } from '../ui/Button';
 
 interface ServiceOrderPrintProps {
     order: ServiceOrder;
+    onBack?: () => void;
 }
 
-export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) => {
+export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order, onBack }) => {
 
     return (
         <>
+            {/* Botão de voltar - não aparece na impressão */}
+            <div
+                id="back-button-container"
+                className="m-4 flex justify-center"
+            >
+                <Button
+                    onClick={onBack}
+                    variant="secondary"
+                    className="flex items-center gap-2 bg-red-300 text-white"
+                >
+                    <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                        />
+                    </svg>
+                    Voltar
+                </Button>
+            </div>
+
             {/* Conteúdo da ordem - visível na tela e na impressão */}
             <div className="bg-white text-black p-4 max-w-4xl mx-auto text-xs line-height-1 eco-font-test">
 
@@ -276,12 +305,14 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order }) =
             font-family: 'Spranq Eco Sans Print', 'Arial Narrow', Arial, sans-serif !important;
           }
           
+          /* Ocultar elementos que não devem aparecer na impressão */
+          .no-print,
           .print\\:hidden {
             display: none !important;
           }
           
-          /* Ocultar botão de PDF na impressão */
-          .print\\:hidden {
+          /* Ocultar div com botão de voltar na impressão */
+          #back-button-container {
             display: none !important;
           }
           
