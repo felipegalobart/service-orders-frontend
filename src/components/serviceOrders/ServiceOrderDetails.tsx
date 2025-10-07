@@ -17,6 +17,7 @@ import {
     isOverdue,
     formatDocument,
     formatPhoneNumber,
+    formatPaymentMethod,
     parseDecimal,
     getTodayDateString
 } from '../../utils/formatters';
@@ -664,6 +665,83 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                             <h4 className="font-semibold text-white text-sm">Notas Internas</h4>
                                         </div>
                                         <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">{order.notes}</div>
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Notas Fiscais - Opcional */}
+                {(order.paymentMethod || order.paymentConditions || order.serviceInvoice || order.saleInvoice || order.shippingInvoice) && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Notas Fiscais</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                {/* Método de Pagamento */}
+                                {order.paymentMethod && (
+                                    <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                            </svg>
+                                            <h4 className="font-semibold text-white text-sm">Método de Pagamento</h4>
+                                        </div>
+                                        <p className="text-sm text-gray-300">{formatPaymentMethod(order.paymentMethod)}</p>
+                                    </div>
+                                )}
+
+                                {/* Condições de Pagamento */}
+                                {order.paymentConditions && (
+                                    <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            <h4 className="font-semibold text-white text-sm">Condições de Pagamento</h4>
+                                        </div>
+                                        <p className="text-sm text-gray-300 break-words overflow-wrap-anywhere">{order.paymentConditions}</p>
+                                    </div>
+                                )}
+
+                                {/* Nota Fiscal de Serviço */}
+                                {order.serviceInvoice && (
+                                    <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <svg className="h-4 w-4 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            <h4 className="font-semibold text-white text-sm">NF de Serviço</h4>
+                                        </div>
+                                        <p className="text-sm text-gray-300 font-mono">{order.serviceInvoice}</p>
+                                    </div>
+                                )}
+
+                                {/* Nota Fiscal de Venda */}
+                                {order.saleInvoice && (
+                                    <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <svg className="h-4 w-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            <h4 className="font-semibold text-white text-sm">NF de Retorno</h4>
+                                        </div>
+                                        <p className="text-sm text-gray-300 font-mono">{order.saleInvoice}</p>
+                                    </div>
+                                )}
+
+                                {/* Nota Fiscal de Frete */}
+                                {order.shippingInvoice && (
+                                    <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <svg className="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                            </svg>
+                                            <h4 className="font-semibold text-white text-sm">NF de Remessa</h4>
+                                        </div>
+                                        <p className="text-sm text-gray-300 font-mono">{order.shippingInvoice}</p>
                                     </div>
                                 )}
                             </div>

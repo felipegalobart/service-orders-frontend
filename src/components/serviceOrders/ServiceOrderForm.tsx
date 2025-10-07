@@ -16,7 +16,9 @@ import { useNotification, Notification } from '../ui/Notification';
 import type {
     ServiceOrder,
     ServiceItem,
-    ServiceOrderValidationErrors
+    ServiceOrderValidationErrors,
+    ServiceOrderFormData,
+    CreateServiceOrderRequest
 } from '../../types/serviceOrder';
 import type { Person } from '../../types/person';
 
@@ -25,7 +27,7 @@ interface ServiceOrderFormProps {
     mode: 'create' | 'edit';
 }
 
-const initialFormData: any = {
+const initialFormData: ServiceOrderFormData = {
     customerId: '',
     equipment: '',
     model: '',
@@ -45,6 +47,11 @@ const initialFormData: any = {
     notes: '',
     financial: 'em_aberto',
     paymentType: 'cash',
+    paymentMethod: undefined,
+    paymentConditions: '',
+    serviceInvoice: '',
+    saleInvoice: '',
+    shippingInvoice: '',
     installmentCount: 1,
     discountPercentage: 0,
     additionPercentage: 0,
@@ -57,7 +64,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [formData, setFormData] = useState<any>(initialFormData);
+    const [formData, setFormData] = useState<ServiceOrderFormData>(initialFormData);
     const [, setSelectedCustomer] = useState<Person | null>(null);
     const [validationErrors, setValidationErrors] = useState<ServiceOrderValidationErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,7 +81,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
             const urlParams = new URLSearchParams(location.search);
             const customerId = urlParams.get('customerId');
             if (customerId) {
-                setFormData((prev: any) => ({
+                setFormData((prev: ServiceOrderFormData) => ({
                     ...prev,
                     customerId: customerId
                 }));
@@ -105,6 +112,11 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 notes: order.notes || '',
                 financial: order.financial,
                 paymentType: order.paymentType,
+                paymentMethod: order.paymentMethod,
+                paymentConditions: order.paymentConditions || '',
+                serviceInvoice: order.serviceInvoice || '',
+                saleInvoice: order.saleInvoice || '',
+                shippingInvoice: order.shippingInvoice || '',
                 installmentCount: order.installmentCount,
                 discountPercentage: parseDecimal(order.discountPercentage) || 0,
                 additionPercentage: parseDecimal(order.additionPercentage) || 0,
@@ -114,6 +126,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                     value: service.value || 0,
                     discount: service.discount || 0,
                     addition: service.addition || 0,
+                    total: service.total || 0,
                 })),
             });
 
@@ -124,8 +137,8 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
         }
     }, [order, mode]);
 
-    const handleInputChange = (field: string, value: any) => {
-        setFormData((prev: any) => ({
+    const handleInputChange = (field: string, value: string | number | boolean | undefined) => {
+        setFormData((prev: ServiceOrderFormData) => ({
             ...prev,
             [field]: value,
         }));
@@ -145,7 +158,17 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
     };
 
     const handleServicesChange = (services: ServiceItem[]) => {
-        handleInputChange('services', services);
+        setFormData((prev: ServiceOrderFormData) => ({
+            ...prev,
+            services: services.map(service => ({
+                description: service.description,
+                quantity: service.quantity,
+                value: service.value,
+                discount: service.discount || 0,
+                addition: service.addition || 0,
+                total: service.total,
+            }))
+        }));
     };
 
     const handleCancel = () => {
@@ -167,7 +190,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
             }
 
             // Preparar dados para envio
-            const submitData: any = {
+            const submitData: CreateServiceOrderRequest = {
                 customerId: formData.customerId,
                 equipment: formData.equipment,
                 model: formData.model,
@@ -179,7 +202,6 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 reportedDefect: formData.reportedDefect,
                 warranty: formData.warranty,
                 isReturn: formData.isReturn,
-                status: formData.status,
                 entryDate: formData.entryDate,
                 approvalDate: formData.approvalDate || undefined,
                 expectedDeliveryDate: formData.expectedDeliveryDate || undefined,
@@ -187,6 +209,11 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 notes: formData.notes,
                 financial: formData.financial,
                 paymentType: formData.paymentType,
+                paymentMethod: formData.paymentMethod,
+                paymentConditions: formData.paymentConditions,
+                serviceInvoice: formData.serviceInvoice,
+                saleInvoice: formData.saleInvoice,
+                shippingInvoice: formData.shippingInvoice,
                 installmentCount: formData.installmentCount,
                 discountPercentage: Number(formData.discountPercentage) || 0,
                 additionPercentage: Number(formData.additionPercentage) || 0,
@@ -227,7 +254,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
 
     // Sempre calcular totais dos serviços do formulário
     const calculatedTotals = formData.services?.reduce(
-        (acc: any, service: any) => ({
+        (acc: { servicesSum: number; totalDiscount: number; totalAddition: number }, service: Omit<ServiceItem, 'total'>) => ({
             servicesSum: acc.servicesSum + ((service.quantity || 0) * (service.value || 0)),
             totalDiscount: acc.totalDiscount + (service.discount || 0),
             totalAddition: acc.totalAddition + (service.addition || 0),
@@ -699,6 +726,91 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                             </CardContent>
                         </Card>
 
+                        {/* Notas Fiscais */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-base">Notas Fiscais</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {/* Método de Pagamento */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Método de Pagamento
+                                    </label>
+                                    <select
+                                        value={formData.paymentMethod || ''}
+                                        onChange={(e) => handleInputChange('paymentMethod', e.target.value || undefined)}
+                                        disabled={isSubmitting}
+                                        className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                    >
+                                        <option value="">Selecione...</option>
+                                        <option value="debit">Débito</option>
+                                        <option value="credit">Crédito</option>
+                                        <option value="cash">Dinheiro</option>
+                                        <option value="pix">PIX</option>
+                                        <option value="boleto">Boleto</option>
+                                        <option value="transfer">Transferência</option>
+                                        <option value="check">Cheque</option>
+                                    </select>
+                                </div>
+
+                                {/* Condições de Pagamento */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        Condições de Pagamento
+                                    </label>
+                                    <textarea
+                                        value={formData.paymentConditions}
+                                        onChange={(e) => handleInputChange('paymentConditions', e.target.value)}
+                                        placeholder="CONDIÇÕES ESPECÍFICAS DE PAGAMENTO..."
+                                        disabled={isSubmitting}
+                                        className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
+                                        rows={2}
+                                    />
+                                </div>
+
+                                {/* Notas Fiscais */}
+                                <div className="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                                            Nota Fiscal de Serviço
+                                        </label>
+                                        <Input
+                                            value={formData.serviceInvoice}
+                                            onChange={(value) => handleInputChange('serviceInvoice', value)}
+                                            placeholder="Ex: 000123456"
+                                            disabled={isSubmitting}
+                                            className="text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                                            Nota Fiscal de Retorno
+                                        </label>
+                                        <Input
+                                            value={formData.saleInvoice}
+                                            onChange={(value) => handleInputChange('saleInvoice', value)}
+                                            placeholder="Ex: 000123456"
+                                            disabled={isSubmitting}
+                                            className="text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                                            Nota Fiscal de Remessa
+                                        </label>
+                                        <Input
+                                            value={formData.shippingInvoice}
+                                            onChange={(value) => handleInputChange('shippingInvoice', value)}
+                                            placeholder="Ex: 000123456"
+                                            disabled={isSubmitting}
+                                            className="text-sm"
+                                        />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
                         {/* Observações */}
                         <Card>
                             <CardHeader>
@@ -720,7 +832,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
 
                 {/* Itens de Serviço - Full Width */}
                 <ServiceItemsManager
-                    items={formData.services?.map((service: any) => ({
+                    items={formData.services?.map((service: Omit<ServiceItem, 'total'>) => ({
                         ...service,
                         total: (service.quantity * service.value) - (service.discount || 0) + (service.addition || 0),
                     })) || []}

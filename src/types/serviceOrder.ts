@@ -22,6 +22,15 @@ export type PaymentType =
   | 'installment'
   | 'store_credit';
 
+export type PaymentMethod = 
+  | 'debit'
+  | 'credit'
+  | 'cash'
+  | 'pix'
+  | 'boleto'
+  | 'transfer'
+  | 'check';
+
 // Interface para itens de serviço
 export interface ServiceItem {
   description: string;
@@ -55,6 +64,12 @@ export interface ServiceOrder {
   deliveryDate?: string;
   notes?: string;
   financial: FinancialStatus;
+  paymentMethod?: PaymentMethod;
+  paymentConditions?: string;
+  serviceInvoice?: string;
+  saleInvoice?: string;
+  shippingInvoice?: string;
+  invoiceId?: string;
   invoiceItemIds: string[];
   paymentType: PaymentType;
   installmentCount: number;
@@ -92,6 +107,12 @@ export interface CreateServiceOrderRequest {
   deliveryDate?: string;
   notes?: string;
   financial?: FinancialStatus;
+  paymentMethod?: PaymentMethod;
+  paymentConditions?: string;
+  serviceInvoice?: string;
+  saleInvoice?: string;
+  shippingInvoice?: string;
+  invoiceId?: string;
   paymentType?: PaymentType;
   installmentCount?: number;
   discountPercentage?: number;
@@ -165,6 +186,7 @@ export interface SearchResponse {
 // Tipos para formulários
 export interface ServiceOrderFormData extends Omit<CreateServiceOrderRequest, 'services'> {
   services: ServiceItem[];
+  status?: ServiceOrderStatus;
 }
 
 // Tipos para validação

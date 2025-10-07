@@ -280,6 +280,22 @@ export const formatPaymentType = (type: string): string => {
 };
 
 /**
+ * Formata método de pagamento
+ */
+export const formatPaymentMethod = (method: string): string => {
+  const methodMap: Record<string, string> = {
+    debit: 'Débito',
+    credit: 'Crédito',
+    cash: 'Dinheiro',
+    pix: 'PIX',
+    boleto: 'Boleto',
+    transfer: 'Transferência',
+    check: 'Cheque',
+  };
+  return methodMap[method] || method;
+};
+
+/**
  * Retorna a cor do badge para status técnico
  */
 export const getServiceOrderStatusColor = (status: string): 'default' | 'success' | 'warning' | 'danger' | 'info' => {
