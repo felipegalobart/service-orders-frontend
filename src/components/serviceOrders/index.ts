@@ -11,6 +11,7 @@ export { StatusUpdateModal, FinancialStatusUpdateModal } from './StatusUpdateMod
 export { ServiceOrderPrint } from './ServiceOrderPrint';
 export { ServiceOrderReactPDF } from './ServiceOrderReactPDF';
 export { ServiceOrderMobileImage } from './ServiceOrderMobileImage';
+export { ServiceOrderActionsModal } from './ServiceOrderActionsModal';
 export { StatusDropdown } from './StatusDropdown';
 export { OrderNumberSearch } from './OrderNumberSearch';
 export { FiltersModal } from './FiltersModal';

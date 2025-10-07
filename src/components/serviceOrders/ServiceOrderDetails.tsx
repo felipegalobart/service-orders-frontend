@@ -25,8 +25,7 @@ import { useServiceOrder, useUpdateServiceOrderFinancialStatus, useDeleteService
 import { PersonDetailsModal } from '../ui/Modal/PersonDetailsModal';
 import { TimelineModal } from '../ui/Modal/TimelineModal';
 import { useNotification, Notification } from '../ui/Notification';
-import { ServiceOrderReactPDF } from './ServiceOrderReactPDF';
-import { ServiceOrderMobileImage } from './ServiceOrderMobileImage';
+import { ServiceOrderActionsModal } from './ServiceOrderActionsModal';
 import type { ServiceOrderStatus, FinancialStatus } from '../../types/serviceOrder';
 
 interface ServiceOrderDetailsProps {
@@ -49,7 +48,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     // Estado para os modais
     const [isPersonModalOpen, setIsPersonModalOpen] = useState(false);
     const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
-    const [showPDFReport, setShowPDFReport] = useState(false);
+    const [showActionsModal, setShowActionsModal] = useState(false);
 
     // Buscar dados do cliente se não vier populado
     const { data: customer } = useQuery({
@@ -165,12 +164,12 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         navigate(`/service-orders/print/${orderId}`);
     };
 
-    const handleShowPDFReport = () => {
-        setShowPDFReport(true);
+    const handleShowActionsModal = () => {
+        setShowActionsModal(true);
     };
 
-    const handleClosePDFReport = () => {
-        setShowPDFReport(false);
+    const handleCloseActionsModal = () => {
+        setShowActionsModal(false);
     };
 
     const handleDelete = async () => {
@@ -318,20 +317,17 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                 </svg>
                                 Imprimir
                             </Button>
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="secondary"
-                                    size="md"
-                                    onClick={handleShowPDFReport}
-                                    className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                                >
-                                    <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Relatório PDF
-                                </Button>
-                                <ServiceOrderMobileImage order={order} customerData={customerData} />
-                            </div>
+                            <Button
+                                variant="secondary"
+                                size="md"
+                                onClick={handleShowActionsModal}
+                                className="bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                                </svg>
+                                Ações
+                            </Button>
                             <Button
                                 variant="secondary"
                                 size="md"
@@ -763,27 +759,14 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     onClose={handleCloseTimelineModal}
                 />
 
-                {/* Componente de Relatório PDF */}
-                {showPDFReport && order && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg p-6 max-w-md">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-2xl font-bold text-gray-900">Relatório PDF</h2>
-                                <button
-                                    onClick={handleClosePDFReport}
-                                    className="text-gray-500 hover:text-gray-700 text-2xl"
-                                >
-                                    ×
-                                </button>
-                            </div>
-                            <div className="text-center mb-6">
-                                <p className="text-gray-600 mb-4">
-                                    Clique no botão abaixo para gerar o relatório em PDF da ordem de serviço <strong>OS {formatOrderNumber(order.orderNumber)}</strong>.
-                                </p>
-                                <ServiceOrderReactPDF order={order} customerData={customerData} />
-                            </div>
-                        </div>
-                    </div>
+                {/* Modal de Ações */}
+                {showActionsModal && order && (
+                    <ServiceOrderActionsModal
+                        order={order}
+                        customerData={customerData}
+                        isOpen={showActionsModal}
+                        onClose={handleCloseActionsModal}
+                    />
                 )}
 
             </div>
