@@ -9,6 +9,12 @@ interface ServiceOrderMobileImageProps {
     customerData?: Person;
 }
 
+// Função simples para truncar texto longo
+const truncateText = (text: string, maxLength: number = 30): string => {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+};
+
 export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = ({ order, customerData }) => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [showContactSelector, setShowContactSelector] = useState(false);
@@ -367,7 +373,7 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                             {order.services.map((service, index) => (
                                 <div key={index} className="bg-white p-1.5 rounded border border-purple-200">
                                     <div className="text-xs font-semibold text-gray-800 mb-1">
-                                        {service.description}
+                                        {truncateText(service.description, 40)}
                                     </div>
                                     <div className="flex justify-between text-xs">
                                         <div className="flex gap-3">
