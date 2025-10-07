@@ -59,17 +59,22 @@ class ApiService {
           window.location.href = '/login';
         }
         
-        // Para o endpoint de registro, tentar extrair a mensagem de erro da resposta
-        if (response.status === 401 && endpoint.includes('/auth/register')) {
-          try {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Email já cadastrado');
-          } catch {
-            throw new Error('Email já cadastrado');
+        // Tentar extrair mensagem de erro da resposta para todos os erros
+        let errorMessage = `HTTP Error: ${response.status} - ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          } else if (errorData.error) {
+            errorMessage = errorData.error;
+          } else if (typeof errorData === 'string') {
+            errorMessage = errorData;
           }
+        } catch {
+          // Se não conseguir extrair JSON, usar mensagem padrão
         }
         
-        throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
+        throw new Error(errorMessage);
       }
 
       return await response.json();

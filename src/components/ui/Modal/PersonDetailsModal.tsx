@@ -38,21 +38,37 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
 
         setLoading(true);
         try {
-            // Preparar dados para a API
-            const updateData: UpdatePersonRequest = {
-                name: updatedData.name,
-                corporateName: updatedData.corporateName,
-                tradeName: updatedData.tradeName,
-                document: updatedData.document,
-                stateRegistration: updatedData.stateRegistration,
-                type: updatedData.type,
-                pessoaJuridica: updatedData.pessoaJuridica,
-                blacklist: updatedData.blacklist,
-                isActive: updatedData.isActive,
-                contacts: updatedData.contacts,
-                addresses: updatedData.addresses,
-                notes: updatedData.notes
-            };
+            // Preparar dados para a API - removendo campos vazios e garantindo tipos corretos
+            const updateData: UpdatePersonRequest = {};
+
+            // Campos obrigatórios
+            if (updatedData.name) updateData.name = updatedData.name.trim();
+            if (updatedData.type) updateData.type = updatedData.type;
+            if (updatedData.pessoaJuridica !== undefined) updateData.pessoaJuridica = updatedData.pessoaJuridica;
+            if (updatedData.isActive !== undefined) updateData.isActive = updatedData.isActive;
+            if (updatedData.blacklist !== undefined) updateData.blacklist = updatedData.blacklist;
+
+            // Campos opcionais (só incluir se não estiverem vazios)
+            if (updatedData.corporateName?.trim()) updateData.corporateName = updatedData.corporateName.trim();
+            if (updatedData.tradeName?.trim()) updateData.tradeName = updatedData.tradeName.trim();
+            if (updatedData.document?.trim()) updateData.document = updatedData.document.trim();
+            if (updatedData.stateRegistration?.trim()) updateData.stateRegistration = updatedData.stateRegistration.trim();
+            if (updatedData.notes?.trim()) updateData.notes = updatedData.notes.trim();
+
+            // Arrays - garantir que existam e não estejam vazios
+            if (updatedData.contacts && updatedData.contacts.length > 0) {
+                updateData.contacts = updatedData.contacts.filter(contact =>
+                    contact.name?.trim() || contact.phone?.trim() || contact.email?.trim()
+                );
+            }
+
+            if (updatedData.addresses && updatedData.addresses.length > 0) {
+                updateData.addresses = updatedData.addresses.filter(address =>
+                    address.street?.trim() || address.city?.trim()
+                );
+            }
+
+            console.log('Dados que serão enviados para a API:', updateData);
 
             // Chamar API real
             const updatedPerson = await apiService.updatePerson(currentPerson._id, updateData);

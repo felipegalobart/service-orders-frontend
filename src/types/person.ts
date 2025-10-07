@@ -42,7 +42,7 @@ export interface CreatePersonRequest {
   name: string;
   corporateName?: string;
   document: string;
-  type: 'client' | 'supplier';
+  type: 'customer' | 'supplier';
   contacts: Contact[];
   addresses: Address[];
 }
