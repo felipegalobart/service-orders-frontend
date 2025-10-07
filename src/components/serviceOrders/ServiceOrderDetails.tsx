@@ -255,7 +255,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         );
     }
 
-    const isDeliveryOverdue = order.deliveryDate && isOverdue(order.deliveryDate);
+    const isDeliveryOverdue = isOverdue(order.expectedDeliveryDate, order.status);
 
     // Converter Decimal128 para números com verificações de segurança
     const servicesSum = parseDecimal(order.servicesSum) || 0;

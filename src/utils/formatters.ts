@@ -356,10 +356,13 @@ export const calculateDaysBetween = (startDate: string | Date, endDate: string |
 };
 
 /**
- * Verifica se uma data está vencida
+ * Verifica se uma ordem está atrasada (passou da data prevista e não foi entregue)
  */
-export const isOverdue = (date: string | Date): boolean => {
-  return new Date(date) < new Date();
+export const isOverdue = (expectedDeliveryDate: string | Date | undefined, status: string): boolean => {
+  if (!expectedDeliveryDate || status === 'entregue') {
+    return false;
+  }
+  return new Date(expectedDeliveryDate) < new Date();
 };
 
 /**

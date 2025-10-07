@@ -7,7 +7,7 @@ import { LoadingSpinner } from '../../../components/ui/Loading';
 import { CustomerDetails, StatusDropdown, OrderNumberSearch, FiltersModal } from '../../../components/serviceOrders';
 import { Pagination } from '../../../components/ui/Pagination';
 import { useServiceOrders } from '../../../hooks/useServiceOrders';
-import { formatDate, formatServiceOrderStatus, formatFinancialStatus } from '../../../utils/formatters';
+import { formatDate, formatServiceOrderStatus, formatFinancialStatus, isOverdue } from '../../../utils/formatters';
 import type { ServiceOrderFilters as ServiceOrderFiltersType } from '../../../types/serviceOrder';
 
 const ServiceOrderList: React.FC = () => {
@@ -369,10 +369,10 @@ const ServiceOrderList: React.FC = () => {
                                                             <div className="flex items-center justify-between">
                                                                 <span className="text-gray-400">Previsão:</span>
                                                                 <div className="flex items-center space-x-2">
-                                                                    <span className={new Date(order.expectedDeliveryDate) < new Date() && order.status !== 'entregue' ? 'text-red-400 font-medium' : 'text-white'}>
+                                                                    <span className={isOverdue(order.expectedDeliveryDate, order.status) ? 'text-red-400 font-medium' : 'text-white'}>
                                                                         {formatDate(order.expectedDeliveryDate)}
                                                                     </span>
-                                                                    {new Date(order.expectedDeliveryDate) < new Date() && order.status !== 'entregue' && (
+                                                                    {isOverdue(order.expectedDeliveryDate, order.status) && (
                                                                         <Badge variant="danger" size="sm">Atrasada</Badge>
                                                                     )}
                                                                 </div>
