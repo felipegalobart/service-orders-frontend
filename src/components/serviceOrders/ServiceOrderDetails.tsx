@@ -360,12 +360,12 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                         </div>
                         {customerData ? (
                             <div className="space-y-1">
-                                <p className="text-sm font-semibold text-white truncate">{customerData.name}</p>
+                                <p className="text-sm font-semibold text-white break-words">{customerData.name}</p>
                                 {customerData.document && (
-                                    <p className="text-xs text-gray-300 truncate">{formatDocument(customerData.document)}</p>
+                                    <p className="text-xs text-gray-300 break-words">{formatDocument(customerData.document)}</p>
                                 )}
                                 {customerData.contacts?.find(c => c.phone) && (
-                                    <p className="text-xs text-gray-300 truncate">{formatPhoneNumber(customerData.contacts.find(c => c.phone)?.phone || '')}</p>
+                                    <p className="text-xs text-gray-300 break-words">{formatPhoneNumber(customerData.contacts.find(c => c.phone)?.phone || '')}</p>
                                 )}
                             </div>
                         ) : (
@@ -387,10 +387,10 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                             <h3 className="text-xs font-semibold text-gray-400 uppercase">Equipamento</h3>
                         </div>
                         <div className="space-y-1">
-                            <p className="text-sm font-semibold text-white truncate">{order.equipment}</p>
-                            {order.brand && <p className="text-xs text-gray-300 truncate">{order.brand}</p>}
-                            {order.model && <p className="text-xs text-gray-300 truncate">{order.model}</p>}
-                            {order.serialNumber && <p className="text-xs text-gray-300 truncate">SN: {order.serialNumber}</p>}
+                            <p className="text-sm font-semibold text-white break-words">{order.equipment}</p>
+                            {order.brand && <p className="text-xs text-gray-300 break-words">{order.brand}</p>}
+                            {order.model && <p className="text-xs text-gray-300 break-words">{order.model}</p>}
+                            {order.serialNumber && <p className="text-xs text-gray-300 break-words">SN: {order.serialNumber}</p>}
                         </div>
                     </CardContent>
                 </Card>
@@ -542,7 +542,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                         </svg>
                                         <h4 className="font-semibold text-white text-sm">Defeito Relatado</h4>
                                     </div>
-                                    <p className="text-sm text-gray-300 leading-relaxed">{order.reportedDefect}</p>
+                                    <p className="text-sm text-gray-300 leading-relaxed break-words overflow-wrap-anywhere">{order.reportedDefect}</p>
                                 </div>
                             )}
 
@@ -554,7 +554,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                         </svg>
                                         <h4 className="font-semibold text-white text-sm">Observações do Cliente</h4>
                                     </div>
-                                    <p className="text-sm text-gray-300 leading-relaxed">{order.customerObservations}</p>
+                                    <p className="text-sm text-gray-300 leading-relaxed break-words overflow-wrap-anywhere">{order.customerObservations}</p>
                                 </div>
                             )}
 
@@ -566,7 +566,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                         </svg>
                                         <h4 className="font-semibold text-white text-sm">Notas Internas</h4>
                                     </div>
-                                    <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">{order.notes}</div>
+                                    <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">{order.notes}</div>
                                 </div>
                             )}
                         </div>
