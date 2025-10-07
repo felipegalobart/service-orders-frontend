@@ -12,7 +12,7 @@ interface ServiceOrderMetricsProps {
 
 export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ className = '' }) => {
     // Buscar todas as ordens para calcular métricas
-    const { data: ordersData, isLoading, error } = useServiceOrders({ limit: 100 });
+    const { data: ordersData, isLoading, error } = useServiceOrders({ limit: 1000 });
 
     if (isLoading) {
         return (
