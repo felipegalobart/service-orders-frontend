@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, Button, Badge, LoadingSpinner, Pagination, AdvancedFilters, PersonDetailsModal, CreatePersonModal } from '../../../components/ui';
 import { apiService } from '../../../services/api';
 import { formatPhoneNumber, formatDocument } from '../../../utils/formatters';
@@ -8,6 +8,7 @@ import type { FilterOptions } from '../../../components/ui/AdvancedFilters';
 
 const PersonList: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
 
     const [persons, setPersons] = useState<Person[]>([]);
     const [loading, setLoading] = useState(true);
@@ -177,6 +178,10 @@ const PersonList: React.FC = () => {
         );
     };
 
+    const handleCreateServiceOrder = (person: Person) => {
+        navigate(`/service-orders/create?customerId=${person._id}`);
+    };
+
     if (loading) {
         return (
             <div className="space-y-6">
@@ -300,12 +305,14 @@ const PersonList: React.FC = () => {
                     persons.map((person: Person) => (
                         <Card
                             key={person._id}
-                            className="bg-gray-800 border-gray-700 hover:shadow-lg hover:shadow-gray-500/25 transition-shadow cursor-pointer"
-                            onClick={() => handleViewDetails(person)}
+                            className="bg-gray-800 border-gray-700 hover:shadow-lg hover:shadow-gray-500/25 transition-shadow"
                         >
                             <CardContent>
                                 <div className="flex items-start justify-between">
-                                    <div className="flex items-start space-x-4">
+                                    <div
+                                        className="flex items-start space-x-4 flex-1 cursor-pointer"
+                                        onClick={() => handleViewDetails(person)}
+                                    >
                                         <div className="h-12 w-12 bg-gray-700 rounded-lg flex items-center justify-center">
                                             {getPersonTypeIcon(person.type)}
                                         </div>
@@ -391,6 +398,35 @@ const PersonList: React.FC = () => {
                                                 </div>
                                             )}
                                         </div>
+                                    </div>
+
+                                    {/* Botões de Ação */}
+                                    <div className="flex flex-col gap-2 ml-4">
+                                        {person.type === 'customer' && (
+                                            <Button
+                                                onClick={() => handleCreateServiceOrder(person)}
+                                                variant="primary"
+                                                size="sm"
+                                                className="whitespace-nowrap"
+                                            >
+                                                <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                </svg>
+                                                Nova OS
+                                            </Button>
+                                        )}
+                                        <Button
+                                            onClick={() => handleViewDetails(person)}
+                                            variant="secondary"
+                                            size="sm"
+                                            className="whitespace-nowrap"
+                                        >
+                                            <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            Ver Detalhes
+                                        </Button>
                                     </div>
                                 </div>
                             </CardContent>

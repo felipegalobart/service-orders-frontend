@@ -66,6 +66,20 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
     const { data: sequenceInfo } = useSequenceInfo();
     const { notification, showNotification, hideNotification } = useNotification();
 
+    // Detectar customerId na URL para preenchimento automático
+    useEffect(() => {
+        if (mode === 'create') {
+            const urlParams = new URLSearchParams(location.search);
+            const customerId = urlParams.get('customerId');
+            if (customerId) {
+                setFormData((prev: any) => ({
+                    ...prev,
+                    customerId: customerId
+                }));
+            }
+        }
+    }, [location.search, mode]);
+
     // Inicializar formulário com dados da ordem (modo edição)
     useEffect(() => {
         if (order && mode === 'edit') {
