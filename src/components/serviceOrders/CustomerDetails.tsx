@@ -1,6 +1,8 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiService } from '../../services/api';
+import { formatPhoneNumber } from '../../utils/formatters';
+
 
 interface CustomerDetailsProps {
     customerId: string;
@@ -53,7 +55,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customerId }) 
                         <div className="flex items-center space-x-2">
                             <span className="text-gray-400">Tel:</span>
                             <span className="text-white">
-                                {customer.contacts[0].phone}
+                                {formatPhoneNumber(customer.contacts[0].phone)}
                                 {customer.contacts[0].isWhatsApp && (
                                     <span className="text-green-400 ml-1">📱</span>
                                 )}
