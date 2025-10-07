@@ -36,7 +36,10 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const { data: order, isLoading, error } = useServiceOrder(orderId);
+    // Estado para controlar se a ordem foi excluída
+    const [isDeleted, setIsDeleted] = useState(false);
+
+    const { data: order, isLoading, error } = useServiceOrder(orderId, !isDeleted);
 
     const updateFinancialStatusMutation = useUpdateServiceOrderFinancialStatus();
     const deleteMutation = useDeleteServiceOrder();
@@ -158,6 +161,16 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         if (confirm(`Tem certeza que deseja excluir a ordem de serviço OS: ${formatOrderNumber(order.orderNumber)}?`)) {
             try {
                 await deleteMutation.mutateAsync(order._id);
+
+                // Marcar como excluído para desabilitar queries futuras
+                setIsDeleted(true);
+
+                // Cancelar queries em andamento
+                queryClient.cancelQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
+                // Remover do cache
+                queryClient.removeQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
                 showNotification('Ordem de serviço excluída com sucesso!', 'success');
 
                 // Aguardar um pouco para mostrar a notificação antes de redirecionar
@@ -198,6 +211,17 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         return (
             <div className="flex justify-center items-center h-64">
                 <LoadingSpinner />
+            </div>
+        );
+    }
+
+    // Se foi excluído, mostrar tela de "excluindo"
+    if (isDeleted) {
+        return (
+            <div className="flex flex-col justify-center items-center h-64 space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+                <p className="text-green-400 text-lg font-semibold">Ordem de serviço excluída com sucesso!</p>
+                <p className="text-gray-400 text-sm">Redirecionando...</p>
             </div>
         );
     }

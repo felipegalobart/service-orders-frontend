@@ -37,11 +37,11 @@ export const useServiceOrders = (filters: ServiceOrderFilters = {}) => {
 };
 
 // Hook para buscar ordem específica
-export const useServiceOrder = (id: string) => {
+export const useServiceOrder = (id: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: serviceOrderKeys.detail(id),
     queryFn: () => apiService.getServiceOrderById(id),
-    enabled: !!id,
+    enabled: !!id && enabled,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
