@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import type { ServiceOrder } from '../../types/serviceOrder';
 import type { Person, Contact } from '../../types/person';
-import { formatCurrency, formatDate, formatOrderNumber, formatUpperCase, parseDecimal } from '../../utils/formatters';
+import { formatCurrency, formatDate, formatOrderNumber, formatUpperCase, formatPaymentMethod, parseDecimal } from '../../utils/formatters';
 
 interface ServiceOrderMobileImageProps {
     order: ServiceOrder;
@@ -406,6 +406,26 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                         </span>
                     </div>
                 </div>
+
+                {/* Informações de Pagamento */}
+                {(order.paymentMethod || order.paymentConditions) && (
+                    <div className="bg-blue-50 p-2 rounded-lg mb-3 border-2 border-blue-200">
+                        <div className="space-y-1">
+                            {order.paymentMethod && (
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm font-semibold text-blue-700">Método de Pagamento:</span>
+                                    <span className="text-sm font-medium text-blue-600">{formatPaymentMethod(order.paymentMethod)}</span>
+                                </div>
+                            )}
+                            {order.paymentConditions && (
+                                <div className="flex justify-between items-start">
+                                    <span className="text-sm font-semibold text-blue-700">Condições:</span>
+                                    <span className="text-xs text-blue-600 text-right max-w-[200px] break-words">{order.paymentConditions}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
 
                 {/* Observações */}
                 {order.notes && (

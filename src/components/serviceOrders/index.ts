@@ -10,7 +10,6 @@ export { ServiceOrderMetrics } from './ServiceOrderMetrics';
 export { StatusUpdateModal, FinancialStatusUpdateModal } from './StatusUpdateModal';
 export { ServiceOrderPrint } from './ServiceOrderPrint';
 export { ServiceOrderReactPDF } from './ServiceOrderReactPDF';
-export { ServiceOrderMobilePDF } from './ServiceOrderMobilePDF';
 export { ServiceOrderMobileImage } from './ServiceOrderMobileImage';
 export { StatusDropdown } from './StatusDropdown';
 export { OrderNumberSearch } from './OrderNumberSearch';

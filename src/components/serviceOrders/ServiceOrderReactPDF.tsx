@@ -1,6 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
-import { formatDate, formatOrderNumber, formatUpperCase, formatCurrency, parseDecimal } from '../../utils/formatters';
+import { formatDate, formatOrderNumber, formatUpperCase, formatCurrency, formatPaymentMethod, parseDecimal } from '../../utils/formatters';
 import type { ServiceOrder } from '../../types/serviceOrder';
 import type { Person } from '../../types/person';
 
@@ -108,6 +108,64 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
+    paymentSection: {
+        backgroundColor: '#f8fafc',
+        borderWidth: 2,
+        borderColor: '#3b82f6',
+        borderRadius: 8,
+        padding: 12,
+        marginTop: 8,
+        marginBottom: 8,
+    },
+    paymentSectionTitle: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#1e40af',
+        marginBottom: 8,
+        textAlign: 'center',
+        backgroundColor: '#dbeafe',
+        padding: 6,
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: '#3b82f6',
+    },
+    paymentGrid: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+    },
+    paymentItem: {
+        flex: 1,
+        marginHorizontal: 4,
+    },
+    paymentLabel: {
+        fontSize: 9,
+        fontWeight: 'bold',
+        color: '#374151',
+        marginBottom: 4,
+        textTransform: 'uppercase',
+    },
+    paymentValue: {
+        fontSize: 10,
+        color: '#1f2937',
+        backgroundColor: '#ffffff',
+        padding: 6,
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: '#d1d5db',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    paymentConditionsValue: {
+        fontSize: 8,
+        color: '#1f2937',
+        backgroundColor: '#ffffff',
+        padding: 6,
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: '#d1d5db',
+        lineHeight: 1.3,
+    },
     servicesTable: {
         marginTop: 8,
     },
@@ -121,7 +179,20 @@ const styles = StyleSheet.create({
         fontSize: 7,
         fontWeight: 'bold',
         color: '#ffffff',
-        flex: 1,
+        textAlign: 'center',
+    },
+    tableHeaderDesc: {
+        fontSize: 7,
+        fontWeight: 'bold',
+        color: '#ffffff',
+        flex: 3, // Descrição ocupa 3x mais espaço
+        textAlign: 'center',
+    },
+    tableHeaderOther: {
+        fontSize: 7,
+        fontWeight: 'bold',
+        color: '#ffffff',
+        flex: 1, // Outras colunas ocupam espaço igual
         textAlign: 'center',
     },
     tableRow: {
@@ -140,7 +211,19 @@ const styles = StyleSheet.create({
     },
     tableRowText: {
         fontSize: 7,
-        flex: 1,
+        textAlign: 'center',
+        color: '#374151',
+    },
+    tableRowDesc: {
+        fontSize: 7,
+        flex: 3, // Descrição ocupa 3x mais espaço
+        textAlign: 'left', // Alinhamento à esquerda para descrições
+        color: '#374151',
+        paddingHorizontal: 4,
+    },
+    tableRowOther: {
+        fontSize: 7,
+        flex: 1, // Outras colunas ocupam espaço igual
         textAlign: 'center',
         color: '#374151',
     },
@@ -198,6 +281,12 @@ const styles = StyleSheet.create({
         color: '#6b7280',
     },
 });
+
+// Função simples para truncar texto longo
+const truncateText = (text: string, maxLength: number = 54): string => {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+};
 
 const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }> = ({ order, customerData }) => {
     const fullCustomer = customerData || order.customer;
@@ -352,21 +441,21 @@ const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }
                         <View style={styles.servicesTable}>
                             {/* Cabeçalho da tabela */}
                             <View style={styles.tableHeader}>
-                                <Text style={styles.tableHeaderText}>Descrição</Text>
-                                <Text style={styles.tableHeaderText}>Valor Unit.</Text>
-                                <Text style={styles.tableHeaderText}>QTD</Text>
-                                <Text style={styles.tableHeaderText}>Desconto</Text>
-                                <Text style={styles.tableHeaderText}>Total</Text>
+                                <Text style={styles.tableHeaderDesc}>Descrição</Text>
+                                <Text style={styles.tableHeaderOther}>Valor Unit.</Text>
+                                <Text style={styles.tableHeaderOther}>QTD</Text>
+                                <Text style={styles.tableHeaderOther}>Desconto</Text>
+                                <Text style={styles.tableHeaderOther}>Total</Text>
                             </View>
 
                             {/* Itens da tabela */}
                             {order.services.map((service, index) => (
                                 <View key={index} style={index % 2 === 0 ? styles.tableRow : styles.tableRowAlt}>
-                                    <Text style={styles.tableRowText}>{service.description}</Text>
-                                    <Text style={styles.tableRowText}>{formatCurrency(parseDecimal(service.value))}</Text>
-                                    <Text style={styles.tableRowText}>{service.quantity}</Text>
-                                    <Text style={styles.tableRowText}>{formatCurrency(parseDecimal(service.discount || 0))}</Text>
-                                    <Text style={styles.tableRowText}>{formatCurrency(parseDecimal(service.total))}</Text>
+                                    <Text style={styles.tableRowDesc}>{truncateText(service.description, 54)}</Text>
+                                    <Text style={styles.tableRowOther}>{formatCurrency(parseDecimal(service.value))}</Text>
+                                    <Text style={styles.tableRowOther}>{service.quantity}</Text>
+                                    <Text style={styles.tableRowOther}>{formatCurrency(parseDecimal(service.discount || 0))}</Text>
+                                    <Text style={styles.tableRowOther}>{formatCurrency(parseDecimal(service.total))}</Text>
                                 </View>
                             ))}
                         </View>
@@ -399,6 +488,27 @@ const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }
                                 <Text style={[styles.totalLabel, { fontSize: 16 }]}>VALOR TOTAL:</Text>
                                 <Text style={[styles.totalValue, { fontSize: 18 }]}>{formatCurrency(parseDecimal(order.totalAmountLeft) || (totalGeral - discountFromPercentage))}</Text>
                             </View>
+                        </View>
+                    </View>
+                )}
+
+                {/* Informações de Pagamento */}
+                {(order.paymentMethod || order.paymentConditions) && (
+                    <View style={styles.paymentSection}>
+                        <Text style={styles.paymentSectionTitle}>INFORMAÇÕES DE PAGAMENTO</Text>
+                        <View style={styles.paymentGrid}>
+                            {order.paymentMethod && (
+                                <View style={styles.paymentItem}>
+                                    <Text style={styles.paymentLabel}>Método de Pagamento</Text>
+                                    <Text style={styles.paymentValue}>{formatPaymentMethod(order.paymentMethod)}</Text>
+                                </View>
+                            )}
+                            {order.paymentConditions && (
+                                <View style={styles.paymentItem}>
+                                    <Text style={styles.paymentLabel}>Condições de Pagamento</Text>
+                                    <Text style={styles.paymentConditionsValue}>{order.paymentConditions}</Text>
+                                </View>
+                            )}
                         </View>
                     </View>
                 )}
