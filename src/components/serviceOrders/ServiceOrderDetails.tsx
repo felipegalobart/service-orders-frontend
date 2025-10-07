@@ -409,13 +409,13 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                 </svg>
                             </div>
                             {customerData ? (
-                                <div className="space-y-1">
-                                    <p className="text-sm font-semibold text-white break-words">{customerData.name}</p>
+                                <div className="space-y-2">
+                                    <p className="text-lg font-bold text-white break-words">{customerData.name}</p>
                                     {customerData.document && (
-                                        <p className="text-xs text-gray-300 break-words">{formatDocument(customerData.document)}</p>
+                                        <p className="text-sm text-gray-300 break-words">{formatDocument(customerData.document)}</p>
                                     )}
                                     {customerData.contacts?.find(c => c.phone) && (
-                                        <p className="text-xs text-gray-300 break-words">{formatPhoneNumber(customerData.contacts.find(c => c.phone)?.phone || '')}</p>
+                                        <p className="text-sm text-gray-300 break-words">{formatPhoneNumber(customerData.contacts.find(c => c.phone)?.phone || '')}</p>
                                     )}
                                 </div>
                             ) : (
@@ -436,11 +436,11 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                 </svg>
                                 <h3 className="text-xs font-semibold text-gray-400 uppercase">Equipamento</h3>
                             </div>
-                            <div className="space-y-1">
-                                <p className="text-sm font-semibold text-white break-words">{order.equipment}</p>
-                                {order.brand && <p className="text-xs text-gray-300 break-words">{order.brand}</p>}
-                                {order.model && <p className="text-xs text-gray-300 break-words">{order.model}</p>}
-                                {order.serialNumber && <p className="text-xs text-gray-300 break-words">SN: {order.serialNumber}</p>}
+                            <div className="space-y-2">
+                                <p className="text-lg font-bold text-white break-words">{order.equipment}</p>
+                                {order.brand && <p className="text-sm text-gray-300 break-words">{order.brand}</p>}
+                                {order.model && <p className="text-sm text-gray-300 break-words">{order.model}</p>}
+                                {order.serialNumber && <p className="text-sm text-gray-300 break-words">SN: {order.serialNumber}</p>}
                             </div>
                         </CardContent>
                     </Card>
