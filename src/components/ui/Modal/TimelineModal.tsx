@@ -18,10 +18,17 @@ export const TimelineModal: React.FC<TimelineModalProps> = ({
 }) => {
     if (!order) return null;
 
-    const servicesSum = parseDecimal(order.servicesSum);
-    const totalDiscount = parseDecimal(order.totalDiscount);
-    const totalAddition = parseDecimal(order.totalAddition);
-    const totalAmount = servicesSum - totalDiscount + totalAddition;
+    const servicesSum = parseDecimal(order.servicesSum) || 0;
+    const totalDiscount = parseDecimal(order.totalDiscount) || 0;
+    const totalAddition = parseDecimal(order.totalAddition) || 0;
+    const discountPercentage = parseDecimal(order.discountPercentage) || 0;
+    const additionPercentage = parseDecimal(order.additionPercentage) || 0;
+
+    // Calcular porcentagens
+    const discountFromPercentage = (servicesSum * discountPercentage) / 100;
+    const additionFromPercentage = (servicesSum * additionPercentage) / 100;
+
+    const totalAmount = servicesSum - totalDiscount - discountFromPercentage + totalAddition + additionFromPercentage;
 
     // Calcular tempos de processamento
     const getProcessingTime = (startDate: string, endDate?: string) => {
@@ -327,10 +334,22 @@ export const TimelineModal: React.FC<TimelineModalProps> = ({
                                         <span className="text-gray-400">Descontos:</span>
                                         <span className="text-red-400 ml-2">-{formatCurrency(totalDiscount)}</span>
                                     </div>
+                                    {discountFromPercentage > 0 && (
+                                        <div>
+                                            <span className="text-gray-400">Desconto ({discountPercentage}%):</span>
+                                            <span className="text-red-400 ml-2">-{formatCurrency(discountFromPercentage)}</span>
+                                        </div>
+                                    )}
                                     <div>
                                         <span className="text-gray-400">Acréscimos:</span>
                                         <span className="text-green-400 ml-2">+{formatCurrency(totalAddition)}</span>
                                     </div>
+                                    {additionFromPercentage > 0 && (
+                                        <div>
+                                            <span className="text-gray-400">Adicional ({additionPercentage}%):</span>
+                                            <span className="text-green-400 ml-2">+{formatCurrency(additionFromPercentage)}</span>
+                                        </div>
+                                    )}
                                     <div>
                                         <span className="text-gray-400">Total Final:</span>
                                         <span className="text-white font-bold ml-2">{formatCurrency(totalAmount)}</span>

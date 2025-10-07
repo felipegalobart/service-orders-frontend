@@ -15,11 +15,15 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
     const cardRef = useRef<HTMLDivElement>(null);
 
     const fullCustomer = customerData || order.customer;
-    let totalGeral = 0;
 
-    if (order.services && order.services.length > 0) {
-        totalGeral = order.services.reduce((sum, service) => sum + parseDecimal(service.total), 0);
-    }
+    // Calcular porcentagens para o total geral
+    const servicesSum = parseDecimal(order.servicesSum);
+    const discountPercentage = parseDecimal(order.discountPercentage || 0);
+    const additionPercentage = parseDecimal(order.additionPercentage || 0);
+    const discountFromPercentage = (servicesSum * discountPercentage) / 100;
+    const additionFromPercentage = (servicesSum * additionPercentage) / 100;
+
+    const totalWithPercentages = servicesSum - discountFromPercentage + additionFromPercentage;
 
     // Função para determinar a cor do badge financeiro
     const getFinancialStatusColor = (status: string) => {
@@ -177,7 +181,7 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                         `*OS: ${formatOrderNumber(order.orderNumber)}*\n` +
                         `Cliente: ${formatUpperCase(fullCustomer?.name || order.customerId || 'N/A')}\n` +
                         `Equipamento: ${formatUpperCase(order.equipment)}\n` +
-                        `Valor: ${formatCurrency(parseDecimal(order.totalAmountLeft) || totalGeral)}\n\n`
+                        `Valor: ${formatCurrency(parseDecimal(order.totalAmountLeft) || totalWithPercentages)}\n\n`
 
                     // Obter número do telefone do contato selecionado
                     const phoneNumber = contact?.phone?.replace(/\D/g, '') || fullCustomer?.contacts?.find((c) => c.phone)?.phone?.replace(/\D/g, '');
@@ -381,12 +385,24 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                     </div>
                 )}
 
+                {/* Desconto Percentual */}
+                {discountFromPercentage > 0 && (
+                    <div className="bg-red-50 p-2 rounded-lg mb-3 border-2 border-red-200">
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm font-bold text-red-700">DESCONTO ({discountPercentage}%):</span>
+                            <span className="text-lg font-bold text-red-600">
+                                -{formatCurrency(discountFromPercentage)}
+                            </span>
+                        </div>
+                    </div>
+                )}
+
                 {/* Total */}
                 <div className="bg-green-50 p-2 rounded-lg mb-3 border-2 border-green-200">
                     <div className="flex justify-between items-center">
                         <span className="text-lg font-bold text-green-700">VALOR TOTAL:</span>
                         <span className="text-xl font-bold text-green-600">
-                            {formatCurrency(parseDecimal(order.totalAmountLeft) || totalGeral)}
+                            {formatCurrency(parseDecimal(order.totalAmountLeft) || totalWithPercentages)}
                         </span>
                     </div>
                 </div>

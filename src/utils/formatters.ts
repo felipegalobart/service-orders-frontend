@@ -201,6 +201,11 @@ export const BRAZILIAN_STATES = [
  * Formata valor monetário em reais brasileiros
  */
 export const formatCurrency = (value: number): string => {
+  // Verificar se o valor é válido
+  if (isNaN(value) || value === null || value === undefined) {
+    return 'R$ 0,00';
+  }
+  
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',

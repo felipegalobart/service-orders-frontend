@@ -100,14 +100,18 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
             // Usar endpoint de UPDATE para incluir as datas
             await apiService.updateServiceOrder(orderId, updateData);
 
-            // Fechar modal de timeline se estiver aberto para forçar atualização
-            if (isTimelineModalOpen) {
-                setIsTimelineModalOpen(false);
-            }
-
             // Invalidar cache e refetch
             await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
             await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
+            // Fechar modal de timeline se estiver aberto para forçar atualização
+            if (isTimelineModalOpen) {
+                setIsTimelineModalOpen(false);
+                // Reabrir o modal após um pequeno delay para mostrar dados atualizados
+                setTimeout(() => {
+                    setIsTimelineModalOpen(true);
+                }, 100);
+            }
 
             // Forçar refetch imediato
             await queryClient.refetchQueries({ queryKey: serviceOrderKeys.detail(orderId) });
@@ -131,6 +135,19 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 id: orderId,
                 financial: { financial: newFinancialStatus }
             });
+
+            // Invalidar cache e refetch
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
+            // Fechar modal de timeline se estiver aberto para forçar atualização
+            if (isTimelineModalOpen) {
+                setIsTimelineModalOpen(false);
+                // Reabrir o modal após um pequeno delay para mostrar dados atualizados
+                setTimeout(() => {
+                    setIsTimelineModalOpen(true);
+                }, 100);
+            }
 
             // Mostrar notificação de sucesso
             showNotification('Status financeiro atualizado com sucesso!', 'success');
@@ -240,11 +257,21 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
 
     const isDeliveryOverdue = order.deliveryDate && isOverdue(order.deliveryDate);
 
-    // Converter Decimal128 para números
-    const servicesSum = parseDecimal(order.servicesSum);
-    const totalDiscount = parseDecimal(order.totalDiscount);
-    const totalAddition = parseDecimal(order.totalAddition);
-    const totalAmount = servicesSum - totalDiscount + totalAddition;
+    // Converter Decimal128 para números com verificações de segurança
+    const servicesSum = parseDecimal(order.servicesSum) || 0;
+    const totalDiscount = parseDecimal(order.totalDiscount) || 0;
+    const totalAddition = parseDecimal(order.totalAddition) || 0;
+    const discountPercentage = parseDecimal(order.discountPercentage) || 0;
+    const additionPercentage = parseDecimal(order.additionPercentage) || 0;
+
+    // Calcular porcentagens
+    const discountFromPercentage = (servicesSum * discountPercentage) / 100;
+    const additionFromPercentage = (servicesSum * additionPercentage) / 100;
+
+    const totalAmount = servicesSum - totalDiscount - discountFromPercentage + totalAddition + additionFromPercentage;
+
+    // Valor total com 5% de acréscimo (campo oculto)
+    const totalWith5Percent = totalAmount * 1.05;
 
     return (
         <>
@@ -557,15 +584,35 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                                 <span className="text-sm font-medium text-red-400">-{formatCurrency(totalDiscount)}</span>
                                             </div>
                                         )}
+                                        {discountFromPercentage > 0 && (
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-gray-300">Desconto ({discountPercentage}%):</span>
+                                                <span className="text-sm font-medium text-red-400">-{formatCurrency(discountFromPercentage)}</span>
+                                            </div>
+                                        )}
                                         {totalAddition > 0 && (
                                             <div className="flex justify-between">
                                                 <span className="text-sm text-gray-300">Acréscimos:</span>
                                                 <span className="text-sm font-medium text-green-400">+{formatCurrency(totalAddition)}</span>
                                             </div>
                                         )}
+                                        {additionFromPercentage > 0 && (
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-gray-300">Adicional ({additionPercentage}%):</span>
+                                                <span className="text-sm font-medium text-green-400">+{formatCurrency(additionFromPercentage)}</span>
+                                            </div>
+                                        )}
                                         <div className="flex justify-between pt-2 border-t border-gray-600">
                                             <span className="font-semibold text-white">Total:</span>
                                             <span className="text-2xl font-bold text-white">{formatCurrency(totalAmount)}</span>
+                                        </div>
+
+                                        {/* Campo oculto com 5% de acréscimo - só aparece no hover */}
+                                        <div className="opacity-0 hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                            <div className="flex justify-between pt-2 border-t border-gray-500">
+                                                <span className="font-semibold text-yellow-400">Total + 5%:</span>
+                                                <span className="text-xl font-bold text-yellow-400">{formatCurrency(totalWith5Percent)}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

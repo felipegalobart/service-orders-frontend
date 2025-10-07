@@ -11,7 +11,7 @@ import { ServiceItemsManager } from './ServiceItemsManager';
 import { useCreateServiceOrder, useUpdateServiceOrder } from '../../hooks/useServiceOrders';
 import { useSequenceInfo } from '../../hooks/useServiceOrders';
 import { validateServiceOrder, hasValidationErrors } from '../../utils/validators';
-import { formatCurrency, formatUpperCase, getTodayDateString } from '../../utils/formatters';
+import { formatCurrency, formatUpperCase, getTodayDateString, parseDecimal } from '../../utils/formatters';
 import { useNotification, Notification } from '../ui/Notification';
 import type {
     ServiceOrder,
@@ -46,6 +46,8 @@ const initialFormData: any = {
     financial: 'em_aberto',
     paymentType: 'cash',
     installmentCount: 1,
+    discountPercentage: 0,
+    additionPercentage: 0,
     services: [],
 };
 
@@ -104,12 +106,14 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 financial: order.financial,
                 paymentType: order.paymentType,
                 installmentCount: order.installmentCount,
+                discountPercentage: parseDecimal(order.discountPercentage) || 0,
+                additionPercentage: parseDecimal(order.additionPercentage) || 0,
                 services: order.services.map(service => ({
-                    description: service.description,
-                    quantity: service.quantity,
-                    value: service.value,
-                    discount: service.discount,
-                    addition: service.addition,
+                    description: service.description || '',
+                    quantity: service.quantity || 0,
+                    value: service.value || 0,
+                    discount: service.discount || 0,
+                    addition: service.addition || 0,
                 })),
             });
 
@@ -184,6 +188,8 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                 financial: formData.financial,
                 paymentType: formData.paymentType,
                 installmentCount: formData.installmentCount,
+                discountPercentage: Number(formData.discountPercentage) || 0,
+                additionPercentage: Number(formData.additionPercentage) || 0,
                 services: formData.services,
             };
 
@@ -219,17 +225,42 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
         }
     };
 
-    // Calcular totais
-    const totals = formData.services?.reduce(
+    // Sempre calcular totais dos serviços do formulário
+    const calculatedTotals = formData.services?.reduce(
         (acc: any, service: any) => ({
-            servicesSum: acc.servicesSum + (service.quantity * service.value),
+            servicesSum: acc.servicesSum + ((service.quantity || 0) * (service.value || 0)),
             totalDiscount: acc.totalDiscount + (service.discount || 0),
             totalAddition: acc.totalAddition + (service.addition || 0),
         }),
         { servicesSum: 0, totalDiscount: 0, totalAddition: 0 }
     ) || { servicesSum: 0, totalDiscount: 0, totalAddition: 0 };
 
-    const totalAmount = totals.servicesSum - totals.totalDiscount + totals.totalAddition;
+    // No modo de edição, se não há serviços no formulário, usar dados da ordem original
+    // Caso contrário, usar sempre os dados calculados
+    const safeServicesSum = (mode === 'edit' && (!formData.services || formData.services.length === 0))
+        ? (parseDecimal(order?.servicesSum) || 0)
+        : calculatedTotals.servicesSum;
+
+    const safeTotalDiscount = (mode === 'edit' && (!formData.services || formData.services.length === 0))
+        ? (parseDecimal(order?.totalDiscount) || 0)
+        : calculatedTotals.totalDiscount;
+
+    const safeTotalAddition = (mode === 'edit' && (!formData.services || formData.services.length === 0))
+        ? (parseDecimal(order?.totalAddition) || 0)
+        : calculatedTotals.totalAddition;
+
+    const safeDiscountPercentage = Number(formData.discountPercentage) || 0;
+    const safeAdditionPercentage = Number(formData.additionPercentage) || 0;
+
+    // Calcular porcentagens
+    const discountFromPercentage = (safeServicesSum * safeDiscountPercentage) / 100;
+    const additionFromPercentage = (safeServicesSum * safeAdditionPercentage) / 100;
+
+    // Total final com porcentagens
+    const totalAmount = safeServicesSum - safeTotalDiscount - discountFromPercentage + safeTotalAddition + additionFromPercentage;
+
+    // Valor total com 5% de acréscimo (campo oculto)
+    const totalWith5Percent = totalAmount * 1.05;
 
     // Verificar se deve focar nos serviços
     const shouldFocusServices = location.search.includes('focus=services');
@@ -597,25 +628,71 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                                     />
                                 )}
 
+                                {/* Campos de Porcentagem */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input
+                                        label="Desconto (%)"
+                                        type="number"
+                                        value={formData.discountPercentage?.toString() || '0'}
+                                        onChange={(value) => handleInputChange('discountPercentage', parseFloat(value) || 0)}
+                                        min="0"
+                                        max="100"
+                                        step="0.01"
+                                        disabled={isSubmitting}
+                                        placeholder="0.00"
+                                    />
+                                    <Input
+                                        label="Adicional (%)"
+                                        type="number"
+                                        value={formData.additionPercentage?.toString() || '0'}
+                                        onChange={(value) => handleInputChange('additionPercentage', parseFloat(value) || 0)}
+                                        min="0"
+                                        max="100"
+                                        step="0.01"
+                                        disabled={isSubmitting}
+                                        placeholder="0.00"
+                                    />
+                                </div>
+
                                 {/* Resumo Financeiro Compacto */}
                                 <div className="p-3 bg-gray-700 rounded-md">
                                     <h4 className="font-medium text-white mb-2 text-sm">Resumo</h4>
                                     <div className="space-y-1 text-xs">
                                         <div className="flex justify-between">
                                             <span className="text-gray-300">Subtotal:</span>
-                                            <span className="font-medium">{formatCurrency(totals.servicesSum)}</span>
+                                            <span className="font-medium">{formatCurrency(safeServicesSum)}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-gray-300">Descontos:</span>
-                                            <span className="font-medium text-red-400">-{formatCurrency(totals.totalDiscount)}</span>
+                                            <span className="font-medium text-red-400">-{formatCurrency(safeTotalDiscount)}</span>
                                         </div>
+                                        {discountFromPercentage > 0 && (
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-300">Desconto ({safeDiscountPercentage}%):</span>
+                                                <span className="font-medium text-red-400">-{formatCurrency(discountFromPercentage)}</span>
+                                            </div>
+                                        )}
                                         <div className="flex justify-between">
                                             <span className="text-gray-300">Acréscimos:</span>
-                                            <span className="font-medium text-green-400">+{formatCurrency(totals.totalAddition)}</span>
+                                            <span className="font-medium text-green-400">+{formatCurrency(safeTotalAddition)}</span>
                                         </div>
+                                        {additionFromPercentage > 0 && (
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-300">Adicional ({safeAdditionPercentage}%):</span>
+                                                <span className="font-medium text-green-400">+{formatCurrency(additionFromPercentage)}</span>
+                                            </div>
+                                        )}
                                         <div className="flex justify-between pt-1 border-t border-gray-600">
                                             <span className="font-medium text-white">Total:</span>
                                             <span className="font-bold text-white">{formatCurrency(totalAmount)}</span>
+                                        </div>
+
+                                        {/* Campo oculto com 5% de acréscimo - só aparece no hover */}
+                                        <div className="opacity-0 hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                            <div className="flex justify-between pt-1 border-t border-gray-500">
+                                                <span className="font-medium text-yellow-400">Total + 5%:</span>
+                                                <span className="font-bold text-yellow-400">{formatCurrency(totalWith5Percent)}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

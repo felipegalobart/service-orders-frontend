@@ -62,6 +62,8 @@ export interface ServiceOrder {
   servicesSum: number;
   totalDiscount: number;
   totalAddition: number;
+  discountPercentage: number;
+  additionPercentage: number;
   totalAmountPaid: number;
   totalAmountLeft: number;
   isActive: boolean;
@@ -92,6 +94,8 @@ export interface CreateServiceOrderRequest {
   financial?: FinancialStatus;
   paymentType?: PaymentType;
   installmentCount?: number;
+  discountPercentage?: number;
+  additionPercentage?: number;
   services?: Omit<ServiceItem, 'total'>[];
 }
 

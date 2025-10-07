@@ -211,6 +211,11 @@ const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }
         totalAdicional = order.services.reduce((sum, service) => sum + parseDecimal(service.addition || 0), 0);
     }
 
+    // Calcular porcentagens
+    const servicesSum = parseDecimal(order.servicesSum) || 0;
+    const discountPercentage = parseDecimal(order.discountPercentage) || 0;
+    const discountFromPercentage = (servicesSum * discountPercentage) / 100;
+
     // Função para determinar a cor do badge financeiro
     const getFinancialStatusStyle = (status: string) => {
         const financialStatus = status?.toLowerCase() || '';
@@ -370,12 +375,18 @@ const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }
                         <View style={styles.totalSection}>
                             <View style={styles.totalRow}>
                                 <Text style={styles.totalLabel}>Subtotal:</Text>
-                                <Text style={styles.totalValue}>{formatCurrency(parseDecimal(order.totalAmountLeft) || totalGeral)}</Text>
+                                <Text style={styles.totalValue}>{formatCurrency(servicesSum || totalGeral)}</Text>
                             </View>
                             {totalDesconto > 0 && (
                                 <View style={styles.totalRow}>
                                     <Text style={styles.totalLabel}>Desconto Total:</Text>
                                     <Text style={styles.totalValue}>-{formatCurrency(totalDesconto)}</Text>
+                                </View>
+                            )}
+                            {discountFromPercentage > 0 && (
+                                <View style={styles.totalRow}>
+                                    <Text style={styles.totalLabel}>Desconto ({discountPercentage}%):</Text>
+                                    <Text style={styles.totalValue}>-{formatCurrency(discountFromPercentage)}</Text>
                                 </View>
                             )}
                             {totalAdicional > 0 && (
@@ -386,7 +397,7 @@ const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }
                             )}
                             <View style={styles.totalRow}>
                                 <Text style={[styles.totalLabel, { fontSize: 16 }]}>VALOR TOTAL:</Text>
-                                <Text style={[styles.totalValue, { fontSize: 18 }]}>{formatCurrency(parseDecimal(order.totalAmountLeft) || totalGeral)}</Text>
+                                <Text style={[styles.totalValue, { fontSize: 18 }]}>{formatCurrency(parseDecimal(order.totalAmountLeft) || (totalGeral - discountFromPercentage))}</Text>
                             </View>
                         </View>
                     </View>
