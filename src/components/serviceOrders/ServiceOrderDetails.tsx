@@ -95,8 +95,10 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
 
     const [isEditingInvoices, setIsEditingInvoices] = useState(false);
     const [invoicesForm, setInvoicesForm] = useState({
+        paymentType: 'cash',
         paymentMethod: '',
         paymentConditions: '',
+        installmentCount: 1,
         serviceInvoice: '',
         saleInvoice: '',
         shippingInvoice: '',
@@ -456,8 +458,10 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     const handleEditInvoices = () => {
         if (order) {
             setInvoicesForm({
+                paymentType: order.paymentType || 'cash',
                 paymentMethod: order.paymentMethod || '',
                 paymentConditions: order.paymentConditions || '',
+                installmentCount: order.installmentCount || 1,
                 serviceInvoice: order.serviceInvoice || '',
                 saleInvoice: order.saleInvoice || '',
                 shippingInvoice: order.shippingInvoice || '',
@@ -476,6 +480,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         try {
             const updateData = {
                 ...invoicesForm,
+                paymentType: invoicesForm.paymentType as 'cash' | 'installment' | 'store_credit',
                 paymentMethod: invoicesForm.paymentMethod as 'debit' | 'credit' | 'cash' | 'pix' | 'boleto' | 'transfer' | 'check' | undefined,
             };
             await apiService.updateServiceOrder(orderId, updateData);
@@ -1378,6 +1383,21 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     <CardContent>
                         {!isEditingInvoices ? (
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                {/* Tipo de Pagamento */}
+                                <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        <h4 className="font-semibold text-white text-sm">Tipo de Pagamento</h4>
+                                    </div>
+                                    <p className="text-sm text-gray-300">
+                                        {order.paymentType === 'cash' && 'À Vista'}
+                                        {order.paymentType === 'installment' && `Parcelado (${order.installmentCount || 1}x)`}
+                                        {order.paymentType === 'store_credit' && 'Crédito na Loja'}
+                                    </p>
+                                </div>
+
                                 {/* Método de Pagamento */}
                                 {order.paymentMethod && (
                                     <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
@@ -1446,6 +1466,33 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                         ) : (
                             /* Modo de Edição */
                             <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm text-gray-300 mb-2 font-semibold">Tipo de Pagamento</label>
+                                        <select
+                                            value={invoicesForm.paymentType}
+                                            onChange={(e) => setInvoicesForm({ ...invoicesForm, paymentType: e.target.value as 'cash' | 'installment' | 'store_credit' })}
+                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            <option value="cash">À Vista</option>
+                                            <option value="installment">Parcelado</option>
+                                            <option value="store_credit">Crédito na Loja</option>
+                                        </select>
+                                    </div>
+                                    {invoicesForm.paymentType === 'installment' && (
+                                        <div>
+                                            <label className="block text-sm text-gray-300 mb-2 font-semibold">Nº de Parcelas</label>
+                                            <input
+                                                type="number"
+                                                value={invoicesForm.installmentCount}
+                                                onChange={(e) => setInvoicesForm({ ...invoicesForm, installmentCount: parseInt(e.target.value) || 1 })}
+                                                min="1"
+                                                max="12"
+                                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                                 <div>
                                     <label className="block text-sm text-gray-300 mb-2 font-semibold">Método de Pagamento</label>
                                     <select
