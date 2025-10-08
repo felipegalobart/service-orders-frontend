@@ -67,10 +67,16 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         reportedDefect: '',
         customerObservations: '',
         notes: '',
+        warranty: false,
+        isReturn: false,
     });
 
     const [isEditingServices, setIsEditingServices] = useState(false);
     const [servicesForm, setServicesForm] = useState<ServiceItem[]>([]);
+    const [percentagesForm, setPercentagesForm] = useState({
+        discountPercentage: 0,
+        additionPercentage: 0,
+    });
 
     const [isEditingInvoices, setIsEditingInvoices] = useState(false);
     const [invoicesForm, setInvoicesForm] = useState({
@@ -79,6 +85,14 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         serviceInvoice: '',
         saleInvoice: '',
         shippingInvoice: '',
+    });
+
+    const [isEditingDates, setIsEditingDates] = useState(false);
+    const [datesForm, setDatesForm] = useState({
+        entryDate: '',
+        approvalDate: '',
+        expectedDeliveryDate: '',
+        deliveryDate: '',
     });
 
     // Buscar dados do cliente se não vier populado
@@ -244,16 +258,8 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         setIsPersonModalOpen(false);
     };
 
-    const handleOpenTimelineModal = () => {
-        setIsTimelineModalOpen(true);
-    };
-
     const handleCloseTimelineModal = () => {
         setIsTimelineModalOpen(false);
-    };
-
-    const handleEditServicesOld = () => {
-        navigate(`/service-orders/edit/${orderId}?focus=services`);
     };
 
     // Funções para edição inline de serviços
@@ -269,6 +275,10 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 total: parseDecimal(service.total),
             }));
             setServicesForm(servicesConverted);
+            setPercentagesForm({
+                discountPercentage: parseDecimal(order.discountPercentage) || 0,
+                additionPercentage: parseDecimal(order.additionPercentage) || 0,
+            });
             setIsEditingServices(true);
         }
     };
@@ -283,6 +293,8 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         try {
             await apiService.updateServiceOrder(orderId, {
                 services: servicesForm,
+                discountPercentage: Number(percentagesForm.discountPercentage) || 0,
+                additionPercentage: Number(percentagesForm.additionPercentage) || 0,
             });
 
             // Invalidar cache e refetch
@@ -349,6 +361,8 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 reportedDefect: order.reportedDefect || '',
                 customerObservations: order.customerObservations || '',
                 notes: order.notes || '',
+                warranty: order.warranty || false,
+                isReturn: order.isReturn || false,
             });
             setIsEditingNotes(true);
         }
@@ -402,7 +416,10 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         if (!order) return;
 
         try {
-            await apiService.updateServiceOrder(orderId, invoicesForm);
+            await apiService.updateServiceOrder(orderId, {
+                ...invoicesForm,
+                paymentMethod: invoicesForm.paymentMethod || undefined,
+            } as any);
 
             // Invalidar cache e refetch
             await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
@@ -416,6 +433,45 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
             const errorMessage = error instanceof Error
                 ? `Erro ao atualizar notas fiscais: ${error.message}`
                 : 'Erro ao atualizar notas fiscais. Tente novamente.';
+            showNotification(errorMessage, 'error');
+        }
+    };
+
+    // Funções para edição inline de datas
+    const handleEditDates = () => {
+        if (order) {
+            setDatesForm({
+                entryDate: order.entryDate ? order.entryDate.split('T')[0] : '',
+                approvalDate: order.approvalDate ? order.approvalDate.split('T')[0] : '',
+                expectedDeliveryDate: order.expectedDeliveryDate ? order.expectedDeliveryDate.split('T')[0] : '',
+                deliveryDate: order.deliveryDate ? order.deliveryDate.split('T')[0] : '',
+            });
+            setIsEditingDates(true);
+        }
+    };
+
+    const handleCancelEditDates = () => {
+        setIsEditingDates(false);
+    };
+
+    const handleSaveDates = async () => {
+        if (!order) return;
+
+        try {
+            await apiService.updateServiceOrder(orderId, datesForm);
+
+            // Invalidar cache e refetch
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
+            await queryClient.refetchQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
+            setIsEditingDates(false);
+            showNotification('Datas atualizadas com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao atualizar datas:', error);
+            const errorMessage = error instanceof Error
+                ? `Erro ao atualizar datas: ${error.message}`
+                : 'Erro ao atualizar datas. Tente novamente.';
             showNotification(errorMessage, 'error');
         }
     };
@@ -610,7 +666,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     </div>
                 </div>
 
-                {/* Informações Básicas - Cliente e Equipamento Compactos */}
+                {/* Informações Básicas - Cliente, Equipamento e Datas */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Cliente - Compacto */}
                     <Card
@@ -760,46 +816,106 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                         </CardContent>
                     </Card>
 
-                    {/* Timeline + Financeiro - Compacto */}
+                    {/* Datas - Edição Inline */}
                     <Card
-                        className="cursor-pointer hover:bg-gray-700/50 transition-colors duration-200 group"
-                        onClick={handleOpenTimelineModal}
+                        className={!isEditingDates ? "cursor-pointer hover:bg-gray-700/50 transition-colors duration-200" : ""}
+                        onClick={!isEditingDates ? handleEditDates : undefined}
                     >
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2 mb-3">
-                                <svg className="h-4 w-4 text-gray-400 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                <h3 className="text-xs font-semibold text-gray-400 uppercase group-hover:text-blue-400 transition-colors">Timeline</h3>
-                                <svg className="h-3 w-3 text-gray-500 ml-auto group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                            <div className="space-y-1">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-xs text-gray-400">Entrada:</span>
-                                    <span className="text-xs text-white">{formatDate(order.entryDate)}</span>
-                                </div>
-                                {order.approvalDate && (
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xs text-gray-400">Aprovado:</span>
-                                        <span className="text-xs text-green-400">{formatDate(order.approvalDate)}</span>
-                                    </div>
+                                <h3 className="text-xs font-semibold text-gray-400 uppercase">Datas</h3>
+                                {!isEditingDates && (
+                                    <svg className="h-3 w-3 text-gray-500 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
                                 )}
-                                {order.deliveryDate && (
+                            </div>
+
+                            {!isEditingDates ? (
+                                <div className="space-y-2">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-xs text-gray-400">Entrega:</span>
-                                        <span className="text-xs text-blue-400">{formatDate(order.deliveryDate)}</span>
+                                        <span className="text-sm text-gray-400">Entrada:</span>
+                                        <span className="text-sm font-medium text-white">{formatDate(order.entryDate)}</span>
                                     </div>
-                                )}
-                                <div className="pt-2 border-t border-gray-700">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xs text-gray-400">Total:</span>
-                                        <span className="text-sm font-bold text-white">{formatCurrency(totalAmount)}</span>
+                                    {order.approvalDate && (
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm text-gray-400">Aprovação:</span>
+                                            <span className="text-sm font-medium text-green-400">{formatDate(order.approvalDate)}</span>
+                                        </div>
+                                    )}
+                                    {order.expectedDeliveryDate && (
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm text-gray-400">Previsão:</span>
+                                            <span className="text-sm font-medium text-yellow-400">{formatDate(order.expectedDeliveryDate)}</span>
+                                        </div>
+                                    )}
+                                    {order.deliveryDate && (
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm text-gray-400">Entrega:</span>
+                                            <span className="text-sm font-medium text-blue-400">{formatDate(order.deliveryDate)}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="block text-xs text-gray-400 mb-1">Entrada *</label>
+                                        <input
+                                            type="date"
+                                            value={datesForm.entryDate}
+                                            onChange={(e) => setDatesForm({ ...datesForm, entryDate: e.target.value })}
+                                            className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-400 mb-1">Aprovação</label>
+                                        <input
+                                            type="date"
+                                            value={datesForm.approvalDate}
+                                            onChange={(e) => setDatesForm({ ...datesForm, approvalDate: e.target.value })}
+                                            className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-400 mb-1">Previsão</label>
+                                        <input
+                                            type="date"
+                                            value={datesForm.expectedDeliveryDate}
+                                            onChange={(e) => setDatesForm({ ...datesForm, expectedDeliveryDate: e.target.value })}
+                                            className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-400 mb-1">Entrega</label>
+                                        <input
+                                            type="date"
+                                            value={datesForm.deliveryDate}
+                                            onChange={(e) => setDatesForm({ ...datesForm, deliveryDate: e.target.value })}
+                                            className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                    <div className="flex gap-2 mt-2">
+                                        <Button
+                                            onClick={handleSaveDates}
+                                            variant="primary"
+                                            size="sm"
+                                        >
+                                            Salvar
+                                        </Button>
+                                        <Button
+                                            onClick={handleCancelEditDates}
+                                            variant="secondary"
+                                            size="sm"
+                                        >
+                                            Cancelar
+                                        </Button>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>
@@ -916,6 +1032,40 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                     onChange={setServicesForm}
                                     autoFocus={true}
                                 />
+
+                                {/* Campos de Desconto e Acréscimo em Porcentagem */}
+                                <div className="grid grid-cols-2 gap-4 p-4 bg-gray-700/30 rounded-lg border border-gray-600">
+                                    <div>
+                                        <label className="block text-sm text-gray-300 mb-2 font-semibold">
+                                            Desconto (%)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={percentagesForm.discountPercentage}
+                                            onChange={(e) => setPercentagesForm({ ...percentagesForm, discountPercentage: Number(e.target.value) || 0 })}
+                                            min="0"
+                                            max="100"
+                                            step="0.01"
+                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm text-gray-300 mb-2 font-semibold">
+                                            Acréscimo (%)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={percentagesForm.additionPercentage}
+                                            onChange={(e) => setPercentagesForm({ ...percentagesForm, additionPercentage: Number(e.target.value) || 0 })}
+                                            min="0"
+                                            max="100"
+                                            step="0.01"
+                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                </div>
 
                                 {/* 5% do total escondido (aparece no hover) */}
                                 {servicesForm.length > 0 && (() => {
@@ -1041,6 +1191,62 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                         placeholder="Notas internas sobre o serviço..."
                                     />
                                 </div>
+
+                                {/* Toggles de Garantia e Retorno */}
+                                <div className="flex gap-6 p-3 bg-gray-700/30 rounded-lg">
+                                    <div className="flex items-center space-x-3">
+                                        <span className="text-sm font-medium text-gray-300">Garantia:</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setNotesForm({ ...notesForm, warranty: !notesForm.warranty })}
+                                            className={`
+                                                relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-opacity-50
+                                                ${notesForm.warranty
+                                                    ? 'bg-green-600 focus:ring-green-300'
+                                                    : 'bg-gray-600 focus:ring-gray-300 hover:bg-gray-500'
+                                                }
+                                                cursor-pointer
+                                            `}
+                                        >
+                                            <span
+                                                className={`
+                                                    inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform duration-300
+                                                    ${notesForm.warranty ? 'translate-x-6' : 'translate-x-1'}
+                                                `}
+                                            />
+                                        </button>
+                                        <span className={`text-xs font-bold ${notesForm.warranty ? 'text-green-400' : 'text-gray-500'}`}>
+                                            {notesForm.warranty ? 'SIM' : 'NÃO'}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center space-x-3">
+                                        <span className="text-sm font-medium text-gray-300">Retorno:</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setNotesForm({ ...notesForm, isReturn: !notesForm.isReturn })}
+                                            className={`
+                                                relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-opacity-50
+                                                ${notesForm.isReturn
+                                                    ? 'bg-orange-600 focus:ring-orange-300'
+                                                    : 'bg-gray-600 focus:ring-gray-300 hover:bg-gray-500'
+                                                }
+                                                cursor-pointer
+                                            `}
+                                        >
+                                            <span
+                                                className={`
+                                                    inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform duration-300
+                                                    ${notesForm.isReturn ? 'translate-x-6' : 'translate-x-1'}
+                                                `}
+                                            />
+                                        </button>
+                                        <span className={`text-xs font-bold ${notesForm.isReturn ? 'text-orange-400' : 'text-gray-500'}`}>
+                                            {notesForm.isReturn ? 'SIM' : 'NÃO'}
+                                        </span>
+                                    </div>
+                                </div>
+
                                 <div className="flex gap-2">
                                     <Button
                                         onClick={handleSaveNotes}
@@ -1226,8 +1432,8 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                 </div>
                             </div>
                         )}
-                        </CardContent>
-                    </Card>
+                    </CardContent>
+                </Card>
 
                 {/* Modal de Detalhes do Cliente */}
                 <PersonDetailsModal

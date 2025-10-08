@@ -5,10 +5,11 @@ import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { LoadingSpinner } from '../../../components/ui/Loading';
 import { CustomerDetails, StatusDropdown, OrderNumberSearch, FiltersModal } from '../../../components/serviceOrders';
+import { TimelineModal } from '../../../components/ui/Modal/TimelineModal';
 import { Pagination } from '../../../components/ui/Pagination';
 import { useServiceOrders } from '../../../hooks/useServiceOrders';
 import { formatDate, formatServiceOrderStatus, formatFinancialStatus, isOverdue } from '../../../utils/formatters';
-import type { ServiceOrderFilters as ServiceOrderFiltersType } from '../../../types/serviceOrder';
+import type { ServiceOrderFilters as ServiceOrderFiltersType, ServiceOrder } from '../../../types/serviceOrder';
 
 const ServiceOrderList: React.FC = () => {
     const navigate = useNavigate();
@@ -19,6 +20,8 @@ const ServiceOrderList: React.FC = () => {
     const [orderNumberSearch, setOrderNumberSearch] = useState('');
     const [hasSearchedOrderNumber, setHasSearchedOrderNumber] = useState(false);
     const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
+    const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
+    const [selectedOrderForTimeline, setSelectedOrderForTimeline] = useState<ServiceOrder | null>(null);
 
     const { data, isLoading, error } = useServiceOrders(filters);
 
@@ -71,6 +74,16 @@ const ServiceOrderList: React.FC = () => {
             ...prev,
             page
         }));
+    };
+
+    const handleOpenTimelineModal = (order: ServiceOrder) => {
+        setSelectedOrderForTimeline(order);
+        setIsTimelineModalOpen(true);
+    };
+
+    const handleCloseTimelineModal = () => {
+        setIsTimelineModalOpen(false);
+        setSelectedOrderForTimeline(null);
     };
 
     const hasActiveFilters = () => {
@@ -321,12 +334,22 @@ const ServiceOrderList: React.FC = () => {
                                                 </div>
 
                                                 {/* Card de Timeline */}
-                                                <div className="bg-gray-700/30 rounded-lg p-4 border border-gray-600">
+                                                <div
+                                                    className="bg-gray-700/30 rounded-lg p-4 border border-gray-600 cursor-pointer hover:bg-gray-700/50 transition-colors duration-200"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleOpenTimelineModal(order);
+                                                    }}
+                                                >
                                                     <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
                                                         <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
                                                         Timeline
+                                                        <svg className="h-3 w-3 text-gray-500 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
                                                     </h4>
 
                                                     <div className="space-y-2 text-sm">
@@ -510,6 +533,15 @@ const ServiceOrderList: React.FC = () => {
                 isOpen={isFiltersModalOpen}
                 onClose={() => setIsFiltersModalOpen(false)}
             />
+
+            {/* Modal de Timeline */}
+            {selectedOrderForTimeline && (
+                <TimelineModal
+                    order={selectedOrderForTimeline}
+                    isOpen={isTimelineModalOpen}
+                    onClose={handleCloseTimelineModal}
+                />
+            )}
         </div>
     );
 };
