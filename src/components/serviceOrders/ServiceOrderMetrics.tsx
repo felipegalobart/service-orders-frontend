@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { LoadingSpinner } from '../ui/Loading';
-import { formatCurrency, formatDate } from '../../utils/formatters';
+import { formatCurrency, formatDate, parseDecimal } from '../../utils/formatters';
 import { useServiceOrders } from '../../hooks/useServiceOrders';
 import type { ServiceOrderMetrics as ServiceOrderMetricsType, ServiceOrder } from '../../types/serviceOrder';
 
@@ -41,12 +41,32 @@ export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ classN
         return expectedDate < today;
     };
 
+    // Função para calcular o valor total real de uma ordem
+    const calculateOrderTotal = (order: ServiceOrder): number => {
+        const servicesSum = parseDecimal(order.servicesSum) || 0;
+        const totalDiscount = parseDecimal(order.totalDiscount) || 0;
+        const totalAddition = parseDecimal(order.totalAddition) || 0;
+        const discountPercentage = parseDecimal(order.discountPercentage) || 0;
+        const additionPercentage = parseDecimal(order.additionPercentage) || 0;
+
+        const discountFromPercentage = (servicesSum * discountPercentage) / 100;
+        const additionFromPercentage = (servicesSum * additionPercentage) / 100;
+
+        return servicesSum - totalDiscount - discountFromPercentage + totalAddition + additionFromPercentage;
+    };
+
     // Calcular métricas
     const metrics: ServiceOrderMetricsType = {
         totalOrders: orders.length,
         pendingOrders: orders.filter(order => order.status === 'confirmar').length,
         completedOrders: orders.filter(order => order.status === 'entregue').length,
-        totalRevenue: orders.reduce((sum, order) => sum + order.totalAmountPaid, 0),
+        totalRevenue: orders
+            .filter(order =>
+                order.financial === 'pago' ||
+                order.financial === 'parcialmente_pago' ||
+                order.financial === 'faturado'
+            )
+            .reduce((sum, order) => sum + calculateOrderTotal(order), 0),
         averageCompletionTime: 0, // Será calculado abaixo
         ordersByStatus: {
             confirmar: orders.filter(order => order.status === 'confirmar').length,
@@ -140,7 +160,7 @@ export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ classN
 
                 <Card>
                     <CardContent className="p-6 text-center">
-                        <div className="text-3xl font-bold text-purple-400 mb-2">
+                        <div className="text-xl font-bold text-purple-400 mb-2 whitespace-nowrap">
                             {formatCurrency(metrics.totalRevenue)}
                         </div>
                         <div className="text-gray-400">Receita Total</div>
