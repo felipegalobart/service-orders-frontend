@@ -72,6 +72,15 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     const [isEditingServices, setIsEditingServices] = useState(false);
     const [servicesForm, setServicesForm] = useState<ServiceItem[]>([]);
 
+    const [isEditingInvoices, setIsEditingInvoices] = useState(false);
+    const [invoicesForm, setInvoicesForm] = useState({
+        paymentMethod: '',
+        paymentConditions: '',
+        serviceInvoice: '',
+        saleInvoice: '',
+        shippingInvoice: '',
+    });
+
     // Buscar dados do cliente se não vier populado
     const { data: customer } = useQuery({
         queryKey: ['customer', order?.customerId],
@@ -367,6 +376,46 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
             const errorMessage = error instanceof Error
                 ? `Erro ao atualizar informações: ${error.message}`
                 : 'Erro ao atualizar informações. Tente novamente.';
+            showNotification(errorMessage, 'error');
+        }
+    };
+
+    // Funções para edição inline de notas fiscais
+    const handleEditInvoices = () => {
+        if (order) {
+            setInvoicesForm({
+                paymentMethod: order.paymentMethod || '',
+                paymentConditions: order.paymentConditions || '',
+                serviceInvoice: order.serviceInvoice || '',
+                saleInvoice: order.saleInvoice || '',
+                shippingInvoice: order.shippingInvoice || '',
+            });
+            setIsEditingInvoices(true);
+        }
+    };
+
+    const handleCancelEditInvoices = () => {
+        setIsEditingInvoices(false);
+    };
+
+    const handleSaveInvoices = async () => {
+        if (!order) return;
+
+        try {
+            await apiService.updateServiceOrder(orderId, invoicesForm);
+
+            // Invalidar cache e refetch
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
+            await queryClient.refetchQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
+            setIsEditingInvoices(false);
+            showNotification('Notas fiscais atualizadas com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao atualizar notas fiscais:', error);
+            const errorMessage = error instanceof Error
+                ? `Erro ao atualizar notas fiscais: ${error.message}`
+                : 'Erro ao atualizar notas fiscais. Tente novamente.';
             showNotification(errorMessage, 'error');
         }
     };
@@ -913,20 +962,18 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 </Card>
 
                 {/* Observações e Defeitos - com Edição Inline */}
-                <Card>
+                <Card
+                    className={!isEditingNotes ? "cursor-pointer hover:bg-gray-700/50 transition-colors duration-200" : ""}
+                    onClick={!isEditingNotes ? handleEditNotes : undefined}
+                >
                     <CardHeader>
                         <div className="flex items-center justify-between">
                             <CardTitle>Informações do Serviço</CardTitle>
                             {!isEditingNotes && (
-                                <button
-                                    onClick={handleEditNotes}
-                                    className="p-2 rounded hover:bg-gray-600 transition-colors"
-                                    title="Editar informações"
-                                >
-                                    <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </button>
+                                <svg className="h-3 w-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
                             )}
                         </div>
                     </CardHeader>
@@ -1024,13 +1071,24 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     </CardContent>
                 </Card>
 
-                {/* Notas Fiscais - Opcional */}
-                {(order.paymentMethod || order.paymentConditions || order.serviceInvoice || order.saleInvoice || order.shippingInvoice) && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Notas Fiscais</CardTitle>
-                        </CardHeader>
-                        <CardContent>
+                {/* Notas Fiscais - com Edição Inline */}
+                <Card
+                    className={!isEditingInvoices ? "cursor-pointer hover:bg-gray-700/50 transition-colors duration-200" : ""}
+                    onClick={!isEditingInvoices ? handleEditInvoices : undefined}
+                >
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <CardTitle>Notas Fiscais & Pagamento</CardTitle>
+                            {!isEditingInvoices && (
+                                <svg className="h-3 w-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            )}
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        {!isEditingInvoices ? (
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 {/* Método de Pagamento */}
                                 {order.paymentMethod && (
@@ -1097,9 +1155,88 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                     </div>
                                 )}
                             </div>
+                        ) : (
+                            /* Modo de Edição */
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm text-gray-300 mb-2 font-semibold">Método de Pagamento</label>
+                                    <select
+                                        value={invoicesForm.paymentMethod}
+                                        onChange={(e) => setInvoicesForm({ ...invoicesForm, paymentMethod: e.target.value })}
+                                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                        <option value="">Selecione...</option>
+                                        <option value="debit">Débito</option>
+                                        <option value="credit">Crédito</option>
+                                        <option value="cash">Dinheiro</option>
+                                        <option value="pix">PIX</option>
+                                        <option value="boleto">Boleto</option>
+                                        <option value="transfer">Transferência</option>
+                                        <option value="check">Cheque</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm text-gray-300 mb-2 font-semibold">Condições de Pagamento</label>
+                                    <textarea
+                                        value={invoicesForm.paymentConditions}
+                                        onChange={(e) => setInvoicesForm({ ...invoicesForm, paymentConditions: e.target.value })}
+                                        rows={2}
+                                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Ex: À vista, 3x sem juros..."
+                                    />
+                                </div>
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-sm text-gray-300 mb-2 font-semibold">NF de Serviço</label>
+                                        <input
+                                            type="text"
+                                            value={invoicesForm.serviceInvoice}
+                                            onChange={(e) => setInvoicesForm({ ...invoicesForm, serviceInvoice: e.target.value })}
+                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Número da NF..."
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm text-gray-300 mb-2 font-semibold">NF de Retorno</label>
+                                        <input
+                                            type="text"
+                                            value={invoicesForm.saleInvoice}
+                                            onChange={(e) => setInvoicesForm({ ...invoicesForm, saleInvoice: e.target.value })}
+                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Número da NF..."
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm text-gray-300 mb-2 font-semibold">NF de Remessa</label>
+                                        <input
+                                            type="text"
+                                            value={invoicesForm.shippingInvoice}
+                                            onChange={(e) => setInvoicesForm({ ...invoicesForm, shippingInvoice: e.target.value })}
+                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Número da NF..."
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={handleSaveInvoices}
+                                        variant="primary"
+                                        size="sm"
+                                    >
+                                        Salvar
+                                    </Button>
+                                    <Button
+                                        onClick={handleCancelEditInvoices}
+                                        variant="secondary"
+                                        size="sm"
+                                    >
+                                        Cancelar
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                         </CardContent>
                     </Card>
-                )}
 
                 {/* Modal de Detalhes do Cliente */}
                 <PersonDetailsModal
