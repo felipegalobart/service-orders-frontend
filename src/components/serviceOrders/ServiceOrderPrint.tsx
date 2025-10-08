@@ -54,11 +54,17 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order, onB
                     </div>
 
                     {/* Grid de 3 colunas com informações da empresa */}
-                    <div className="grid grid-cols-2 gap-1 mb-1 mt-1">
-                        {/* Coluna 1: Número da OS */}
+                    <div className="grid grid-cols-3 gap-1 mb-1 mt-1">
+                        {/* Coluna 1: Número da OS e Nome da Empresa */}
                         <div className="text-center border border-gray-400 rounded-lg p-1">
                             <p>MITSUWA ELETRO MECANICA LTDA</p>
                             <p className="text-4xl font-bold text-gray-900">OS N° {formatOrderNumber(order.orderNumber)}</p>
+                        </div>
+
+                        {/* Coluna 2: Data de Entrada */}
+                        <div className="text-center border border-gray-400 rounded-lg p-1 flex flex-col justify-center items-center">
+                            <p className="font-semibold">ENTRADA:</p>
+                            <p className="text-2xl font-bold text-gray-900">{formatDate(order.entryDate)}</p>
                         </div>
 
                         {/* Coluna 3: Contatos */}
@@ -72,53 +78,53 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order, onB
                 </div>
 
                 {/* Dados do Cliente e Equipamento */}
-                <div className="grid grid-cols-2 gap-6 mb-1 text-sm">
-                    <div>
-                        <div className="space-y-1">
-                            <div className="flex">
-                                <span className="w-20 font-semibold">Nome:</span>
-                                <span>{formatUpperCase(order.customer?.name || order.customerId || 'Cliente não informado')}</span>
-                            </div>
-                            <div className="flex">
-                                <span className="w-20 font-semibold">Produto:</span>
-                                <span>{formatUpperCase(order.equipment)}</span>
-                            </div>
-                            <div className="flex">
-                                <span className="w-20 font-semibold">Modelo:</span>
-                                <span>{formatUpperCase(order.model || '-')}</span>
-                            </div>
-                            <div className="flex">
-                                <span className="w-20 font-semibold">Entrada:</span>
-                                <span>{formatDate(order.entryDate)}</span>
-                            </div>
-
-                        </div>
+                <div className="mb-1 text-sm">
+                    {/* Nome em linha completa */}
+                    <div className="flex mb-1">
+                        <span className="w-20 font-semibold">Nome:</span>
+                        <span>{formatUpperCase(order.customer?.name || order.customerId || 'Cliente não informado')}</span>
                     </div>
-                    <div>
-                        <div className="space-y-1">
-                            <div className="flex">
-                                <span className="w-20 font-semibold">Telefone:</span>
-                                <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
+
+                    {/* Grid com 2 colunas */}
+                    <div className="grid grid-cols-2 gap-6">
+                        <div>
+                            <div className="space-y-1">
+                                <div className="flex">
+                                    <span className="w-20 font-semibold">Produto:</span>
+                                    <span>{formatUpperCase(order.equipment)}</span>
+                                </div>
+                                <div className="flex">
+                                    <span className="w-20 font-semibold">Modelo:</span>
+                                    <span>{formatUpperCase(order.model || '-')}</span>
+                                </div>
+                                <div className="flex">
+                                    <span className="w-20 font-semibold">Fabricante:</span>
+                                    <span>{formatUpperCase(order.brand || '-')}</span>
+                                </div>
                             </div>
-                            <div className="flex">
-                                <span className="w-20 font-semibold">Acessórios:</span>
-                                <span>{formatUpperCase(order.accessories || '-')}</span>
-                            </div>
-                            <div className="flex">
-                                <span className="w-20 font-semibold">Fabricante:</span>
-                                <span>{formatUpperCase(order.brand || '-')}</span>
-                            </div>
-                            <div className="flex">
-                                <span className="w-20 font-semibold">Celular:</span>
-                                <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
+                        </div>
+                        <div>
+                            <div className="space-y-1">
+                                <div className="flex">
+                                    <span className="w-20 font-semibold">Telefone:</span>
+                                    <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
+                                </div>
+                                <div className="flex">
+                                    <span className="w-20 font-semibold">Celular:</span>
+                                    <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
+                                </div>
+                                <div className="flex">
+                                    <span className="w-20 font-semibold">Acessórios:</span>
+                                    <span>{formatUpperCase(order.accessories || '-')}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Observações */}
-                <div className="mb-2 border border-gray-400 p-2 text-center">
-                    <h3 className="font-bold mb-1 text-xl">OBSERVAÇÕES</h3>
+                <div className="mb-1 border border-gray-400 p-1 text-center">
+                    <h3 className="font-bold mb-1 text-sm">OBSERVAÇÕES</h3>
                     <div className="space-y-0 text-xs">
                         <p>• GARANTIA DOS SERVIÇOS EFETUADOS: 90 DIAS</p>
                         <p>• VALIDADE DO ORÇAMENTO: 30 DIAS</p>
@@ -129,7 +135,6 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order, onB
 
                 {/* Linha de recorte */}
                 <div className="mt-3 border-t border-dashed border-gray-600 text-center">
-                    <span className="text-xs text-gray-500 bg-white px-2">--- RECORTAR AQUI ---</span>
                 </div>
 
                 {/* Seção do Orçamento */}
@@ -146,55 +151,63 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order, onB
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6 mb-1 text-sm">
-                        <div>
-                            <div className="space-y-1">
-                                <div className="flex">
-                                    <span className="w-20 font-semibold">Nome:</span>
-                                    <span>{formatUpperCase(order.customer?.name || order.customerId || 'Cliente não informado')}</span>
+                    <div className="mb-1 text-sm">
+                        {/* Nome em linha completa com truncate */}
+                        <div className="flex mb-1">
+                            <span className="w-20 font-semibold flex-shrink-0">Nome:</span>
+                            <span className="truncate flex-1 overflow-hidden" style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {formatUpperCase(order.customer?.name || order.customerId || 'Cliente não informado')}
+                            </span>
+                        </div>
+
+                        {/* Grid com 2 colunas */}
+                        <div className="grid grid-cols-2 gap-6">
+                            <div>
+                                <div className="space-y-1">
+                                    <div className="flex">
+                                        <span className="w-20 font-semibold">Aprovado</span>
+                                        <span className="min-w-20">_____ / _____ / _____</span>
+                                    </div>
+                                    <div className="flex">
+                                        <span className="w-20 font-semibold">Produto:</span>
+                                        <span>{formatUpperCase(order.equipment)}</span>
+                                    </div>
+                                    <div className="flex">
+                                        <span className="w-20 font-semibold">Fabricante:</span>
+                                        <span>{formatUpperCase(order.brand || '-')}</span>
+                                    </div>
+                                    <div className="flex">
+                                        <span className="w-20 font-semibold">Modelo:</span>
+                                        <span>{formatUpperCase(order.model || '-')}</span>
+                                    </div>
                                 </div>
-                                <div className="flex">
-                                    <span className="w-20 font-semibold">Aprovado</span>
-                                    <span className="min-w-20">_____ / _____ / _____</span>
-                                </div>
-                                <div className="flex">
-                                    <span className="w-20 font-semibold">Produto:</span>
-                                    <span>{formatUpperCase(order.equipment)}</span>
-                                </div>
-                                <div className="flex">
-                                    <span className="w-20 font-semibold">Fabricante:</span>
-                                    <span>{formatUpperCase(order.brand || '-')}</span>
-                                </div>
-                                <div className="flex">
-                                    <span className="w-20 font-semibold">Modelo:</span>
-                                    <span>{formatUpperCase(order.model || '-')}</span>
+                            </div>
+                            <div>
+                                <div className="space-y-1">
+                                    <div className="flex">
+                                        <span className="w-20 font-semibold">Previsão:</span>
+                                        <span className="min-w-20">_____ / _____ / _____</span>
+                                    </div>
+                                    <div className="flex">
+                                        <span className="w-20 font-semibold">Telefone:</span>
+                                        <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
+                                    </div>
+                                    <div className="flex">
+                                        <span className="w-20 font-semibold">Celular:</span>
+                                        <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
+                                    </div>
+                                    <div className="flex">
+                                        <span className="w-20 font-semibold">Tensão:</span>
+                                        <span>{formatUpperCase(order.voltage || '-')}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div>
-                            <div className="space-y-1">
-                                <div className="flex">
-                                    <span className="w-20 font-semibold">Telefone:</span>
-                                    <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
-                                </div>
-                                <div className="flex">
-                                    <span className="w-20 font-semibold">Previsão:</span>
-                                    <span className="min-w-20">_____ / _____ / _____</span>
-                                </div>
-                                <div className="flex">
-                                    <span className="w-20 font-semibold">Celular:</span>
-                                    <span>{formatPhoneNumber(order.customer?.contacts?.find(c => c.phone)?.phone || '') || '-'}</span>
-                                </div>
-                                <div className="flex">
-                                    <span className="w-20 font-semibold">Tensão:</span>
-                                    <span>{formatUpperCase(order.voltage || '-')}</span>
-                                </div>
-                                <div className="flex items-center">
-                                    <span className="w-20 font-semibold">Garantia?</span>
-                                    <input type="checkbox" checked={order.warranty} readOnly className="ml-2" />
-                                </div>
 
-                            </div>
+                        {/* Garantia em linha separada */}
+                        <div className="flex items-center mt-1">
+                            <span className="w-20 font-semibold">Garantia?</span>
+                            <input type="checkbox" checked={order.warranty} readOnly className="ml-2" />
                         </div>
                     </div>
                 </div>
@@ -290,7 +303,7 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order, onB
             padding: 0;
             background: white;
             font-size: 8px;
-            line-height: 0.9;
+            line-height: 0.8;
             color: black;
             font-family: 'Spranq Eco Sans Print', Arial, sans-serif !important;
           }
@@ -399,11 +412,19 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order, onB
             flex-shrink: 0 !important;
           }
           
-          /* Campo de defeito - uma linha só com truncate */
+          /* Campo de defeito e nome - uma linha só com truncate */
           .truncate {
             overflow: hidden !important;
             text-overflow: ellipsis !important;
             white-space: nowrap !important;
+            max-width: 100% !important;
+            display: block !important;
+          }
+          
+          /* Para truncate funcionar dentro de flex, garantir largura do pai */
+          .flex .truncate {
+            flex: 1 !important;
+            min-width: 0 !important;
           }
           
           .flex-1 {
