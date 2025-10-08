@@ -30,9 +30,11 @@ export const useServiceOrders = (filters: ServiceOrderFilters = {}) => {
   return useQuery({
     queryKey: serviceOrderKeys.list(filters),
     queryFn: () => apiService.getServiceOrders(filters),
-    staleTime: hasSearch ? 0 : 5 * 60 * 1000, // Sem cache para busca
-    gcTime: hasSearch ? 0 : 10 * 60 * 1000, // Sem cache para busca
-    refetchOnWindowFocus: hasSearch, // Refetch quando foca na janela se há busca
+    staleTime: hasSearch ? 0 : 30 * 1000, // 30 segundos (reduzido para sincronizar mais rápido)
+    gcTime: hasSearch ? 0 : 10 * 60 * 1000,
+    refetchOnWindowFocus: true, // Sempre refetch ao focar na janela
+    refetchInterval: 30 * 1000, // Atualiza automaticamente a cada 30 segundos
+    refetchIntervalInBackground: false, // Não atualiza quando a aba está em background
   });
 };
 

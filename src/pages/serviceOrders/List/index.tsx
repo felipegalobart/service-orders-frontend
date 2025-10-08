@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
@@ -22,8 +22,16 @@ const ServiceOrderList: React.FC = () => {
     const [isFiltersModalOpen, setIsFiltersModalOpen] = useState(false);
     const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
     const [selectedOrderForTimeline, setSelectedOrderForTimeline] = useState<ServiceOrder | null>(null);
+    const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
-    const { data, isLoading, error } = useServiceOrders(filters);
+    const { data, isLoading, error, isFetching, dataUpdatedAt } = useServiceOrders(filters);
+
+    // Atualizar timestamp quando dados mudam
+    useEffect(() => {
+        if (dataUpdatedAt) {
+            setLastUpdate(new Date(dataUpdatedAt));
+        }
+    }, [dataUpdatedAt]);
 
     const handleFiltersChange = (newFilters: ServiceOrderFiltersType) => {
         setFilters(newFilters);
@@ -212,8 +220,25 @@ const ServiceOrderList: React.FC = () => {
                     </Button>
                 </div>
 
-                <div className="text-sm text-gray-400">
-                    {data?.total || 0} ordens encontradas
+                <div className="flex items-center gap-3">
+                    <div className="text-sm text-gray-400">
+                        {data?.total || 0} ordens encontradas
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                        {isFetching ? (
+                            <>
+                                <div className="animate-spin h-3 w-3 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                                <span>Atualizando...</span>
+                            </>
+                        ) : (
+                            <>
+                                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <span>
+                                    Atualizado às {lastUpdate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
 
