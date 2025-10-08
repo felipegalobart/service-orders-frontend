@@ -26,7 +26,8 @@ import { PersonDetailsModal } from '../ui/Modal/PersonDetailsModal';
 import { TimelineModal } from '../ui/Modal/TimelineModal';
 import { useNotification, Notification } from '../ui/Notification';
 import { ServiceOrderActionsModal } from './ServiceOrderActionsModal';
-import type { ServiceOrderStatus, FinancialStatus } from '../../types/serviceOrder';
+import { ServiceItemsManager } from './ServiceItemsManager';
+import type { ServiceOrderStatus, FinancialStatus, ServiceItem } from '../../types/serviceOrder';
 
 interface ServiceOrderDetailsProps {
     orderId: string;
@@ -67,6 +68,9 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         customerObservations: '',
         notes: '',
     });
+
+    const [isEditingServices, setIsEditingServices] = useState(false);
+    const [servicesForm, setServicesForm] = useState<ServiceItem[]>([]);
 
     // Buscar dados do cliente se não vier populado
     const { data: customer } = useQuery({
@@ -239,8 +243,53 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         setIsTimelineModalOpen(false);
     };
 
-    const handleEditServices = () => {
+    const handleEditServicesOld = () => {
         navigate(`/service-orders/edit/${orderId}?focus=services`);
+    };
+
+    // Funções para edição inline de serviços
+    const handleEditServicesInline = () => {
+        if (order) {
+            // Converter todos os valores Decimal128 para números
+            const servicesConverted = (order.services || []).map(service => ({
+                description: service.description,
+                quantity: parseDecimal(service.quantity),
+                value: parseDecimal(service.value),
+                discount: parseDecimal(service.discount),
+                addition: parseDecimal(service.addition),
+                total: parseDecimal(service.total),
+            }));
+            setServicesForm(servicesConverted);
+            setIsEditingServices(true);
+        }
+    };
+
+    const handleCancelEditServices = () => {
+        setIsEditingServices(false);
+    };
+
+    const handleSaveServices = async () => {
+        if (!order) return;
+
+        try {
+            await apiService.updateServiceOrder(orderId, {
+                services: servicesForm,
+            });
+
+            // Invalidar cache e refetch
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
+            await queryClient.refetchQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
+            setIsEditingServices(false);
+            showNotification('Serviços atualizados com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao atualizar serviços:', error);
+            const errorMessage = error instanceof Error
+                ? `Erro ao atualizar serviços: ${error.message}`
+                : 'Erro ao atualizar serviços. Tente novamente.';
+            showNotification(errorMessage, 'error');
+        }
     };
 
     // Funções para edição inline de equipamento
@@ -368,8 +417,8 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
 
     const totalAmount = servicesSum - totalDiscount - discountFromPercentage + totalAddition + additionFromPercentage;
 
-    // Valor total com 5% de acréscimo (campo oculto)
-    const totalWith5Percent = totalAmount * 1.05;
+    // Apenas 5% do total (campo oculto)
+    const fivePercentValue = totalAmount * 0.05;
 
     return (
         <>
@@ -710,11 +759,8 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     </Card>
                 </div>
 
-                {/* Itens de Serviço - Sempre Visível */}
-                <Card
-                    className="cursor-pointer hover:bg-gray-700/50 transition-all duration-300 hover:shadow-lg"
-                    onClick={handleEditServices}
-                >
+                {/* Itens de Serviço - com Edição Inline */}
+                <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2">
@@ -723,96 +769,145 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                 </svg>
                                 Itens de Serviço
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-blue-400">
-                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                                <span>Clique para editar</span>
-                            </div>
+                            {!isEditingServices && (
+                                <button
+                                    onClick={handleEditServicesInline}
+                                    className="flex items-center gap-2 px-3 py-1.5 rounded hover:bg-gray-600 transition-colors"
+                                    title="Editar serviços"
+                                >
+                                    <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    <span className="text-sm text-blue-400">Editar</span>
+                                </button>
+                            )}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="overflow-x-auto">
-                        {order.services && order.services.length > 0 ? (
-                            <div className="space-y-4">
-                                <table className="w-full border-collapse">
-                                    <thead>
-                                        <tr className="border-b-2 border-gray-700">
-                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">#</th>
-                                            <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">Descrição</th>
-                                            <th className="text-center py-3 px-4 text-sm font-semibold text-gray-300">Qtd</th>
-                                            <th className="text-right py-3 px-4 text-sm font-semibold text-gray-300">Valor Unit.</th>
-                                            <th className="text-right py-3 px-4 text-sm font-semibold text-gray-300">Desconto</th>
-                                            <th className="text-right py-3 px-4 text-sm font-semibold text-gray-300">Acréscimo</th>
-                                            <th className="text-right py-3 px-4 text-sm font-semibold text-gray-300">Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {order.services.map((service, index) => (
-                                            <tr key={index} className="border-b border-gray-700">
-                                                <td className="py-3 px-4 text-sm text-gray-400">{index + 1}</td>
-                                                <td className="py-3 px-4 text-sm text-white font-medium">{service.description}</td>
-                                                <td className="py-3 px-4 text-center text-sm text-gray-300">{service.quantity}</td>
-                                                <td className="py-3 px-4 text-right text-sm text-gray-300">{formatCurrency(parseDecimal(service.value))}</td>
-                                                <td className="py-3 px-4 text-right text-sm text-red-400">
-                                                    {parseDecimal(service.discount) > 0 ? `-${formatCurrency(parseDecimal(service.discount))}` : '-'}
-                                                </td>
-                                                <td className="py-3 px-4 text-right text-sm text-green-400">
-                                                    {parseDecimal(service.addition) > 0 ? `+${formatCurrency(parseDecimal(service.addition))}` : '-'}
-                                                </td>
-                                                <td className="py-3 px-4 text-right text-sm font-bold text-white">{formatCurrency(parseDecimal(service.total))}</td>
+                        {!isEditingServices ? (
+                            order.services && order.services.length > 0 ? (
+                                <div className="space-y-4">
+                                    <table className="w-full border-collapse">
+                                        <thead>
+                                            <tr className="border-b-2 border-gray-700">
+                                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">#</th>
+                                                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">Descrição</th>
+                                                <th className="text-center py-3 px-4 text-sm font-semibold text-gray-300">Qtd</th>
+                                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-300">Valor Unit.</th>
+                                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-300">Desconto</th>
+                                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-300">Acréscimo</th>
+                                                <th className="text-right py-3 px-4 text-sm font-semibold text-gray-300">Total</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            {order.services.map((service, index) => (
+                                                <tr key={index} className="border-b border-gray-700">
+                                                    <td className="py-3 px-4 text-sm text-gray-400">{index + 1}</td>
+                                                    <td className="py-3 px-4 text-sm text-white font-medium">{service.description}</td>
+                                                    <td className="py-3 px-4 text-center text-sm text-gray-300">{service.quantity}</td>
+                                                    <td className="py-3 px-4 text-right text-sm text-gray-300">{formatCurrency(parseDecimal(service.value))}</td>
+                                                    <td className="py-3 px-4 text-right text-sm text-red-400">
+                                                        {parseDecimal(service.discount) > 0 ? `-${formatCurrency(parseDecimal(service.discount))}` : '-'}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-right text-sm text-green-400">
+                                                        {parseDecimal(service.addition) > 0 ? `+${formatCurrency(parseDecimal(service.addition))}` : '-'}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-right text-sm font-bold text-white">{formatCurrency(parseDecimal(service.total))}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
 
-                                {/* Totais */}
-                                <div className="mt-6 p-4 bg-gray-700 rounded-lg">
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between">
-                                            <span className="text-sm text-gray-300">Subtotal:</span>
-                                            <span className="text-sm font-medium text-white">{formatCurrency(servicesSum)}</span>
-                                        </div>
-                                        {totalDiscount > 0 && (
+                                    {/* Totais */}
+                                    <div className="mt-6 p-4 bg-gray-700 rounded-lg">
+                                        <div className="space-y-2">
                                             <div className="flex justify-between">
-                                                <span className="text-sm text-gray-300">Descontos:</span>
-                                                <span className="text-sm font-medium text-red-400">-{formatCurrency(totalDiscount)}</span>
+                                                <span className="text-sm text-gray-300">Subtotal:</span>
+                                                <span className="text-sm font-medium text-white">{formatCurrency(servicesSum)}</span>
                                             </div>
-                                        )}
-                                        {discountFromPercentage > 0 && (
-                                            <div className="flex justify-between">
-                                                <span className="text-sm text-gray-300">Desconto ({discountPercentage}%):</span>
-                                                <span className="text-sm font-medium text-red-400">-{formatCurrency(discountFromPercentage)}</span>
+                                            {totalDiscount > 0 && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm text-gray-300">Descontos:</span>
+                                                    <span className="text-sm font-medium text-red-400">-{formatCurrency(totalDiscount)}</span>
+                                                </div>
+                                            )}
+                                            {discountFromPercentage > 0 && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm text-gray-300">Desconto ({discountPercentage}%):</span>
+                                                    <span className="text-sm font-medium text-red-400">-{formatCurrency(discountFromPercentage)}</span>
+                                                </div>
+                                            )}
+                                            {totalAddition > 0 && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm text-gray-300">Acréscimos:</span>
+                                                    <span className="text-sm font-medium text-green-400">+{formatCurrency(totalAddition)}</span>
+                                                </div>
+                                            )}
+                                            {additionFromPercentage > 0 && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm text-gray-300">Adicional ({additionPercentage}%):</span>
+                                                    <span className="text-sm font-medium text-green-400">+{formatCurrency(additionFromPercentage)}</span>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between pt-2 border-t border-gray-600">
+                                                <span className="font-semibold text-white">Total:</span>
+                                                <span className="text-2xl font-bold text-white">{formatCurrency(totalAmount)}</span>
                                             </div>
-                                        )}
-                                        {totalAddition > 0 && (
-                                            <div className="flex justify-between">
-                                                <span className="text-sm text-gray-300">Acréscimos:</span>
-                                                <span className="text-sm font-medium text-green-400">+{formatCurrency(totalAddition)}</span>
-                                            </div>
-                                        )}
-                                        {additionFromPercentage > 0 && (
-                                            <div className="flex justify-between">
-                                                <span className="text-sm text-gray-300">Adicional ({additionPercentage}%):</span>
-                                                <span className="text-sm font-medium text-green-400">+{formatCurrency(additionFromPercentage)}</span>
-                                            </div>
-                                        )}
-                                        <div className="flex justify-between pt-2 border-t border-gray-600">
-                                            <span className="font-semibold text-white">Total:</span>
-                                            <span className="text-2xl font-bold text-white">{formatCurrency(totalAmount)}</span>
-                                        </div>
 
-                                        {/* Campo oculto com 5% de acréscimo - só aparece no hover */}
-                                        <div className="opacity-0 hover:opacity-100 transition-opacity duration-300 ease-in-out">
-                                            <div className="flex justify-between pt-2 border-t border-gray-500">
-                                                <span className="font-semibold text-yellow-400">Total + 5%:</span>
-                                                <span className="text-xl font-bold text-yellow-400">{formatCurrency(totalWith5Percent)}</span>
+                                            {/* Campo oculto com 5% do total - só aparece no hover */}
+                                            <div className="opacity-0 hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                                <div className="flex justify-between pt-2 border-t border-gray-500">
+                                                    <span className="font-semibold text-yellow-400">5% do Total:</span>
+                                                    <span className="text-xl font-bold text-yellow-400">{formatCurrency(fivePercentValue)}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            ) : (
+                                <p className="text-gray-400 text-center py-8">Nenhum item de serviço</p>
+                            )) : (
+                            /* Modo de Edição usando ServiceItemsManager */
+                            <div className="space-y-4">
+                                <ServiceItemsManager
+                                    items={servicesForm}
+                                    onChange={setServicesForm}
+                                    autoFocus={true}
+                                />
+
+                                {/* 5% do total escondido (aparece no hover) */}
+                                {servicesForm.length > 0 && (() => {
+                                    const servicesSum = servicesForm.reduce((sum, item) => sum + (parseDecimal(item.total) || 0), 0);
+                                    const fivePercent = servicesSum * 0.05;
+
+                                    return (
+                                        <div className="opacity-0 hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                                            <div className="flex justify-between p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
+                                                <span className="font-semibold text-yellow-400">5% do Total:</span>
+                                                <span className="text-xl font-bold text-yellow-400">{formatCurrency(fivePercent)}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
+
+                                {/* Botões Salvar/Cancelar */}
+                                <div className="flex gap-2 pt-4 border-t border-gray-700">
+                                    <Button
+                                        onClick={handleSaveServices}
+                                        variant="primary"
+                                        size="sm"
+                                    >
+                                        Salvar Serviços
+                                    </Button>
+                                    <Button
+                                        onClick={handleCancelEditServices}
+                                        variant="secondary"
+                                        size="sm"
+                                    >
+                                        Cancelar
+                                    </Button>
+                                </div>
                             </div>
-                        ) : (
-                            <p className="text-gray-400 text-center py-8">Nenhum item de serviço</p>
                         )}
                     </CardContent>
                 </Card>
