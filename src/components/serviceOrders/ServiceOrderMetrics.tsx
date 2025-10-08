@@ -4,7 +4,7 @@ import { Badge } from '../ui/Badge';
 import { LoadingSpinner } from '../ui/Loading';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { useServiceOrders } from '../../hooks/useServiceOrders';
-import type { ServiceOrderMetrics as ServiceOrderMetricsType } from '../../types/serviceOrder';
+import type { ServiceOrderMetrics as ServiceOrderMetricsType, ServiceOrder } from '../../types/serviceOrder';
 
 interface ServiceOrderMetricsProps {
     className?: string;
@@ -33,6 +33,14 @@ export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ classN
 
     const orders = ordersData.data || [];
 
+    // Função para verificar se está atrasada (somente para status "aprovado")
+    const isOrderOverdue = (order: ServiceOrder) => {
+        if (!order.expectedDeliveryDate || order.status !== 'aprovado') return false;
+        const today = new Date();
+        const expectedDate = new Date(order.expectedDeliveryDate);
+        return expectedDate < today;
+    };
+
     // Calcular métricas
     const metrics: ServiceOrderMetricsType = {
         totalOrders: orders.length,
@@ -58,6 +66,12 @@ export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ classN
         },
     };
 
+    // Calcular ordens aprovadas
+    const approvedOrders = orders.filter(order => order.status === 'aprovado').length;
+
+    // Calcular ordens atrasadas (apenas aprovadas com data de previsão vencida)
+    const overdueOrdersCount = orders.filter(order => isOrderOverdue(order)).length;
+
     // Calcular tempo médio de conclusão
     const completedOrdersWithDeliveryDate = orders.filter(
         order => order.status === 'entregue' && order.deliveryDate
@@ -75,15 +89,19 @@ export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ classN
         metrics.averageCompletionTime = Math.round(totalDays / completedOrdersWithDeliveryDate.length);
     }
 
-    // Ordenar por data de criação (mais recentes primeiro)
-    const recentOrders = [...orders]
+    // Filtrar ordens aprovadas e atrasadas
+    const approvedOrdersList = orders.filter(order => order.status === 'aprovado');
+    const overdueOrders = orders.filter(order => isOrderOverdue(order));
+
+    // Combinar aprovadas e atrasadas, removendo duplicatas
+    const relevantOrders = [...new Set([...approvedOrdersList, ...overdueOrders])]
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 5);
 
     return (
         <div className={`space-y-6 ${className}`}>
             {/* Cards de Métricas Principais */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <Card>
                     <CardContent className="p-6 text-center">
                         <div className="text-3xl font-bold text-blue-400 mb-2">
@@ -98,16 +116,25 @@ export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ classN
                         <div className="text-3xl font-bold text-yellow-400 mb-2">
                             {metrics.pendingOrders}
                         </div>
-                        <div className="text-gray-400">Aguardando Confirmação</div>
+                        <div className="text-gray-400">Aguardando</div>
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardContent className="p-6 text-center">
                         <div className="text-3xl font-bold text-green-400 mb-2">
-                            {metrics.completedOrders}
+                            {approvedOrders}
                         </div>
-                        <div className="text-gray-400">Entregues</div>
+                        <div className="text-gray-400">Aprovadas</div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardContent className="p-6 text-center">
+                        <div className="text-3xl font-bold text-red-400 mb-2">
+                            {overdueOrdersCount}
+                        </div>
+                        <div className="text-gray-400">Atrasadas</div>
                     </CardContent>
                 </Card>
 
@@ -262,12 +289,13 @@ export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ classN
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Ordens Recentes</CardTitle>
+                        <CardTitle>Aprovadas & Atrasadas</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-3">
-                            {recentOrders.length > 0 ? (
-                                recentOrders.map((order) => {
+                            {relevantOrders.length > 0 ? (
+                                relevantOrders.map((order) => {
+                                    const isOverdue = isOrderOverdue(order);
                                     const getStatusColor = (status: string) => {
                                         switch (status) {
                                             case 'confirmar': return 'warning';
@@ -280,12 +308,19 @@ export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ classN
                                     };
 
                                     return (
-                                        <div key={order._id} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
-                                            <div>
-                                                <p className="text-sm font-medium text-white">
-                                                    OS: {order.orderNumber}
-                                                </p>
-                                                <p className="text-xs text-gray-500">
+                                        <div key={order._id} className="flex justify-between items-center p-2 hover:bg-gray-700/50 rounded">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-sm font-medium text-white">
+                                                        OS: {order.orderNumber}
+                                                    </p>
+                                                    {isOverdue && (
+                                                        <Badge variant="danger" size="sm">
+                                                            ATRASADA
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-gray-400">
                                                     {order.equipment}
                                                 </p>
                                             </div>
@@ -302,7 +337,7 @@ export const ServiceOrderMetrics: React.FC<ServiceOrderMetricsProps> = ({ classN
                                 })
                             ) : (
                                 <p className="text-gray-500 text-center py-4">
-                                    Nenhuma ordem encontrada
+                                    Nenhuma ordem aprovada ou atrasada
                                 </p>
                             )}
                         </div>
