@@ -50,6 +50,24 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
     const [showActionsModal, setShowActionsModal] = useState(false);
 
+    // Estados para edição inline
+    const [isEditingEquipment, setIsEditingEquipment] = useState(false);
+    const [equipmentForm, setEquipmentForm] = useState({
+        equipment: '',
+        brand: '',
+        model: '',
+        serialNumber: '',
+        voltage: '',
+        accessories: '',
+    });
+
+    const [isEditingNotes, setIsEditingNotes] = useState(false);
+    const [notesForm, setNotesForm] = useState({
+        reportedDefect: '',
+        customerObservations: '',
+        notes: '',
+    });
+
     // Buscar dados do cliente se não vier populado
     const { data: customer } = useQuery({
         queryKey: ['customer', order?.customerId],
@@ -223,6 +241,85 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
 
     const handleEditServices = () => {
         navigate(`/service-orders/edit/${orderId}?focus=services`);
+    };
+
+    // Funções para edição inline de equipamento
+    const handleEditEquipment = () => {
+        if (order) {
+            setEquipmentForm({
+                equipment: order.equipment || '',
+                brand: order.brand || '',
+                model: order.model || '',
+                serialNumber: order.serialNumber || '',
+                voltage: order.voltage || '',
+                accessories: order.accessories || '',
+            });
+            setIsEditingEquipment(true);
+        }
+    };
+
+    const handleCancelEditEquipment = () => {
+        setIsEditingEquipment(false);
+    };
+
+    const handleSaveEquipment = async () => {
+        if (!order) return;
+
+        try {
+            await apiService.updateServiceOrder(orderId, equipmentForm);
+
+            // Invalidar cache e refetch
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
+            await queryClient.refetchQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
+            setIsEditingEquipment(false);
+            showNotification('Equipamento atualizado com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao atualizar equipamento:', error);
+            const errorMessage = error instanceof Error
+                ? `Erro ao atualizar equipamento: ${error.message}`
+                : 'Erro ao atualizar equipamento. Tente novamente.';
+            showNotification(errorMessage, 'error');
+        }
+    };
+
+    // Funções para edição inline de defeito e observações
+    const handleEditNotes = () => {
+        if (order) {
+            setNotesForm({
+                reportedDefect: order.reportedDefect || '',
+                customerObservations: order.customerObservations || '',
+                notes: order.notes || '',
+            });
+            setIsEditingNotes(true);
+        }
+    };
+
+    const handleCancelEditNotes = () => {
+        setIsEditingNotes(false);
+    };
+
+    const handleSaveNotes = async () => {
+        if (!order) return;
+
+        try {
+            await apiService.updateServiceOrder(orderId, notesForm);
+
+            // Invalidar cache e refetch
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
+            await queryClient.refetchQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
+            setIsEditingNotes(false);
+            showNotification('Informações atualizadas com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao atualizar informações:', error);
+            const errorMessage = error instanceof Error
+                ? `Erro ao atualizar informações: ${error.message}`
+                : 'Erro ao atualizar informações. Tente novamente.';
+            showNotification(errorMessage, 'error');
+        }
     };
 
     if (isLoading) {
@@ -452,7 +549,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                         </CardContent>
                     </Card>
 
-                    {/* Equipamento - Compacto */}
+                    {/* Equipamento - Compacto com Edição Inline */}
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2 mb-3">
@@ -460,13 +557,112 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
                                 <h3 className="text-xs font-semibold text-gray-400 uppercase">Equipamento</h3>
+                                {!isEditingEquipment && (
+                                    <button
+                                        onClick={handleEditEquipment}
+                                        className="ml-auto p-1 rounded hover:bg-gray-600 transition-colors"
+                                        title="Editar equipamento"
+                                    >
+                                        <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                )}
                             </div>
-                            <div className="space-y-2">
-                                <p className="text-lg font-bold text-white break-words">{order.equipment}</p>
-                                {order.brand && <p className="text-sm text-gray-300 break-words">{order.brand}</p>}
-                                {order.model && <p className="text-sm text-gray-300 break-words">{order.model}</p>}
-                                {order.serialNumber && <p className="text-sm text-gray-300 break-words">SN: {order.serialNumber}</p>}
-                            </div>
+
+                            {!isEditingEquipment ? (
+                                <div className="space-y-2">
+                                    <p className="text-lg font-bold text-white break-words">{order.equipment}</p>
+                                    {order.brand && <p className="text-sm text-gray-300 break-words">{order.brand}</p>}
+                                    {order.model && <p className="text-sm text-gray-300 break-words">{order.model}</p>}
+                                    {order.serialNumber && <p className="text-sm text-gray-300 break-words">SN: {order.serialNumber}</p>}
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="block text-xs text-gray-400 mb-1">Equipamento *</label>
+                                        <input
+                                            type="text"
+                                            value={equipmentForm.equipment}
+                                            onChange={(e) => setEquipmentForm({ ...equipmentForm, equipment: e.target.value })}
+                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Ex: Notebook, Impressora..."
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-xs text-gray-400 mb-1">Marca</label>
+                                            <input
+                                                type="text"
+                                                value={equipmentForm.brand}
+                                                onChange={(e) => setEquipmentForm({ ...equipmentForm, brand: e.target.value })}
+                                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Ex: HP, Dell..."
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-gray-400 mb-1">Modelo</label>
+                                            <input
+                                                type="text"
+                                                value={equipmentForm.model}
+                                                onChange={(e) => setEquipmentForm({ ...equipmentForm, model: e.target.value })}
+                                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Ex: G50-80..."
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-xs text-gray-400 mb-1">Nº Série</label>
+                                            <input
+                                                type="text"
+                                                value={equipmentForm.serialNumber}
+                                                onChange={(e) => setEquipmentForm({ ...equipmentForm, serialNumber: e.target.value })}
+                                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Número de série"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs text-gray-400 mb-1">Tensão</label>
+                                            <input
+                                                type="text"
+                                                value={equipmentForm.voltage}
+                                                onChange={(e) => setEquipmentForm({ ...equipmentForm, voltage: e.target.value })}
+                                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Ex: 110V, 220V..."
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-400 mb-1">Acessórios</label>
+                                        <input
+                                            type="text"
+                                            value={equipmentForm.accessories}
+                                            onChange={(e) => setEquipmentForm({ ...equipmentForm, accessories: e.target.value })}
+                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Ex: Carregador, mouse..."
+                                        />
+                                    </div>
+                                    <div className="flex gap-2 mt-3">
+                                        <Button
+                                            onClick={handleSaveEquipment}
+                                            variant="primary"
+                                            size="sm"
+                                            className="flex-1"
+                                        >
+                                            Salvar
+                                        </Button>
+                                        <Button
+                                            onClick={handleCancelEditEquipment}
+                                            variant="secondary"
+                                            size="sm"
+                                            className="flex-1"
+                                        >
+                                            Cancelar
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
@@ -621,13 +817,26 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     </CardContent>
                 </Card>
 
-                {/* Observações e Defeitos - Opcional */}
-                {(order.reportedDefect || order.customerObservations || order.notes) && (
-                    <Card>
-                        <CardHeader>
+                {/* Observações e Defeitos - com Edição Inline */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
                             <CardTitle>Informações do Serviço</CardTitle>
-                        </CardHeader>
-                        <CardContent>
+                            {!isEditingNotes && (
+                                <button
+                                    onClick={handleEditNotes}
+                                    className="p-2 rounded hover:bg-gray-600 transition-colors"
+                                    title="Editar informações"
+                                >
+                                    <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </button>
+                            )}
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        {!isEditingNotes ? (
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 {order.reportedDefect && (
                                     <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
@@ -665,9 +874,60 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                     </div>
                                 )}
                             </div>
-                        </CardContent>
-                    </Card>
-                )}
+                        ) : (
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm text-gray-300 mb-2 font-semibold">Defeito Relatado</label>
+                                    <textarea
+                                        value={notesForm.reportedDefect}
+                                        onChange={(e) => setNotesForm({ ...notesForm, reportedDefect: e.target.value })}
+                                        rows={3}
+                                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Descreva o defeito relatado pelo cliente..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm text-gray-300 mb-2 font-semibold">Observações do Cliente</label>
+                                    <textarea
+                                        value={notesForm.customerObservations}
+                                        onChange={(e) => setNotesForm({ ...notesForm, customerObservations: e.target.value })}
+                                        rows={3}
+                                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Observações adicionais do cliente..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm text-gray-300 mb-2 font-semibold">Notas Internas</label>
+                                    <textarea
+                                        value={notesForm.notes}
+                                        onChange={(e) => setNotesForm({ ...notesForm, notes: e.target.value })}
+                                        rows={4}
+                                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Notas internas sobre o serviço..."
+                                    />
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={handleSaveNotes}
+                                        variant="primary"
+                                        size="sm"
+                                        className="flex-1"
+                                    >
+                                        Salvar
+                                    </Button>
+                                    <Button
+                                        onClick={handleCancelEditNotes}
+                                        variant="secondary"
+                                        size="sm"
+                                        className="flex-1"
+                                    >
+                                        Cancelar
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
 
                 {/* Notas Fiscais - Opcional */}
                 {(order.paymentMethod || order.paymentConditions || order.serviceInvoice || order.saleInvoice || order.shippingInvoice) && (
