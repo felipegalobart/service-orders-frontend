@@ -27,6 +27,7 @@ import { TimelineModal } from '../ui/Modal/TimelineModal';
 import { useNotification, Notification } from '../ui/Notification';
 import { ServiceOrderActionsModal } from './ServiceOrderActionsModal';
 import { ServiceItemsManager } from './ServiceItemsManager';
+import { CustomerSelector } from './CustomerSelector';
 import type { ServiceOrderStatus, FinancialStatus, ServiceItem } from '../../types/serviceOrder';
 
 interface ServiceOrderDetailsProps {
@@ -93,6 +94,11 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         approvalDate: '',
         expectedDeliveryDate: '',
         deliveryDate: '',
+    });
+
+    const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
+    const [customerForm, setCustomerForm] = useState({
+        customerId: '',
     });
 
     // Buscar dados do cliente se não vier populado
@@ -260,6 +266,44 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
 
     const handleCloseTimelineModal = () => {
         setIsTimelineModalOpen(false);
+    };
+
+    // Funções para modal de edição de cliente
+    const handleOpenEditCustomerModal = () => {
+        if (order) {
+            setCustomerForm({
+                customerId: order.customerId,
+            });
+            setIsEditCustomerModalOpen(true);
+        }
+    };
+
+    const handleCloseEditCustomerModal = () => {
+        setIsEditCustomerModalOpen(false);
+    };
+
+    const handleSaveCustomer = async () => {
+        if (!order) return;
+
+        try {
+            await apiService.updateServiceOrder(orderId, {
+                customerId: customerForm.customerId,
+            });
+
+            // Invalidar cache e refetch
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+            await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.lists() });
+            await queryClient.refetchQueries({ queryKey: serviceOrderKeys.detail(orderId) });
+
+            setIsEditCustomerModalOpen(false);
+            showNotification('Cliente atualizado com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao atualizar cliente:', error);
+            const errorMessage = error instanceof Error
+                ? `Erro ao atualizar cliente: ${error.message}`
+                : 'Erro ao atualizar cliente. Tente novamente.';
+            showNotification(errorMessage, 'error');
+        }
     };
 
     // Funções para edição inline de serviços
@@ -671,7 +715,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     {/* Cliente - Compacto */}
                     <Card
                         className="cursor-pointer hover:bg-gray-700/50 transition-colors duration-200"
-                        onClick={handleOpenPersonModal}
+                        onClick={handleOpenEditCustomerModal}
                     >
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2 mb-3">
@@ -679,10 +723,24 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                                 <h3 className="text-xs font-semibold text-gray-400 uppercase">Cliente</h3>
-                                <svg className="h-3 w-3 text-gray-500 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
+                                <div className="flex items-center gap-1 ml-auto">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleOpenPersonModal();
+                                        }}
+                                        className="p-1 rounded hover:bg-gray-600 transition-colors"
+                                        title="Ver detalhes do cliente"
+                                    >
+                                        <svg className="h-3 w-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </button>
+                                    <svg className="h-3 w-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </div>
                             </div>
                             {customerData ? (
                                 <div className="space-y-2">
@@ -1434,6 +1492,52 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                         )}
                     </CardContent>
                 </Card>
+
+                {/* Modal de Trocar Cliente */}
+                {isEditCustomerModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full border border-gray-700">
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-2xl font-bold text-white">Trocar Cliente</h2>
+                                    <button
+                                        onClick={handleCloseEditCustomerModal}
+                                        className="text-gray-400 hover:text-white transition-colors"
+                                    >
+                                        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div className="space-y-4">
+                                    <CustomerSelector
+                                        value={customerForm.customerId}
+                                        onChange={(customerId) => setCustomerForm({ customerId })}
+                                        disabled={false}
+                                    />
+                                    <div className="flex gap-3 pt-4">
+                                        <Button
+                                            onClick={handleSaveCustomer}
+                                            variant="primary"
+                                            size="md"
+                                            className="flex-1"
+                                        >
+                                            Salvar Cliente
+                                        </Button>
+                                        <Button
+                                            onClick={handleCloseEditCustomerModal}
+                                            variant="secondary"
+                                            size="md"
+                                            className="flex-1"
+                                        >
+                                            Cancelar
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Modal de Detalhes do Cliente */}
                 <PersonDetailsModal
