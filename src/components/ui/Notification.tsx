@@ -80,22 +80,24 @@ export const Notification: React.FC<NotificationProps> = ({
     };
 
     return (
-        <div className={`fixed top-4 right-4 z-50 max-w-sm w-full ${isAnimating ? 'animate-slide-in' : 'animate-slide-out'}`}>
-            <div className={`rounded-lg border p-4 shadow-lg ${getTypeStyles()}`}>
-                <div className="flex items-start">
-                    <div className="flex-shrink-0">
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-2xl px-4">
+            <div className={`rounded-lg border p-6 shadow-2xl ${getTypeStyles()} ${isAnimating ? 'animate-slide-in' : 'animate-slide-out'}`}>
+                <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 mt-0.5">
                         {getIcon()}
                     </div>
-                    <div className="ml-3 flex-1">
-                        <p className="text-sm font-medium">{message}</p>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-base font-medium leading-relaxed">{message}</p>
                     </div>
-                    <div className="ml-4 flex-shrink-0">
+                    <div className="flex-shrink-0">
                         <button
+                            type="button"
                             onClick={onClose}
-                            className="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="inline-flex items-center justify-center rounded-full p-2 bg-gray-800/80 hover:bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-white/50 transition-all shadow-lg cursor-pointer"
+                            aria-label="Fechar notificação"
                         >
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>

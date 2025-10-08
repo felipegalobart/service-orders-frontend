@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiService } from '../../services/api';
@@ -46,6 +46,20 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     const updateFinancialStatusMutation = useUpdateServiceOrderFinancialStatus();
     const deleteMutation = useDeleteServiceOrder();
     const { notification, showNotification, hideNotification } = useNotification();
+
+    // Flag para controlar se já mostrou a notificação de NF
+    const hasShownNFNotification = useRef(false);
+
+    // Alerta automático para entrega de Nota Fiscal (mostra apenas UMA VEZ ao abrir a ordem)
+    useEffect(() => {
+        if (order && order.status === 'pronto' && order.serviceInvoice && order.serviceInvoice.trim() !== '' && !hasShownNFNotification.current) {
+            showNotification(
+                `⚠️ ATENÇÃO: Esta ordem possui NF de Serviço (${order.serviceInvoice}). Lembre-se de entregar a nota fiscal junto com o aparelho!`,
+                'warning'
+            );
+            hasShownNFNotification.current = true;
+        }
+    }, [order, showNotification]);
 
     // Estado para os modais
     const [isPersonModalOpen, setIsPersonModalOpen] = useState(false);
@@ -460,10 +474,11 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         if (!order) return;
 
         try {
-            await apiService.updateServiceOrder(orderId, {
+            const updateData = {
                 ...invoicesForm,
-                paymentMethod: invoicesForm.paymentMethod || undefined,
-            } as any);
+                paymentMethod: invoicesForm.paymentMethod as 'debit' | 'credit' | 'cash' | 'pix' | 'boleto' | 'transfer' | 'check' | undefined,
+            };
+            await apiService.updateServiceOrder(orderId, updateData);
 
             // Invalidar cache e refetch
             await queryClient.invalidateQueries({ queryKey: serviceOrderKeys.detail(orderId) });
@@ -1180,43 +1195,61 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     </CardHeader>
                     <CardContent>
                         {!isEditingNotes ? (
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                {order.reportedDefect && (
-                                    <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <svg className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-1.964-1.333-2.732 0L3.732 16c-.77 1.333.192 3 1.732 3z" />
-                                            </svg>
-                                            <h4 className="font-semibold text-white text-sm">Defeito Relatado</h4>
+                            <>
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                    {order.reportedDefect && (
+                                        <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <svg className="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-1.964-1.333-2.732 0L3.732 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <h4 className="font-semibold text-white text-sm">Defeito Relatado</h4>
+                                            </div>
+                                            <p className="text-sm text-gray-300 leading-relaxed break-words overflow-wrap-anywhere">{order.reportedDefect}</p>
                                         </div>
-                                        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-wrap-anywhere">{order.reportedDefect}</p>
-                                    </div>
-                                )}
+                                    )}
 
-                                {order.customerObservations && (
-                                    <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                                            </svg>
-                                            <h4 className="font-semibold text-white text-sm">Observações do Cliente</h4>
+                                    {order.customerObservations && (
+                                        <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <svg className="h-4 w-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                                </svg>
+                                                <h4 className="font-semibold text-white text-sm">Observações do Cliente</h4>
+                                            </div>
+                                            <p className="text-sm text-gray-300 leading-relaxed break-words overflow-wrap-anywhere">{order.customerObservations}</p>
                                         </div>
-                                        <p className="text-sm text-gray-300 leading-relaxed break-words overflow-wrap-anywhere">{order.customerObservations}</p>
-                                    </div>
-                                )}
+                                    )}
 
-                                {order.notes && (
-                                    <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <svg className="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
-                                            <h4 className="font-semibold text-white text-sm">Notas Internas</h4>
+                                    {order.notes && (
+                                        <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <svg className="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <h4 className="font-semibold text-white text-sm">Notas Internas</h4>
+                                            </div>
+                                            <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">{order.notes}</div>
                                         </div>
-                                        <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">{order.notes}</div>
+                                    )}
+                                </div>
+
+                                {/* Badges de Garantia e Retorno - Sempre visíveis */}
+                                <div className="mt-4 flex gap-4 justify-center p-4 bg-gray-700/30 rounded-lg border border-gray-600">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm font-medium text-gray-300">Garantia:</span>
+                                        <Badge variant={order.warranty ? 'success' : 'default'} size="md">
+                                            {order.warranty ? '✓ SIM' : '✗ NÃO'}
+                                        </Badge>
                                     </div>
-                                )}
-                            </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm font-medium text-gray-300">Retorno:</span>
+                                        <Badge variant={order.isReturn ? 'warning' : 'default'} size="md">
+                                            {order.isReturn ? '✓ SIM' : '✗ NÃO'}
+                                        </Badge>
+                                    </div>
+                                </div>
+                            </>
                         ) : (
                             <div className="space-y-4">
                                 <div>
@@ -1571,6 +1604,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                 type={notification.type}
                 isVisible={notification.isVisible}
                 onClose={hideNotification}
+                duration={notification.type === 'warning' ? 10000 : 5000}
             />
         </>
     );
