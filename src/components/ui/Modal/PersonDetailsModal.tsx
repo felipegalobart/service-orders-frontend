@@ -6,6 +6,7 @@ import { PersonEditForm } from './PersonEditForm';
 import { Notification, useNotification } from '../Notification';
 import { formatPhoneNumber, formatDocument } from '../../../utils/formatters';
 import { apiService } from '../../../services/api';
+import { useUpdatePerson } from '../../../hooks/usePersons';
 import type { Person, UpdatePersonRequest } from '../../../types/person';
 
 interface PersonDetailsModalProps {
@@ -24,9 +25,9 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
     onDelete,
 }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [currentPerson, setCurrentPerson] = useState<Person | null>(person);
     const { notification, showNotification, hideNotification } = useNotification();
+    const updatePersonMutation = useUpdatePerson();
 
     // Atualiza currentPerson quando person muda
     useEffect(() => {
@@ -36,7 +37,6 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
     const handleSave = async (updatedData: Partial<Person>) => {
         if (!currentPerson) return;
 
-        setLoading(true);
         try {
             // Preparar dados para a API - removendo campos vazios e garantindo tipos corretos
             const updateData: UpdatePersonRequest = {};
@@ -70,8 +70,11 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
 
             console.log('Dados que serão enviados para a API:', updateData);
 
-            // Chamar API real
-            const updatedPerson = await apiService.updatePerson(currentPerson._id, updateData);
+            // Usar mutation hook - isso automaticamente invalidará o cache das service orders
+            const updatedPerson = await updatePersonMutation.mutateAsync({
+                id: currentPerson._id,
+                data: updateData
+            });
 
             // Atualizar estado local
             setCurrentPerson(updatedPerson);
@@ -92,8 +95,6 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
                 ? `Erro ao atualizar cadastro: ${error.message}`
                 : 'Erro ao atualizar cadastro. Tente novamente.';
             showNotification(errorMessage, 'error');
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -111,7 +112,6 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
 
         if (!confirmed) return;
 
-        setLoading(true);
         try {
             await apiService.deletePerson(currentPerson._id);
 
@@ -131,8 +131,6 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
                 ? `Erro ao excluir cadastro: ${error.message}`
                 : 'Erro ao excluir cadastro. Tente novamente.';
             showNotification(errorMessage, 'error');
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -181,7 +179,7 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
                             person={currentPerson}
                             onSave={handleSave}
                             onCancel={handleCancelEdit}
-                            loading={loading}
+                            loading={updatePersonMutation.isPending}
                         />
                     ) : (
                         <>
@@ -382,13 +380,13 @@ export const PersonDetailsModal: React.FC<PersonDetailsModalProps> = ({
                                         <Button
                                             variant="ghost"
                                             onClick={handleDelete}
-                                            disabled={loading}
+                                            disabled={updatePersonMutation.isPending}
                                             className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
                                         >
                                             <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                            {loading ? 'Excluindo...' : 'Excluir'}
+                                            {updatePersonMutation.isPending ? 'Salvando...' : 'Excluir'}
                                         </Button>
                                     )}
                                 </div>

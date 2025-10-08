@@ -55,7 +55,8 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         queryKey: ['customer', order?.customerId],
         queryFn: () => apiService.getPersonById(order!.customerId),
         enabled: !!order && !order.customer,
-        staleTime: 10 * 60 * 1000,
+        staleTime: 0, // Sempre considerar stale para refetch quando invalidado
+        gcTime: 5 * 60 * 1000, // Manter no cache por 5 minutos
     });
 
     const customerData = order?.customer || customer;

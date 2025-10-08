@@ -59,6 +59,16 @@ export const useUpdatePerson = () => {
       
       // Invalidar listas para refetch
       queryClient.invalidateQueries({ queryKey: personKeys.lists() });
+      
+      // IMPORTANTE: Invalidar ordens de serviço que possam conter esse cliente
+      // Isso garante que as ordens de serviço mostrem os dados atualizados do cliente
+      queryClient.invalidateQueries({ queryKey: ['serviceOrders'] });
+      
+      // Invalidar também a query individual do customer usada no ServiceOrderDetails
+      queryClient.invalidateQueries({ queryKey: ['customer', updatedPerson._id] });
+      
+      // Forçar refetch imediato de todas as queries invalidadas
+      queryClient.refetchQueries({ queryKey: ['serviceOrders'] });
     },
   });
 };
