@@ -1,16 +1,25 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { formatDate, formatOrderNumber, formatUpperCase, formatCurrency, formatPaymentMethod, parseDecimal } from '../../utils/formatters';
 import type { ServiceOrder } from '../../types/serviceOrder';
 import type { Person } from '../../types/person';
+
+// Importar apenas tipos do react-pdf (não afeta bundle)
+import type {
+    Styles,
+    Document as PDFDocument,
+    Page as PDFPage,
+    Text as PDFText,
+    View as PDFView,
+    Image as PDFImage
+} from '@react-pdf/renderer';
 
 interface ServiceOrderReactPDFProps {
     order: ServiceOrder;
     customerData?: Person;
 }
 
-// Estilos CSS compactos para o PDF
-const styles = StyleSheet.create({
+// Função auxiliar para criar os estilos dinamicamente
+const createStyles = (StyleSheet: { create: (styles: Styles) => Styles }) => StyleSheet.create({
     page: {
         flexDirection: 'column',
         backgroundColor: '#FFFFFF',
@@ -288,7 +297,16 @@ const truncateText = (text: string, maxLength: number = 54): string => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 };
 
-const OrcamentoDocument: React.FC<{ order: ServiceOrder; customerData?: Person }> = ({ order, customerData }) => {
+const OrcamentoDocument = ({ order, customerData, Document, Page, Text, View, Image, styles }: {
+    order: ServiceOrder;
+    customerData?: Person;
+    Document: typeof PDFDocument;
+    Page: typeof PDFPage;
+    Text: typeof PDFText;
+    View: typeof PDFView;
+    Image: typeof PDFImage;
+    styles: Styles;
+}) => {
     const fullCustomer = customerData || order.customer;
     let totalGeral = 0;
     let totalDesconto = 0;
@@ -537,11 +555,25 @@ export const ServiceOrderReactPDF: React.FC<ServiceOrderReactPDFProps> = ({ orde
 
         setIsGenerating(true);
         try {
-            // Importar pdf() dinamicamente
-            const { pdf } = await import('@react-pdf/renderer');
+            // Importar todos os componentes do react-pdf dinamicamente
+            const { pdf, Document, Page, Text, View, StyleSheet, Image } = await import('@react-pdf/renderer');
 
-            // Gerar PDF
-            const blob = await pdf(<OrcamentoDocument order={order} customerData={customerData} />).toBlob();
+            // Criar estilos dinamicamente
+            const styles = createStyles(StyleSheet);
+
+            // Gerar PDF com componentes carregados dinamicamente
+            const blob = await pdf(
+                <OrcamentoDocument
+                    order={order}
+                    customerData={customerData}
+                    Document={Document}
+                    Page={Page}
+                    Text={Text}
+                    View={View}
+                    Image={Image}
+                    styles={styles}
+                />
+            ).toBlob();
 
             // Download
             const url = URL.createObjectURL(blob);
