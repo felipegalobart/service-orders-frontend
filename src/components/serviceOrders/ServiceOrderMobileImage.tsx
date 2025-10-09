@@ -165,7 +165,7 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
-                    link.download = `OS ${formatOrderNumber(order.orderNumber)}.png`;
+                    //link.download = `OS ${formatOrderNumber(order.orderNumber)}.png`;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
@@ -180,19 +180,19 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                         const firstName = contactName.split(' ')[0];
 
                         if (hour < 12) {
-                            return `Bom dia, ${firstName}!\n\nSegue abaixo o orçamento.\n\n*Fico no aguardo de sua confirmação para executar os serviços e qualquer dúvida estamos à disposição.*`;
+                            return `Bom dia, ${firstName}!\n\nSegue o orçamento.\n\n*Fico no aguardo de sua confirmação para executar os serviços e qualquer dúvida estamos à disposição.*`;
                         } else if (hour < 18) {
-                            return `Boa tarde, ${firstName}!\n\nSegue abaixo o orçamento.\n\n*Fico no aguardo de sua confirmação para executar os serviços e qualquer dúvida estamos à disposição.*`;
+                            return `Boa tarde, ${firstName}!\n\nSegue o orçamento.\n\n*Fico no aguardo de sua confirmação para executar os serviços e qualquer dúvida estamos à disposição.*`;
                         } else {
-                            return `Boa noite, ${firstName}!\n\nSegue abaixo o orçamento.\n\n*Fico no aguardo de sua confirmação para executar os serviços e qualquer dúvida estamos à disposição.*`;
+                            return `Boa noite, ${firstName}!\n\nSegue o orçamento.\n\n*Fico no aguardo de sua confirmação para executar os serviços e qualquer dúvida estamos à disposição.*`;
                         }
                     };
 
                     // Mensagem personalizada sem emojis
                     const message = `${getGreeting()}\n\n` +
 
-                        `OS: ${formatOrderNumber(order.orderNumber)}*\n` +
-                        `Valor: ${formatCurrency(parseDecimal(order.totalAmountLeft) || totalWithPercentages)}\n\n`
+                        `*OS: ${formatOrderNumber(order.orderNumber)}*\n` +
+                        `*Valor: ${formatCurrency(parseDecimal(order.totalAmountLeft) || totalWithPercentages)}*\n\n`
 
                     // Obter número do telefone do contato selecionado
                     const phoneNumber = contact?.phone?.replace(/\D/g, '') || fullCustomer?.contacts?.find((c) => c.phone)?.phone?.replace(/\D/g, '');
