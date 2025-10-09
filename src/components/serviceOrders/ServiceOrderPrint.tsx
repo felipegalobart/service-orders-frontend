@@ -53,21 +53,21 @@ export const ServiceOrderPrint: React.FC<ServiceOrderPrintProps> = ({ order, onB
                         />
                     </div>
 
-                    {/* Grid de 3 colunas com informações da empresa */}
-                    <div className="grid grid-cols-3 gap-1 mb-1 mt-1">
-                        {/* Coluna 1: Número da OS e Nome da Empresa */}
+                    {/* Grid de 3 colunas com informações da empresa - Proporção 2:0.8:1.2 */}
+                    <div className="grid grid-cols-[2fr_0.8fr_1.2fr] gap-1 mb-1 mt-1">
+                        {/* Coluna 1: Número da OS e Nome da Empresa (50% do espaço) */}
                         <div className="text-center border border-gray-400 rounded-lg p-1">
                             <p>MITSUWA ELETRO MECANICA LTDA</p>
                             <p className="text-4xl font-bold text-gray-900">OS N° {formatOrderNumber(order.orderNumber)}</p>
                         </div>
 
-                        {/* Coluna 2: Data de Entrada */}
+                        {/* Coluna 2: Data de Entrada (20% do espaço) */}
                         <div className="text-center border border-gray-400 rounded-lg p-1 flex flex-col justify-center items-center">
                             <p className="font-semibold">ENTRADA:</p>
                             <p className="text-2xl font-bold text-gray-900">{formatDate(order.entryDate)}</p>
                         </div>
 
-                        {/* Coluna 3: Contatos */}
+                        {/* Coluna 3: Contatos (30% do espaço) */}
                         <div className="text-center text-xs text-gray-600 border border-gray-400 rounded-lg p-1">
                             <p>Telefone: 4479-1814</p>
                             <p>WHATSAPP: 3458-5898</p>
