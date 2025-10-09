@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
-import { Card, CardHeader, CardTitle, CardContent, Badge, LoadingSpinner } from '../../../components/ui';
+import { Card, CardContent, LoadingSpinner } from '../../../components/ui';
 import { apiService } from '../../../services/api';
 import type { Person } from '../../../types/person';
 
@@ -14,6 +14,13 @@ const Home: React.FC = () => {
         customers: 0,
         suppliers: 0,
         thisMonth: 0,
+        loading: true,
+        error: null as string | null
+    });
+
+    const [ordersStats, setOrdersStats] = useState({
+        approved: 0,
+        overdue: 0,
         loading: true,
         error: null as string | null
     });
@@ -75,11 +82,55 @@ const Home: React.FC = () => {
         }
     };
 
+    // Função para carregar estatísticas de ordens
+    const loadOrdersStats = async () => {
+        try {
+            setOrdersStats(prev => ({ ...prev, loading: true, error: null }));
+
+            // Buscar todas as ordens (sem paginação para estatísticas)
+            const response = await apiService.getServiceOrders({
+                page: 1,
+                limit: 1000, // Limite alto para pegar todas
+            });
+
+            const orders = response.data;
+
+            // Contar aprovadas
+            const approved = orders.filter(o => o.status === 'aprovado').length;
+
+            // Contar atrasadas (apenas aprovadas com prazo vencido)
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+            const overdue = orders.filter(o => {
+                if (o.status !== 'aprovado') return false;
+                if (!o.expectedDeliveryDate) return false;
+                const expectedDate = new Date(o.expectedDeliveryDate);
+                expectedDate.setHours(0, 0, 0, 0);
+                return expectedDate < now;
+            }).length;
+
+            setOrdersStats({
+                approved,
+                overdue,
+                loading: false,
+                error: null
+            });
+        } catch (error) {
+            console.error('Erro ao carregar estatísticas de ordens:', error);
+            setOrdersStats(prev => ({
+                ...prev,
+                loading: false,
+                error: 'Erro ao carregar dados'
+            }));
+        }
+    };
+
     // Carregar dados ao montar o componente
     useEffect(() => {
         // Só carregar dados se o usuário estiver autenticado
         if (user) {
             loadStatsData();
+            loadOrdersStats();
         }
     }, [user]);
 
@@ -107,13 +158,24 @@ const Home: React.FC = () => {
             ),
         },
         {
-            title: 'Fornecedores',
-            value: statsData.loading ? '...' : statsData.suppliers.toString(),
-            change: statsData.loading ? 'Carregando...' : `${statsData.suppliers} cadastrados`,
-            changeType: 'neutral' as 'positive' | 'negative' | 'neutral',
+            title: 'Ordens Aprovadas',
+            value: ordersStats.loading ? '...' : ordersStats.approved.toString(),
+            change: ordersStats.loading ? 'Carregando...' : 'Aguardando execução',
+            changeType: 'positive' as const,
             icon: (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            ),
+        },
+        {
+            title: 'Ordens Atrasadas',
+            value: ordersStats.loading ? '...' : ordersStats.overdue.toString(),
+            change: ordersStats.loading ? 'Carregando...' : ordersStats.overdue > 0 ? 'Requer atenção!' : 'Nenhuma atrasada',
+            changeType: ordersStats.overdue > 0 ? 'negative' as const : 'positive' as const,
+            icon: (
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             ),
         },
@@ -137,6 +199,16 @@ const Home: React.FC = () => {
             icon: (
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+            ),
+        },
+        {
+            title: 'Ordens de Serviço',
+            description: 'Gerenciar ordens de serviço',
+            href: '/service-orders',
+            icon: (
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
             ),
         },
@@ -167,13 +239,14 @@ const Home: React.FC = () => {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 animate-fade-in">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-fade-in">
                 {stats.map((stat, index) => (
                     <Card
                         key={index}
                         className={`group bg-gray-800 border-gray-700 hover:border-red-500/50 transition-all duration-500 ease-out hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 cursor-pointer animate-fade-in-up ${index === 0 ? 'animate-stagger-1' :
                                 index === 1 ? 'animate-stagger-2' :
-                                    'animate-stagger-3'
+                                index === 2 ? 'animate-stagger-3' :
+                                    'animate-stagger-4'
                             }`}
                     >
                         <CardContent>
@@ -229,58 +302,30 @@ const Home: React.FC = () => {
             )}
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up animate-stagger-4">
-                <Card className="bg-gray-800 border-gray-700 hover:border-red-500/30 transition-all duration-500 ease-out hover:shadow-xl hover:shadow-red-500/5">
-                    <CardHeader>
-                        <CardTitle className="text-white">Ações Rápidas</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            {quickActions.map((action, index) => (
-                                <Link
-                                    key={index}
-                                    to={action.href}
-                                    className="flex items-center p-4 rounded-lg border border-gray-600 hover:border-red-500 hover:bg-gray-700 transition-all duration-300 ease-out group hover:shadow-lg hover:shadow-red-500/10 hover:-translate-y-1"
-                                >
-                                    <div className="h-10 w-10 bg-gray-700 rounded-lg flex items-center justify-center text-gray-300 group-hover:bg-red-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-out">
-                                        {action.icon}
-                                    </div>
-                                    <div className="ml-4">
-                                        <h3 className="font-medium text-white group-hover:text-red-400 transition-colors duration-300">
-                                            {action.title}
-                                        </h3>
-                                        <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">{action.description}</p>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="bg-gray-800 border-gray-700 hover:border-red-500/30 transition-all duration-500 ease-out hover:shadow-xl hover:shadow-red-500/5 animate-fade-in-up animate-stagger-5">
-                    <CardHeader>
-                        <CardTitle className="text-white">Informações do Sistema</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between group">
-                                <span className="text-sm text-gray-300 group-hover:text-white transition-colors duration-300">Versão do Sistema</span>
-                                <Badge variant="info" className="group-hover:scale-105 transition-transform duration-300">v1.0.0</Badge>
-                            </div>
-                            <div className="flex items-center justify-between group">
-                                <span className="text-sm text-gray-300 group-hover:text-white transition-colors duration-300">Seu Perfil</span>
-                                <Badge variant={user?.role === 'admin' ? 'danger' : 'info'} className="group-hover:scale-105 transition-transform duration-300">
-                                    {user?.role}
-                                </Badge>
-                            </div>
-                            <div className="flex items-center justify-between group">
-                                <span className="text-sm text-gray-300 group-hover:text-white transition-colors duration-300">Status</span>
-                                <Badge variant="success" className="group-hover:scale-105 transition-transform duration-300 animate-pulse-glow">Ativo</Badge>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
+            <Card className="bg-gray-800 border-gray-700 hover:border-red-500/30 transition-all duration-500 ease-out hover:shadow-xl hover:shadow-red-500/5">
+                <CardContent className="p-6">
+                    <h2 className="text-lg font-semibold text-white mb-4">Ações Rápidas</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {quickActions.map((action, index) => (
+                            <Link
+                                key={index}
+                                to={action.href}
+                                className="flex items-center p-4 rounded-lg border border-gray-600 hover:border-red-500 hover:bg-gray-700 transition-all duration-300 ease-out group hover:shadow-lg hover:shadow-red-500/10 hover:-translate-y-1"
+                            >
+                                <div className="h-10 w-10 bg-gray-700 rounded-lg flex items-center justify-center text-gray-300 group-hover:bg-red-600 group-hover:text-white group-hover:scale-110 transition-all duration-300 ease-out">
+                                    {action.icon}
+                                </div>
+                                <div className="ml-4">
+                                    <h3 className="font-medium text-white group-hover:text-red-400 transition-colors duration-300">
+                                        {action.title}
+                                    </h3>
+                                    <p className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">{action.description}</p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 };
