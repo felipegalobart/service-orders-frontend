@@ -873,7 +873,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                             placeholder="Ex: Carregador, mouse..."
                                         />
                                     </div>
-                                    <div className="flex gap-2 mt-3">
+                                    <div className="flex gap-2 mt-3 pb-2">
                                         <Button
                                             onClick={handleSaveEquipment}
                                             variant="primary"
@@ -976,7 +976,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                             className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         />
                                     </div>
-                                    <div className="flex gap-2 mt-2">
+                                    <div className="flex gap-2 mt-2 pb-2">
                                         <Button
                                             onClick={handleSaveDates}
                                             variant="primary"
@@ -1019,7 +1019,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                             )}
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="overflow-x-auto">
+                    <CardContent className={`overflow-x-auto ${isEditingServices ? 'pb-6' : ''}`}>
                         {!isEditingServices ? (
                             order.services && order.services.length > 0 ? (
                                 <div className="space-y-4">
@@ -1119,12 +1119,12 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                         </label>
                                         <input
                                             type="number"
-                                            value={percentagesForm.discountPercentage}
-                                            onChange={(e) => setPercentagesForm({ ...percentagesForm, discountPercentage: Number(e.target.value) || 0 })}
+                                            value={percentagesForm.discountPercentage || ""}
+                                            onChange={(e) => setPercentagesForm({ ...percentagesForm, discountPercentage: e.target.value === "" ? 0 : Number(e.target.value) })}
                                             min="0"
                                             max="100"
                                             step="0.01"
-                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                             placeholder="0.00"
                                         />
                                     </div>
@@ -1134,12 +1134,12 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                         </label>
                                         <input
                                             type="number"
-                                            value={percentagesForm.additionPercentage}
-                                            onChange={(e) => setPercentagesForm({ ...percentagesForm, additionPercentage: Number(e.target.value) || 0 })}
+                                            value={percentagesForm.additionPercentage || ""}
+                                            onChange={(e) => setPercentagesForm({ ...percentagesForm, additionPercentage: e.target.value === "" ? 0 : Number(e.target.value) })}
                                             min="0"
                                             max="100"
                                             step="0.01"
-                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                             placeholder="0.00"
                                         />
                                     </div>
@@ -1161,7 +1161,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                 })()}
 
                                 {/* Botões Salvar/Cancelar */}
-                                <div className="flex gap-2 pt-4 border-t border-gray-700">
+                                <div className="flex gap-2 p-4 border-t border-gray-700">
                                     <Button
                                         onClick={handleSaveServices}
                                         variant="primary"
@@ -1343,7 +1343,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                     </div>
                                 </div>
 
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 pb-2">
                                     <Button
                                         onClick={handleSaveNotes}
                                         variant="primary"
@@ -1552,7 +1552,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                         />
                                     </div>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 pb-2">
                                     <Button
                                         onClick={handleSaveInvoices}
                                         variant="primary"

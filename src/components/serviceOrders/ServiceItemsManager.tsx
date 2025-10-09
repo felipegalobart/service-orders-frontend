@@ -296,52 +296,52 @@ export const ServiceItemsManager: React.FC<ServiceItemsManagerProps> = ({
                                     <Input
                                         ref={valueInputRef}
                                         type="number"
-                                        value={formData.value.toString()}
-                                        onChange={(value) => handleInputChange('value', parseFloat(value) || 0)}
+                                        value={formData.value ? formData.value.toString() : ""}
+                                        onChange={(value) => handleInputChange('value', value === "" ? 0 : parseFloat(value))}
                                         onKeyPress={(e) => handleKeyPress(e, () => quantityInputRef.current?.focus())}
                                         min="0"
                                         step="0.01"
                                         disabled={disabled}
-                                        className="text-sm text-right"
+                                        className="text-sm text-right [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                     />
                                 </td>
                                 <td className="py-2 px-2">
                                     <Input
                                         ref={quantityInputRef}
                                         type="number"
-                                        value={formData.quantity.toString()}
-                                        onChange={(value) => handleInputChange('quantity', parseInt(value) || 0)}
+                                        value={formData.quantity ? formData.quantity.toString() : ""}
+                                        onChange={(value) => handleInputChange('quantity', value === "" ? 0 : parseInt(value))}
                                         onKeyPress={(e) => handleKeyPress(e, () => discountInputRef.current?.focus())}
                                         min="1"
                                         step="1"
                                         disabled={disabled}
-                                        className="text-sm text-center"
+                                        className="text-sm text-center [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                     />
                                 </td>
                                 <td className="py-2 px-2">
                                     <Input
                                         ref={discountInputRef}
                                         type="number"
-                                        value={formData.discount.toString()}
-                                        onChange={(value) => handleInputChange('discount', parseFloat(value) || 0)}
+                                        value={formData.discount ? formData.discount.toString() : ""}
+                                        onChange={(value) => handleInputChange('discount', value === "" ? 0 : parseFloat(value))}
                                         onKeyPress={(e) => handleKeyPress(e, () => additionInputRef.current?.focus())}
                                         min="0"
                                         step="0.01"
                                         disabled={disabled}
-                                        className="text-sm text-right"
+                                        className="text-sm text-right [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                     />
                                 </td>
                                 <td className="py-2 px-2">
                                     <Input
                                         ref={additionInputRef}
                                         type="number"
-                                        value={formData.addition.toString()}
-                                        onChange={(value) => handleInputChange('addition', parseFloat(value) || 0)}
+                                        value={formData.addition ? formData.addition.toString() : ""}
+                                        onChange={(value) => handleInputChange('addition', value === "" ? 0 : parseFloat(value))}
                                         onKeyPress={(e) => handleKeyPress(e)}
                                         min="0"
                                         step="0.01"
                                         disabled={disabled}
-                                        className="text-sm text-right"
+                                        className="text-sm text-right [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                     />
                                 </td>
                                 <td className="py-2 px-2 text-right text-sm font-bold text-blue-400">
