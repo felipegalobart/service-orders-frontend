@@ -15,3 +15,4 @@ export { ServiceOrderActionsModal } from './ServiceOrderActionsModal';
 export { StatusDropdown } from './StatusDropdown';
 export { OrderNumberSearch } from './OrderNumberSearch';
 export { FiltersModal } from './FiltersModal';
+export { QuickServiceOrderModal } from './QuickServiceOrderModal';

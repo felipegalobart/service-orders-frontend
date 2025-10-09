@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, Button, Badge, LoadingSpinner, Pagination, PersonDetailsModal, CreatePersonModal } from '../../../components/ui';
+import { QuickServiceOrderModal } from '../../../components/serviceOrders';
 import { apiService } from '../../../services/api';
 import { formatPhoneNumber, formatDocument } from '../../../utils/formatters';
 import type { Person, PersonListResponse, PaginationParams } from '../../../types/person';
 
 const PersonList: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const navigate = useNavigate();
 
     const [persons, setPersons] = useState<Person[]>([]);
     const [loading, setLoading] = useState(true);
@@ -19,6 +19,10 @@ const PersonList: React.FC = () => {
 
     // Modal de criação
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    // Modal de criação rápida de OS
+    const [isQuickOrderModalOpen, setIsQuickOrderModalOpen] = useState(false);
+    const [selectedCustomerForOrder, setSelectedCustomerForOrder] = useState<Person | null>(null);
 
     // Filtros simplificados
     const [searchTerm, setSearchTerm] = useState('');
@@ -153,7 +157,15 @@ const PersonList: React.FC = () => {
     };
 
     const handleCreateServiceOrder = (person: Person) => {
-        navigate(`/service-orders/create?customerId=${person._id}`);
+        setSelectedCustomerForOrder(person);
+        setIsQuickOrderModalOpen(true);
+    };
+
+    const handleCloseQuickOrderModal = () => {
+        setIsQuickOrderModalOpen(false);
+        setSelectedCustomerForOrder(null);
+        // Refetch para atualizar a lista com a nova OS
+        refetch();
     };
 
     if (loading) {
@@ -542,6 +554,15 @@ const PersonList: React.FC = () => {
                 onClose={handleCloseCreateModal}
                 onPersonCreated={handlePersonCreated}
             />
+
+            {/* Quick Service Order Modal */}
+            {selectedCustomerForOrder && (
+                <QuickServiceOrderModal
+                    isOpen={isQuickOrderModalOpen}
+                    onClose={handleCloseQuickOrderModal}
+                    customer={selectedCustomerForOrder}
+                />
+            )}
         </div>
     );
 };

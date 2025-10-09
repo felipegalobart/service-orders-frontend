@@ -39,7 +39,17 @@ export const ServiceOrderPrintPage: React.FC = () => {
     }, [orderWithCustomer, isLoading]);
 
     const handleClose = () => {
-        navigate(-1); // Volta para a página anterior
+        // Se foi aberto em nova aba (sem histórico), fecha a aba
+        if (window.history.length <= 1) {
+            window.close();
+            // Se não conseguir fechar (algumas browsers bloqueiam), redireciona
+            setTimeout(() => {
+                navigate('/service-orders');
+            }, 100);
+        } else {
+            // Se tem histórico, volta para a página anterior
+            navigate(-1);
+        }
     };
 
     if (isLoading) {
