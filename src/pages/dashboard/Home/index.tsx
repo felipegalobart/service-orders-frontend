@@ -244,7 +244,7 @@ const Home: React.FC = () => {
                     <Card
                         key={index}
                         className={`group bg-gray-800 border-gray-700 hover:border-red-500/50 transition-all duration-500 ease-out hover:shadow-2xl hover:shadow-red-500/10 hover:-translate-y-2 cursor-pointer animate-fade-in-up ${index === 0 ? 'animate-stagger-1' :
-                                index === 1 ? 'animate-stagger-2' :
+                            index === 1 ? 'animate-stagger-2' :
                                 index === 2 ? 'animate-stagger-3' :
                                     'animate-stagger-4'
                             }`}
