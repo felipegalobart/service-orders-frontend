@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import type { ServiceOrder } from '../../types/serviceOrder';
 import type { Person, Contact } from '../../types/person';
@@ -9,6 +9,7 @@ interface ServiceOrderMobileImageProps {
     customerData?: Person;
     compact?: boolean;
     showWhatsAppOnly?: boolean;
+    onClose?: () => void;
 }
 
 // Função simples para truncar texto longo
@@ -21,11 +22,23 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
     order,
     customerData,
     compact = false,
-    showWhatsAppOnly = false
+    showWhatsAppOnly = false,
+    onClose
 }) => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [showContactSelector, setShowContactSelector] = useState(false);
+    const [justGenerated, setJustGenerated] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
+
+    // Fechar automaticamente após 5 segundos de gerar a imagem
+    useEffect(() => {
+        if (justGenerated && onClose) {
+            const timer = setTimeout(() => {
+                onClose();
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [justGenerated, onClose]);
 
     const fullCustomer = customerData || order.customer;
 
@@ -94,6 +107,7 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
             console.error('Erro ao gerar imagem:', error);
         } finally {
             setIsGenerating(false);
+            setJustGenerated(true);
         }
     };
 
@@ -161,14 +175,7 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                     // Tentar copiar para clipboard
                     const clipboardSuccess = await copyImageToClipboard();
 
-                    // Também salvar a imagem automaticamente (backup)
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    //link.download = `OS ${formatOrderNumber(order.orderNumber)}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    // Download removido - apenas copia para clipboard
 
                     // Função para gerar saudação baseada no horário
                     const getGreeting = () => {
@@ -217,9 +224,9 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                         // Mostrar instruções baseadas no sucesso do clipboard
                         setTimeout(() => {
                             if (clipboardSuccess) {
-                                alert('Imagem copiada para área de transferência!\n\nInstruções:\n\n1. Cole a mensagem no WhatsApp\n2. Pressione Ctrl+V para colar a imagem\n3. Envie para o cliente\n\nA imagem está pronta para colar!');
+                                alert('✅ Imagem copiada!\n\nInstruções:\n\n1. Cole a mensagem no WhatsApp\n2. Pressione Ctrl+V (ou Cmd+V) para colar a imagem\n3. Envie para o cliente\n\nA imagem está pronta para colar!');
                             } else {
-                                alert('Imagem salva automaticamente!\n\nInstruções:\n\n1. Cole a mensagem no WhatsApp\n2. Anexe a imagem do orçamento (já salva na pasta Downloads)\n3. Envie para o cliente\n\nA imagem foi baixada como: OS ' + formatOrderNumber(order.orderNumber) + '.png');
+                                alert('⚠️ Não foi possível copiar a imagem automaticamente.\n\nInstruções:\n\n1. Cole a mensagem no WhatsApp\n2. Tire um print da tela (Print Screen)\n3. Cole no WhatsApp e envie');
                             }
                         }, 1000);
 
@@ -233,23 +240,19 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
 
                         setTimeout(() => {
                             if (clipboardSuccess) {
-                                alert('Imagem copiada para área de transferência!\n\nInstruções:\n\n1. Cole a mensagem no WhatsApp\n2. Digite o número do cliente\n3. Pressione Ctrl+V para colar a imagem\n4. Envie\n\nA imagem está pronta para colar!');
+                                alert('✅ Imagem copiada!\n\nInstruções:\n\n1. Cole a mensagem no WhatsApp\n2. Digite o número do cliente\n3. Pressione Ctrl+V (ou Cmd+V) para colar a imagem\n4. Envie\n\nA imagem está pronta para colar!');
                             } else {
-                                alert('Imagem salva automaticamente!\n\nInstruções:\n\n1. Cole a mensagem no WhatsApp\n2. Digite o número do cliente\n3. Anexe a imagem do orçamento (já salva na pasta Downloads)\n4. Envie\n\nA imagem foi baixada como: OS ' + formatOrderNumber(order.orderNumber) + '.png');
+                                alert('⚠️ Não foi possível copiar a imagem automaticamente.\n\nInstruções:\n\n1. Cole a mensagem no WhatsApp\n2. Digite o número do cliente\n3. Tire um print da tela (Print Screen)\n4. Cole no WhatsApp e envie');
                             }
                         }, 1000);
                     }
-
-                    // Limpar URL após 2 segundos
-                    setTimeout(() => {
-                        URL.revokeObjectURL(url);
-                    }, 2000);
                 }
             }, 'image/png');
         } catch (error) {
             console.error('Erro ao gerar imagem para WhatsApp:', error);
         } finally {
             setIsGenerating(false);
+            setJustGenerated(true);
         }
     };
 

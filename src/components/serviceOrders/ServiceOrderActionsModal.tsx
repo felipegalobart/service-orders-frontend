@@ -78,6 +78,7 @@ export const ServiceOrderActionsModal: React.FC<ServiceOrderActionsModalProps> =
                                 order={order}
                                 customerData={customerData}
                                 compact={true}
+                                onClose={onClose}
                             />
                         </div>
                     </div>
