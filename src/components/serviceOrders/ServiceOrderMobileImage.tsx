@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import type { ServiceOrder } from '../../types/serviceOrder';
 import type { Person, Contact } from '../../types/person';
-import { formatCurrency, formatDate, formatOrderNumber, formatUpperCase, formatPaymentMethod, parseDecimal } from '../../utils/formatters';
+import { formatCurrency, formatDate, formatOrderNumber, formatUpperCase, formatPaymentMethod, parseDecimal, formatDocument, formatPhoneNumber } from '../../utils/formatters';
 
 interface ServiceOrderMobileImageProps {
     order: ServiceOrder;
@@ -322,11 +322,11 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                         </div>
                         <div className="flex justify-between">
                             <span className="text-xs font-semibold text-gray-700">Telefone:</span>
-                            <span className="text-xs text-gray-900 text-right flex-1 ml-2">{fullCustomer?.contacts?.find((c) => c.phone)?.phone || '-'}</span>
+                            <span className="text-xs text-gray-900 text-right flex-1 ml-2">{formatPhoneNumber(fullCustomer?.contacts?.find((c) => c.phone)?.phone || '-')}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-xs font-semibold text-gray-700">Documento:</span>
-                            <span className="text-xs text-gray-900 text-right flex-1 ml-2">{fullCustomer?.document || '-'}</span>
+                            <span className="text-xs text-gray-900 text-right flex-1 ml-2">{formatDocument(fullCustomer?.document || '-')}</span>
                         </div>
                     </div>
                 </div>
