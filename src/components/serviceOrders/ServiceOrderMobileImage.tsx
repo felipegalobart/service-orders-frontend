@@ -17,11 +17,11 @@ const truncateText = (text: string, maxLength: number = 30): string => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 };
 
-export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = ({ 
-    order, 
-    customerData, 
-    compact = false, 
-    showWhatsAppOnly = false 
+export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = ({
+    order,
+    customerData,
+    compact = false,
+    showWhatsAppOnly = false
 }) => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [showContactSelector, setShowContactSelector] = useState(false);
@@ -176,8 +176,8 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                         const hour = now.getHours();
 
                         // Obter primeiro nome do cliente
-                        const fullName = fullCustomer?.name || order.customerId || 'Cliente';
-                        const firstName = fullName.split(' ')[0];
+                        const contactName = contact?.name || fullCustomer?.name || order.customerId || 'Cliente';
+                        const firstName = contactName.split(' ')[0];
 
                         if (hour < 12) {
                             return `Bom dia, ${firstName}!\n\nSegue abaixo o orçamento.\n\n*Fico no aguardo de sua confirmação para executar os serviços e qualquer dúvida estamos à disposição.*`;
