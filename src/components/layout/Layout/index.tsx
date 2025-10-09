@@ -9,11 +9,11 @@ const Layout: React.FC = () => {
     useEffect(() => {
         // Detectar se é a primeira vez que a aplicação carrega nesta sessão
         const hasNavigated = sessionStorage.getItem('hasNavigated');
-        
+
         if (!hasNavigated) {
             // Marcar que já navegou nesta sessão
             sessionStorage.setItem('hasNavigated', 'true');
-            
+
             // Se não estiver na dashboard, redirecionar
             if (location.pathname !== '/dashboard' && location.pathname !== '/') {
                 navigate('/dashboard', { replace: true });
