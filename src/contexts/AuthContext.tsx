@@ -134,6 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
+        sessionStorage.removeItem('hasNavigated'); // Limpar flag de navegação
         dispatch({ type: 'LOGOUT' });
     };
 

@@ -1,8 +1,26 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Header from '../Header';
 
 const Layout: React.FC = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        // Detectar se é a primeira vez que a aplicação carrega nesta sessão
+        const hasNavigated = sessionStorage.getItem('hasNavigated');
+        
+        if (!hasNavigated) {
+            // Marcar que já navegou nesta sessão
+            sessionStorage.setItem('hasNavigated', 'true');
+            
+            // Se não estiver na dashboard, redirecionar
+            if (location.pathname !== '/dashboard' && location.pathname !== '/') {
+                navigate('/dashboard', { replace: true });
+            }
+        }
+    }, []);
+
     return (
         <div className="min-h-screen bg-gray-900">
             <Header />
