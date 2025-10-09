@@ -191,9 +191,7 @@ export const ServiceOrderMobileImage: React.FC<ServiceOrderMobileImageProps> = (
                     // Mensagem personalizada sem emojis
                     const message = `${getGreeting()}\n\n` +
 
-                        `*OS: ${formatOrderNumber(order.orderNumber)}*\n` +
-                        `Cliente: ${formatUpperCase(fullCustomer?.name || order.customerId || 'N/A')}\n` +
-                        `Equipamento: ${formatUpperCase(order.equipment)}\n` +
+                        `OS: ${formatOrderNumber(order.orderNumber)}*\n` +
                         `Valor: ${formatCurrency(parseDecimal(order.totalAmountLeft) || totalWithPercentages)}\n\n`
 
                     // Obter número do telefone do contato selecionado
