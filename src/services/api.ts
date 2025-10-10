@@ -246,6 +246,23 @@ class ApiService {
     // Determinar qual endpoint usar baseado nos filtros
     let baseEndpoint = API_CONFIG.ENDPOINTS.SERVICE_ORDERS.LIST;
     
+    // Converter dateFrom/dateTo para dateRange se necessário
+    let dateRangeFilter: { start: string; end: string } | undefined;
+    if (filters?.dateFrom || filters?.dateTo) {
+      // Se há dateTo, adicionar um dia para incluir todo o dia final
+      let adjustedEndDate = filters.dateTo;
+      if (adjustedEndDate) {
+        const endDate = new Date(adjustedEndDate);
+        endDate.setDate(endDate.getDate() + 1); // Adiciona 1 dia
+        adjustedEndDate = endDate.toISOString().split('T')[0];
+      }
+      
+      dateRangeFilter = {
+        start: filters.dateFrom || '',
+        end: adjustedEndDate || '',
+      };
+    }
+    
     // Verificar se há outros filtros além do customerName e orderNumber
     const hasOtherFilters = !!(
       filters?.status ||
@@ -255,8 +272,7 @@ class ApiService {
       filters?.model ||
       filters?.brand ||
       filters?.serialNumber ||
-      filters?.dateFrom ||
-      filters?.dateTo
+      dateRangeFilter
     );
 
     // Se há busca por número da ordem, sempre usar endpoint específico
@@ -302,13 +318,10 @@ class ApiService {
         console.log('🔍 DEBUG - Adicionando filtro serialNumber:', filters.serialNumber);
         queryParams.append('serialNumber', filters.serialNumber);
       }
-      if (filters?.dateFrom) {
-        console.log('🔍 DEBUG - Adicionando filtro dateFrom:', filters.dateFrom);
-        queryParams.append('dateFrom', filters.dateFrom);
-      }
-      if (filters?.dateTo) {
-        console.log('🔍 DEBUG - Adicionando filtro dateTo:', filters.dateTo);
-        queryParams.append('dateTo', filters.dateTo);
+      if (dateRangeFilter) {
+        console.log('🔍 DEBUG - Adicionando filtro dateRange:', dateRangeFilter);
+        if (dateRangeFilter.start) queryParams.append('dateRange[start]', dateRangeFilter.start);
+        if (dateRangeFilter.end) queryParams.append('dateRange[end]', dateRangeFilter.end);
       }
     } else {
       // Para outros casos, usar endpoint normal
@@ -324,8 +337,10 @@ class ApiService {
       if (filters?.model) queryParams.append('model', filters.model);
       if (filters?.brand) queryParams.append('brand', filters.brand);
       if (filters?.serialNumber) queryParams.append('serialNumber', filters.serialNumber);
-      if (filters?.dateFrom) queryParams.append('dateFrom', filters.dateFrom);
-      if (filters?.dateTo) queryParams.append('dateTo', filters.dateTo);
+      if (dateRangeFilter) {
+        if (dateRangeFilter.start) queryParams.append('dateRange[start]', dateRangeFilter.start);
+        if (dateRangeFilter.end) queryParams.append('dateRange[end]', dateRangeFilter.end);
+      }
     }
     
     const endpoint = `${baseEndpoint}?${queryParams.toString()}`;
