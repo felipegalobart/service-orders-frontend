@@ -26,6 +26,7 @@ import { PersonDetailsModal } from '../ui/Modal/PersonDetailsModal';
 import { TimelineModal } from '../ui/Modal/TimelineModal';
 import { useNotification, Notification } from '../ui/Notification';
 import { ServiceOrderActionsModal } from './ServiceOrderActionsModal';
+import { PrintOptionsModal } from './PrintOptionsModal';
 import { ServiceItemsManager } from './ServiceItemsManager';
 import { CustomerSelector } from './CustomerSelector';
 import type { ServiceOrderStatus, FinancialStatus, ServiceItem } from '../../types/serviceOrder';
@@ -65,6 +66,7 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
     const [isPersonModalOpen, setIsPersonModalOpen] = useState(false);
     const [isTimelineModalOpen, setIsTimelineModalOpen] = useState(false);
     const [showActionsModal, setShowActionsModal] = useState(false);
+    const [showPrintModal, setShowPrintModal] = useState(false);
 
     // Estados para edição inline
     const [isEditingEquipment, setIsEditingEquipment] = useState(false);
@@ -228,16 +230,12 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         }
     };
 
-    const handlePrint = () => {
-        navigate(`/service-orders/print/${orderId}`);
+    const handleShowPrintModal = () => {
+        setShowPrintModal(true);
     };
 
-    const handlePrintNoHeader = () => {
-        navigate(`/service-orders/print-no-header/${orderId}`);
-    };
-
-    const handleReceipt = () => {
-        navigate(`/service-orders/receipt/${orderId}`);
+    const handleClosePrintModal = () => {
+        setShowPrintModal(false);
     };
 
     const handleShowActionsModal = () => {
@@ -633,35 +631,13 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                             <Button
                                 variant="primary"
                                 size="md"
-                                onClick={handlePrint}
+                                onClick={handleShowPrintModal}
                                 className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                             >
                                 <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                 </svg>
                                 Imprimir
-                            </Button>
-                            <Button
-                                variant="primary"
-                                size="md"
-                                onClick={handlePrintNoHeader}
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                            >
-                                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
-                                Imprimir S/ Cabeçalho
-                            </Button>
-                            <Button
-                                variant="primary"
-                                size="md"
-                                onClick={handleReceipt}
-                                className="bg-green-600 hover:bg-green-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                            >
-                                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                Cupom de Serviços
                             </Button>
                             <Button
                                 variant="secondary"
@@ -1661,6 +1637,13 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                     order={order}
                     isOpen={isTimelineModalOpen}
                     onClose={handleCloseTimelineModal}
+                />
+
+                {/* Modal de Opções de Impressão */}
+                <PrintOptionsModal
+                    isOpen={showPrintModal}
+                    onClose={handleClosePrintModal}
+                    orderId={orderId}
                 />
 
                 {/* Modal de Ações */}
