@@ -9,6 +9,7 @@ export { ServiceOrderDetails } from './ServiceOrderDetails';
 export { ServiceOrderMetrics } from './ServiceOrderMetrics';
 export { StatusUpdateModal, FinancialStatusUpdateModal } from './StatusUpdateModal';
 export { ServiceOrderPrint } from './ServiceOrderPrint';
+export { ServiceOrderReceipt } from './ServiceOrderReceipt';
 export { ServiceOrderReactPDF } from './ServiceOrderReactPDF';
 export { ServiceOrderMobileImage } from './ServiceOrderMobileImage';
 export { ServiceOrderActionsModal } from './ServiceOrderActionsModal';

@@ -9,6 +9,7 @@ import Home from './pages/dashboard/Home';
 import PersonList from './pages/persons/List';
 import { ServiceOrderList, ServiceOrderCreate, ServiceOrderEdit, ServiceOrderView, ServiceOrderDashboard } from './pages/serviceOrders';
 import { ServiceOrderPrintPage } from './pages/serviceOrders/Print';
+import { ServiceOrderReceiptPage } from './pages/serviceOrders/Receipt';
 
 function App() {
   return (
@@ -23,6 +24,13 @@ function App() {
           <Route path="/service-orders/print/:id" element={
             <ProtectedRoute>
               <ServiceOrderPrintPage />
+            </ProtectedRoute>
+          } />
+
+          {/* Rota de cupom de serviços (sem layout) */}
+          <Route path="/service-orders/receipt/:id" element={
+            <ProtectedRoute>
+              <ServiceOrderReceiptPage />
             </ProtectedRoute>
           } />
 
