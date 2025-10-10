@@ -232,6 +232,10 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         navigate(`/service-orders/print/${orderId}`);
     };
 
+    const handlePrintNoHeader = () => {
+        navigate(`/service-orders/print-no-header/${orderId}`);
+    };
+
     const handleReceipt = () => {
         navigate(`/service-orders/receipt/${orderId}`);
     };
@@ -636,6 +640,17 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                 </svg>
                                 Imprimir
+                            </Button>
+                            <Button
+                                variant="primary"
+                                size="md"
+                                onClick={handlePrintNoHeader}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                                Imprimir S/ Cabeçalho
                             </Button>
                             <Button
                                 variant="primary"

@@ -5,4 +5,5 @@ export { default as ServiceOrderEdit } from './Edit';
 export { default as ServiceOrderView } from './View';
 export { default as ServiceOrderDashboard } from './Dashboard';
 export { ServiceOrderPrintPage } from './Print';
+export { ServiceOrderPrintNoHeaderPage } from './PrintNoHeader';
 export { ServiceOrderReceiptPage } from './Receipt';

@@ -9,6 +9,7 @@ import Home from './pages/dashboard/Home';
 import PersonList from './pages/persons/List';
 import { ServiceOrderList, ServiceOrderCreate, ServiceOrderEdit, ServiceOrderView, ServiceOrderDashboard } from './pages/serviceOrders';
 import { ServiceOrderPrintPage } from './pages/serviceOrders/Print';
+import { ServiceOrderPrintNoHeaderPage } from './pages/serviceOrders/PrintNoHeader';
 import { ServiceOrderReceiptPage } from './pages/serviceOrders/Receipt';
 
 function App() {
@@ -24,6 +25,13 @@ function App() {
           <Route path="/service-orders/print/:id" element={
             <ProtectedRoute>
               <ServiceOrderPrintPage />
+            </ProtectedRoute>
+          } />
+
+          {/* Rota de impressão sem cabeçalho (sem layout) */}
+          <Route path="/service-orders/print-no-header/:id" element={
+            <ProtectedRoute>
+              <ServiceOrderPrintNoHeaderPage />
             </ProtectedRoute>
           } />
 
