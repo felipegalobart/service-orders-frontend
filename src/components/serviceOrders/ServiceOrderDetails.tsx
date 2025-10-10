@@ -238,6 +238,44 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
         setShowPrintModal(false);
     };
 
+    const handleCloneOrder = () => {
+        if (!order) return;
+
+        // Preparar dados para clonar (sem _id, orderNumber, datas específicas)
+        const cloneData = {
+            customerId: order.customerId,
+            equipment: order.equipment,
+            model: order.model,
+            brand: order.brand,
+            serialNumber: order.serialNumber,
+            voltage: order.voltage,
+            accessories: order.accessories,
+            customerObservations: order.customerObservations,
+            reportedDefect: order.reportedDefect,
+            warranty: order.warranty,
+            isReturn: order.isReturn,
+            status: 'confirmar' as const,
+            financial: 'em_aberto' as const,
+            paymentType: order.paymentType,
+            paymentMethod: order.paymentMethod,
+            paymentConditions: order.paymentConditions,
+            installmentCount: order.installmentCount,
+            discountPercentage: order.discountPercentage,
+            additionPercentage: order.additionPercentage,
+            notes: order.notes,
+            services: order.services?.map(s => ({
+                description: s.description,
+                quantity: parseDecimal(s.quantity),
+                value: parseDecimal(s.value),
+                discount: parseDecimal(s.discount),
+                addition: parseDecimal(s.addition),
+            })) || [],
+            entryDate: new Date().toISOString().split('T')[0],
+        };
+
+        navigate('/service-orders/create', { state: { cloneData } });
+    };
+
     const handleShowActionsModal = () => {
         setShowActionsModal(true);
     };
@@ -638,6 +676,17 @@ export const ServiceOrderDetails: React.FC<ServiceOrderDetailsProps> = ({ orderI
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                 </svg>
                                 Imprimir
+                            </Button>
+                            <Button
+                                variant="primary"
+                                size="md"
+                                onClick={handleCloneOrder}
+                                className="bg-orange-600 hover:bg-orange-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Clonar
                             </Button>
                             <Button
                                 variant="secondary"

@@ -25,6 +25,7 @@ import type { Person } from '../../types/person';
 interface ServiceOrderFormProps {
     order?: ServiceOrder;
     mode: 'create' | 'edit';
+    initialData?: Partial<ServiceOrderFormData>;
 }
 
 const initialFormData: ServiceOrderFormData = {
@@ -61,10 +62,14 @@ const initialFormData: ServiceOrderFormData = {
 export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
     order,
     mode,
+    initialData,
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [formData, setFormData] = useState<ServiceOrderFormData>(initialFormData);
+    const [formData, setFormData] = useState<ServiceOrderFormData>({
+        ...initialFormData,
+        ...initialData,
+    });
     const [, setSelectedCustomer] = useState<Person | null>(null);
     const [validationErrors, setValidationErrors] = useState<ServiceOrderValidationErrors>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
