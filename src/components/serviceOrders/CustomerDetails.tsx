@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiService } from '../../services/api';
-import { formatPhoneNumber } from '../../utils/formatters';
+import { formatDocument, formatPhoneNumber } from '../../utils/formatters';
 
 
 interface CustomerDetailsProps {
@@ -90,7 +90,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customerId }) 
                 <div className="flex items-center space-x-2">
                     <span className="text-gray-400">Doc:</span>
                     <span className="text-gray-300 text-xs">
-                        {customer.document}
+                        {formatDocument(customer.document)}
                     </span>
                 </div>
             )}

@@ -835,6 +835,7 @@ export const ServiceOrderForm: React.FC<ServiceOrderFormProps> = ({
                                 rows={3}
                                 disabled={isSubmitting}
                                 maxLength={1000}
+                                className="min-h-96"
                             />
                         </CardContent>
                     </Card>
