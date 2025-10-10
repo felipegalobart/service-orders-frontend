@@ -41,6 +41,7 @@ export const ServiceItemsManager: React.FC<ServiceItemsManagerProps> = ({
     const [formData, setFormData] = useState<ServiceItemFormData>(initialFormData);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [formErrors, setFormErrors] = useState<string[]>([]);
+    const [copiedItemsCount, setCopiedItemsCount] = useState<number>(0);
 
     // Refs para focar nos inputs
     const descriptionInputRef = useRef<HTMLInputElement>(null);
@@ -65,6 +66,28 @@ export const ServiceItemsManager: React.FC<ServiceItemsManagerProps> = ({
             }, 100);
         }
     }, [autoFocus]);
+
+    // Verificar se tem serviços copiados no localStorage
+    useEffect(() => {
+        const checkCopiedServices = () => {
+            const copied = localStorage.getItem('copiedServices');
+            if (copied) {
+                try {
+                    const services = JSON.parse(copied);
+                    setCopiedItemsCount(services.length || 0);
+                } catch {
+                    setCopiedItemsCount(0);
+                }
+            } else {
+                setCopiedItemsCount(0);
+            }
+        };
+
+        checkCopiedServices();
+        // Verificar periodicamente se outros componentes copiaram
+        const interval = setInterval(checkCopiedServices, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Calcular totais gerais
     const totals = items.reduce(
@@ -163,6 +186,54 @@ export const ServiceItemsManager: React.FC<ServiceItemsManagerProps> = ({
         setFormErrors([]);
     };
 
+    // Copiar serviços para o localStorage
+    const handleCopyServices = () => {
+        if (items.length === 0) {
+            alert('Nenhum serviço para copiar!');
+            return;
+        }
+
+        try {
+            localStorage.setItem('copiedServices', JSON.stringify(items));
+            setCopiedItemsCount(items.length);
+            alert(`${items.length} serviço(s) copiado(s) com sucesso!`);
+        } catch (error) {
+            alert('Erro ao copiar serviços!');
+        }
+    };
+
+    // Colar serviços do localStorage
+    const handlePasteServices = () => {
+        const copied = localStorage.getItem('copiedServices');
+        if (!copied) {
+            alert('Nenhum serviço copiado!');
+            return;
+        }
+
+        try {
+            const copiedServices = JSON.parse(copied) as ServiceItem[];
+
+            // Perguntar se quer adicionar ou substituir
+            const shouldAdd = window.confirm(
+                `${copiedServices.length} serviço(s) encontrado(s).\n\n` +
+                'Clique OK para ADICIONAR aos serviços existentes.\n' +
+                'Clique CANCELAR para SUBSTITUIR todos os serviços.'
+            );
+
+            if (shouldAdd) {
+                // Adicionar aos existentes
+                onChange([...items, ...copiedServices]);
+            } else {
+                // Substituir todos
+                onChange(copiedServices);
+            }
+
+            alert(`${copiedServices.length} serviço(s) colado(s) com sucesso!`);
+        } catch (error) {
+            alert('Erro ao colar serviços!');
+        }
+    };
+
     // Suporte a ESC para cancelar edição
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
@@ -192,7 +263,42 @@ export const ServiceItemsManager: React.FC<ServiceItemsManagerProps> = ({
             {/* Tabela de Serviços com Formulário Inline */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Itens de Serviço ({items.length})</CardTitle>
+                    <div className="flex items-center justify-between">
+                        <CardTitle>Itens de Serviço ({items.length})</CardTitle>
+                        <div className="flex items-center gap-2">
+                            {copiedItemsCount > 0 && (
+                                <Badge variant="info" size="sm">
+                                    {copiedItemsCount} copiado(s)
+                                </Badge>
+                            )}
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleCopyServices}
+                                disabled={disabled || items.length === 0}
+                                className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                            >
+                                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Copiar
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                onClick={handlePasteServices}
+                                disabled={disabled || copiedItemsCount === 0}
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Colar
+                            </Button>
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent className="overflow-x-auto">
                     <table className="w-full border-collapse">
