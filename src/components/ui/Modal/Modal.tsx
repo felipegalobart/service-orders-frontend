@@ -60,7 +60,7 @@ export const Modal: React.FC<ModalProps> = ({
             className="fixed inset-0 z-50 overflow-y-auto"
             onClick={handleBackdropClick}
         >
-            <div className="flex min-h-screen items-center justify-center p-4 py-8">
+            <div className="flex min-h-screen items-center justify-center p-4">
                 {/* Backdrop */}
                 <div className={`fixed inset-0 bg-black transition-opacity duration-300 ${isAnimating ? 'bg-opacity-50' : 'bg-opacity-0'}`} />
 
