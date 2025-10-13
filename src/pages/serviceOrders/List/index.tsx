@@ -7,13 +7,15 @@ import { LoadingSpinner } from '../../../components/ui/Loading';
 import { CustomerDetails, StatusDropdown, OrderNumberSearch, FiltersModal } from '../../../components/serviceOrders';
 import { TimelineModal } from '../../../components/ui/Modal/TimelineModal';
 import { Pagination } from '../../../components/ui/Pagination';
-import { useServiceOrders } from '../../../hooks/useServiceOrders';
+import { useServiceOrders, usePersistedFilters } from '../../../hooks';
 import { formatDate, formatServiceOrderStatus, formatFinancialStatus, isOverdue } from '../../../utils/formatters';
 import type { ServiceOrderFilters as ServiceOrderFiltersType, ServiceOrder } from '../../../types/serviceOrder';
 
 const ServiceOrderList: React.FC = () => {
     const navigate = useNavigate();
-    const [filters, setFilters] = useState<ServiceOrderFiltersType>({
+
+    // Usar hook de filtros persistidos
+    const { filters, setFilters, clearFilters } = usePersistedFilters({
         page: 1,
         limit: 50,
     });
@@ -59,20 +61,7 @@ const ServiceOrderList: React.FC = () => {
     };
 
     const handleClearAllFilters = () => {
-        setFilters({
-            page: 1,
-            limit: 50,
-            status: undefined,
-            financial: undefined,
-            customerName: undefined,
-            orderNumber: undefined,
-            equipment: undefined,
-            model: undefined,
-            brand: undefined,
-            serialNumber: undefined,
-            dateFrom: undefined,
-            dateTo: undefined
-        });
+        clearFilters();
         setOrderNumberSearch('');
         setHasSearchedOrderNumber(false);
     };
