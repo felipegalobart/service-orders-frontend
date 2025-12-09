@@ -53,7 +53,7 @@ export const usePersistedFilters = (initialFilters: ServiceOrderFilters) => {
         }
     }, [filters]);
 
-    const updateFilters = (newFilters: ServiceOrderFilters) => {
+    const updateFilters = (newFilters: ServiceOrderFilters | ((prev: ServiceOrderFilters) => ServiceOrderFilters)) => {
         setFilters(newFilters);
     };
 
